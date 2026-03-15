@@ -2,6 +2,8 @@
 
 Visual QC Project is a Flask-based manufacturing quality control simulator focused on inspection workflows, KPI tracking, and report generation. It combines computer vision, process simulation, and operational metrics in a single lightweight web application.
 
+Demo: [Portfolio project entry](https://senanur-cetin.vercel.app/#projects)
+
 ## What it does
 
 - Simulates a production line inspection workflow.
