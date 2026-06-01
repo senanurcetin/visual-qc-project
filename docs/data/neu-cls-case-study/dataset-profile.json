@@ -1,0 +1,39 @@
+{
+  "name": "NEU-CLS",
+  "class_count": 6,
+  "total_images": 1800,
+  "class_distribution": {
+    "crazing": 300,
+    "inclusion": 300,
+    "patches": 300,
+    "pitted_surface": 300,
+    "rolled-in_scale": 300,
+    "scratches": 300
+  },
+  "class_descriptions": [
+    {
+      "class_name": "crazing",
+      "description": "Micro-crack patterns that indicate surface fatigue and coating stress."
+    },
+    {
+      "class_name": "inclusion",
+      "description": "Foreign material trapped in the strip surface that can propagate into downstream defects."
+    },
+    {
+      "class_name": "patches",
+      "description": "Irregular surface patches that often require operator review before shipment."
+    },
+    {
+      "class_name": "pitted_surface",
+      "description": "Localized pitting that degrades finish quality and can lead to corrosion risk."
+    },
+    {
+      "class_name": "rolled-in_scale",
+      "description": "Scale rolled into the steel strip, causing persistent texture distortion."
+    },
+    {
+      "class_name": "scratches",
+      "description": "Linear scoring defects that commonly drive rework or rejection decisions."
+    }
+  ]
+}

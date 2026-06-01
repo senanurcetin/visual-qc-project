@@ -1,0 +1,61 @@
+{
+  "project": "Industrial surface defect triage benchmark",
+  "portfolio_role": "support case study",
+  "dataset": {
+    "name": "NEU-CLS",
+    "doi": "10.6084/m9.figshare.28903550.v1",
+    "source_url": "https://doi.org/10.6084/m9.figshare.28903550.v1",
+    "license": "CC BY 4.0",
+    "total_images": 1800,
+    "classes": [
+      "crazing",
+      "inclusion",
+      "patches",
+      "pitted_surface",
+      "rolled-in_scale",
+      "scratches"
+    ],
+    "class_count": 6,
+    "class_distribution": {
+      "crazing": 300,
+      "inclusion": 300,
+      "patches": 300,
+      "pitted_surface": 300,
+      "rolled-in_scale": 300,
+      "scratches": 300
+    },
+    "evaluation_split": {
+      "train_samples": 1440,
+      "holdout_samples": 360,
+      "strategy": "Deterministic 80/20 stratified holdout over the full public corpus"
+    }
+  },
+  "feature_pipeline": {
+    "representation": "64x64 grayscale HOG descriptors",
+    "feature_count": 1764,
+    "reason": "Fast classical baseline that keeps the pipeline free-tier friendly and reproducible."
+  },
+  "final_model": {
+    "name": "Random forest on HOG descriptors",
+    "accuracy": 0.8167,
+    "macro_precision": 0.8163,
+    "macro_recall": 0.8167,
+    "macro_f1": 0.8093
+  },
+  "review_queue": {
+    "selected_budget_fraction": 0.15,
+    "selected_budget_label": "15% lowest-confidence predictions",
+    "reviewed_samples": 54,
+    "captured_errors": 22,
+    "error_capture_rate": 0.3333,
+    "review_yield": 0.4074,
+    "random_review_yield": 0.1833,
+    "yield_lift_vs_random": 2.2222
+  },
+  "operational_takeaway": "The model is strong enough to triage defect classes automatically, while a low-confidence review queue concentrates a meaningful share of routing errors into a small analyst workload.",
+  "limitations": [
+    "This is a public balanced dataset, so real plant imbalance and line drift are not represented.",
+    "The model is a classical CV baseline rather than a production deep-learning stack.",
+    "Holdout metrics should be treated as portfolio-grade evidence, not as a production claim."
+  ]
+}

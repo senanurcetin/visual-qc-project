@@ -1,0 +1,44 @@
+[
+  {
+    "class_name": "crazing",
+    "precision": 0.7733,
+    "recall": 0.9667,
+    "f1": 0.8593,
+    "support": 60
+  },
+  {
+    "class_name": "inclusion",
+    "precision": 0.7671,
+    "recall": 0.9333,
+    "f1": 0.8421,
+    "support": 60
+  },
+  {
+    "class_name": "patches",
+    "precision": 0.8214,
+    "recall": 0.7667,
+    "f1": 0.7931,
+    "support": 60
+  },
+  {
+    "class_name": "pitted_surface",
+    "precision": 0.6512,
+    "recall": 0.4667,
+    "f1": 0.5437,
+    "support": 60
+  },
+  {
+    "class_name": "rolled-in_scale",
+    "precision": 0.9048,
+    "recall": 0.95,
+    "f1": 0.9268,
+    "support": 60
+  },
+  {
+    "class_name": "scratches",
+    "precision": 0.98,
+    "recall": 0.8167,
+    "f1": 0.8909,
+    "support": 60
+  }
+]

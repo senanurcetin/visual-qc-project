@@ -1,0 +1,105 @@
+{
+  "review_budgets": [
+    {
+      "review_fraction": 0.1,
+      "reviewed_samples": 36,
+      "captured_errors": 18,
+      "error_capture_rate": 0.2727,
+      "review_yield": 0.5,
+      "random_review_yield": 0.1833,
+      "yield_lift_vs_random": 2.7273
+    },
+    {
+      "review_fraction": 0.15,
+      "reviewed_samples": 54,
+      "captured_errors": 22,
+      "error_capture_rate": 0.3333,
+      "review_yield": 0.4074,
+      "random_review_yield": 0.1833,
+      "yield_lift_vs_random": 2.2222
+    },
+    {
+      "review_fraction": 0.2,
+      "reviewed_samples": 72,
+      "captured_errors": 28,
+      "error_capture_rate": 0.4242,
+      "review_yield": 0.3889,
+      "random_review_yield": 0.1833,
+      "yield_lift_vs_random": 2.1212
+    }
+  ],
+  "misclassified_examples": [
+    {
+      "file": "patches_37.jpg",
+      "actual": "patches",
+      "predicted": "pitted_surface",
+      "confidence": 0.228
+    },
+    {
+      "file": "patches_171.jpg",
+      "actual": "patches",
+      "predicted": "pitted_surface",
+      "confidence": 0.264
+    },
+    {
+      "file": "inclusion_253.jpg",
+      "actual": "inclusion",
+      "predicted": "pitted_surface",
+      "confidence": 0.268
+    },
+    {
+      "file": "pitted_surface_237.jpg",
+      "actual": "pitted_surface",
+      "predicted": "rolled-in_scale",
+      "confidence": 0.276
+    },
+    {
+      "file": "patches_271.jpg",
+      "actual": "patches",
+      "predicted": "pitted_surface",
+      "confidence": 0.28
+    },
+    {
+      "file": "pitted_surface_226.jpg",
+      "actual": "pitted_surface",
+      "predicted": "patches",
+      "confidence": 0.28
+    },
+    {
+      "file": "patches_1.jpg",
+      "actual": "patches",
+      "predicted": "pitted_surface",
+      "confidence": 0.28
+    },
+    {
+      "file": "scratches_18.jpg",
+      "actual": "scratches",
+      "predicted": "inclusion",
+      "confidence": 0.284
+    },
+    {
+      "file": "patches_243.jpg",
+      "actual": "patches",
+      "predicted": "pitted_surface",
+      "confidence": 0.288
+    },
+    {
+      "file": "inclusion_144.jpg",
+      "actual": "inclusion",
+      "predicted": "patches",
+      "confidence": 0.288
+    },
+    {
+      "file": "patches_244.jpg",
+      "actual": "patches",
+      "predicted": "pitted_surface",
+      "confidence": 0.288
+    },
+    {
+      "file": "patches_85.jpg",
+      "actual": "patches",
+      "predicted": "pitted_surface",
+      "confidence": 0.292
+    }
+  ]
+}

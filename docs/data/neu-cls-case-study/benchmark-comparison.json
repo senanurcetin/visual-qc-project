@@ -1,0 +1,26 @@
+[
+  {
+    "model": "dummy_baseline",
+    "accuracy": 0.1667,
+    "macro_precision": 0.0278,
+    "macro_recall": 0.1667,
+    "macro_f1": 0.0476,
+    "training_seconds": 0.001
+  },
+  {
+    "model": "logistic_regression",
+    "accuracy": 0.6972,
+    "macro_precision": 0.7106,
+    "macro_recall": 0.6972,
+    "macro_f1": 0.7019,
+    "training_seconds": 2.4116
+  },
+  {
+    "model": "random_forest",
+    "accuracy": 0.8167,
+    "macro_precision": 0.8163,
+    "macro_recall": 0.8167,
+    "macro_f1": 0.8093,
+    "training_seconds": 5.0962
+  }
+]

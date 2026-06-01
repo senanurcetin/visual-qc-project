@@ -9,8 +9,10 @@ import csv
 from flask import Flask, Response, render_template_string, jsonify, request, send_file
 from datetime import datetime
 import pandas as pd  # Excel raporlama ve veri manipülasyonu için
+from case_study import case_study_bp
 
 app = Flask(__name__)
+app.register_blueprint(case_study_bp)
 
 # --- MİMARİ YAPITAŞI: THREAD SAFETY ---
 # Standart 'Lock' yerine 'RLock' (Re-entrant Lock) kullanıyoruz.
@@ -86,13 +88,14 @@ HTML_TEMPLATE = """
         .kpi-title { font-size: 0.7rem; color: #9ca3af; text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
         .kpi-val { font-family: 'Roboto Mono', monospace; font-size: 1.4rem; font-weight: 500; }
         
-        .control-bar { flex-shrink: 0; padding: 10px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; background: #111827; border-bottom: 1px solid var(--border); }
+        .control-bar { flex-shrink: 0; padding: 10px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; background: #111827; border-bottom: 1px solid var(--border); }
         .btn { padding: 10px; border: none; border-radius: 4px; color: white; font-weight: 600; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; transition: 0.2s; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         .btn-start { background: #065f46; border-bottom: 3px solid #064e3b; } .btn-start:active { transform: translateY(2px); border-bottom: 0px; }
         .btn-pause { background: #92400e; border-bottom: 3px solid #78350f; } .btn-pause:active { transform: translateY(2px); border-bottom: 0px; }
         .btn-reset { background: #1e40af; border-bottom: 3px solid #1e3a8a; } .btn-reset:active { transform: translateY(2px); border-bottom: 0px; }
         .btn-estop { background: #991b1b; border-bottom: 3px solid #7f1d1d; } .btn-estop:active { transform: translateY(2px); border-bottom: 0px; }
         .btn-sim-fail { background: #6b21a8; border-bottom: 3px solid #581c87; } .btn-sim-fail:active { transform: translateY(2px); border-bottom: 0px; }
+        .btn-case-study { background: #0369a1; border-bottom: 3px solid #075985; } .btn-case-study:active { transform: translateY(2px); border-bottom: 0px; }
         .btn-export { background: var(--teal); border-bottom: 3px solid #0f766e; } .btn-export:active { transform: translateY(2px); border-bottom: 0px; }
 
         .main-grid { flex-grow: 1; display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 12px; padding: 12px; min-height: 0; }
@@ -130,6 +133,7 @@ HTML_TEMPLATE = """
         <button class="btn btn-reset" onclick="sendCmd('RESET')">Master Reset</button>
         <button class="btn btn-estop" onclick="sendCmd('ESTOP')">Emergency Stop</button>
         <button class="btn btn-sim-fail" onclick="sendCmd('SIMULATE_FAIL')">Simulate Defect</button>
+        <a href="/case-study" class="btn btn-case-study">Case Study</a>
         <a href="/api/export_report" class="btn btn-export">&#x1F4E5; Export Report</a>
     </div>
     <div class="main-grid">
