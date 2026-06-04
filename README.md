@@ -1,142 +1,206 @@
 # Visual QC Project
 
-Visual QC Project is an industrial computer-vision support case study for steel surface inspection. It combines two portfolio layers in one repo:
+[![CI](https://github.com/senanurcetin/visual-qc-project/actions/workflows/ci.yml/badge.svg)](https://github.com/senanurcetin/visual-qc-project/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-- a Flask-based operator workflow with historian logging, KPI tracking, and Excel export
-- a real NEU-CLS defect-classification benchmark with measurable evaluation and review-queue logic
+**Computer vision analytics case study** — steel surface defect classification on the NEU-CLS dataset, combined with an operator-facing Flask QA dashboard. Covers EDA, feature engineering (HOG), model benchmarking, per-class metrics, Pareto error analysis, and confidence-based review queue design.
 
 Demo: [Portfolio project entry](https://senanur-cetin.vercel.app/projects/visual-qc-project)
 
-Short video demo: [`docs/assets/visual-qc-dashboard.webm`](docs/assets/visual-qc-dashboard.webm)
+Short video: [`docs/assets/visual-qc-dashboard.webm`](docs/assets/visual-qc-dashboard.webm)
 
 ![Visual QC dashboard](docs/assets/visual-qc-dashboard.png)
 
-Portfolio role: `support case study`
+---
 
-## Why this project exists
+## Problem
 
-Manufacturing inspection projects are rarely valuable as model output alone. Quality teams still need traceability, pass/fail context, KPI visibility, and a practical path for human review when model confidence drops.
+Steel surface inspection needs more than a classifier. A useful system must route uncertain cases, preserve a production log, and export reviewable evidence for quality teams. The model output is a decision surface — not just a label.
 
-This repo exists to show both sides:
+---
 
-- workflow design for operator-facing quality systems
-- measurable CV evaluation that can stand up in DS and applied-AI interviews
+## Dataset
 
-## Case-study frame
+| Property | Value |
+|----------|-------|
+| Source | [NEU-CLS Steel Surface Defect Dataset](http://faculty.neu.edu.cn/yunhyan/NEU_surface_defect_database.html) |
+| Images | 1,800 grayscale images |
+| Classes | 6 defect types, perfectly balanced (300 per class) |
+| Evaluation | Deterministic 80/20 stratified holdout (seed=42) |
+| Feature pipeline | 64×64 HOG descriptors + Gabor filter bank + grid statistics |
 
-### Problem
+### Defect Classes
 
-Steel surface inspection needs more than a classifier. A useful system has to route uncertain cases, preserve a production log, and export reviewable evidence for quality teams.
+| Class | Description |
+|-------|-------------|
+| Crazing | Micro-crack patterns — surface fatigue and coating stress |
+| Inclusion | Foreign material trapped in the strip surface |
+| Patches | Irregular patches — often require operator review before shipment |
+| Pitted surface | Localized pitting — corrosion risk |
+| Rolled-in scale | Scale rolled into strip — persistent texture distortion |
+| Scratches | Linear scoring defects — commonly drive rework or rejection |
 
-### Business context
+---
 
-In manufacturing, the output is not only a label. It is a decision surface: which units can move forward automatically, which ones need escalation, and how the line records that decision.
+## Model Benchmark
 
-### Data or signal source
+![Model comparison](docs/assets/model-comparison.png)
 
-- Workflow layer: simulated live inspection feed, unit events, OEE updates, and SQLite historian logs
-- DS layer: `NEU-CLS` public steel defect dataset with `1,800` grayscale images across six defect classes
+| Model | Accuracy | Macro F1 | Macro Precision |
+|-------|----------|----------|-----------------|
+| Dummy baseline | 0.167 | 0.048 | 0.028 |
+| Logistic regression | 0.869 | 0.868 | 0.872 |
+| **Random Forest (selected)** | **0.939** | **0.939** | **0.942** |
 
-### Methodology
+Random forest on HOG + Gabor + grid features selected for highest accuracy and balanced per-class performance.
 
-- Feature pipeline: `64x64` grayscale HOG descriptors
-- Benchmarks:
-  - dummy baseline
-  - logistic regression
-  - random forest
-- Evaluation:
-  - deterministic `80/20` stratified holdout
-  - accuracy, macro precision, macro recall, macro F1
-  - confidence-based review queue
+---
 
-## Key results
+## Per-Class Metrics
 
-From [`docs/data/neu-cls-case-study/summary.json`](docs/data/neu-cls-case-study/summary.json):
+![Class metrics](docs/assets/class-metrics.png)
 
-- Final model: `random forest on HOG descriptors`
-- Accuracy: `0.8167`
-- Macro precision: `0.8163`
-- Macro recall: `0.8167`
-- Macro F1: `0.8093`
-- Review queue outcome: the `15%` lowest-confidence predictions capture `33.3%` of routing errors with `2.22x` better error yield than random review
+| Class | Precision | Recall | F1 | FN Cost |
+|-------|-----------|--------|----|---------|
+| Crazing | 0.967 | 0.983 | 0.975 | $100 |
+| Inclusion | 0.836 | 0.933 | 0.882 | $500 ← highest cost |
+| Patches | 0.966 | 0.950 | 0.958 | $200 |
+| Pitted surface | 0.900 | 0.900 | 0.900 | $350 |
+| Rolled-in scale | 0.984 | 1.000 | 0.992 | $400 |
+| Scratches | 1.000 | 0.867 | 0.929 | $150 |
 
-From [`docs/data/neu-cls-case-study/benchmark-comparison.json`](docs/data/neu-cls-case-study/benchmark-comparison.json):
+Inclusion has the lowest precision/recall and the highest false-negative cost — the primary target for the review queue.
 
-- Dummy baseline macro F1: `0.0476`
-- Logistic regression macro F1: `0.7019`
-- Random forest macro F1: `0.8093`
+---
 
-## What it does
+## Confusion Matrix
 
-- Simulates an inspection line with an operator-facing HMI
-- Streams a synthetic vision feed for monitoring
-- Tracks OEE, output, and yield metrics
-- Stores timestamped production events in SQLite
-- Exports Excel reports for QA review
-- Publishes a real CV case-study surface at `/case-study`
+![Confusion matrix](docs/assets/confusion-matrix.png)
+
+22 total errors out of 360 holdout samples (6.1% error rate). Main confusion hotspot: **scratches → inclusion** (8 cases). Second: **inclusion → pitted_surface** (4 cases).
+
+---
+
+## Pareto Error Analysis
+
+![Pareto errors](docs/assets/pareto-errors.png)
+
+| Class | Errors | Share | Cumulative |
+|-------|--------|-------|-----------|
+| Scratches | 8 | 36.4% | 36.4% |
+| Pitted surface | 6 | 27.3% | 63.6% |
+| Inclusion | 4 | 18.2% | 81.8% |
+| Patches | 3 | 13.6% | 95.5% |
+| Crazing | 1 | 4.5% | 100% |
+
+**Two classes (scratches + pitted_surface) account for 64% of all errors** — prioritizing inspection budget on these two classes maximises defect capture.
+
+---
+
+## Review Queue — Confidence-Based Routing
+
+![Review queue curve](docs/assets/review-queue-curve.png)
+
+Samples ranked by prediction entropy (high entropy = low confidence = route to human review):
+
+| Budget | Samples reviewed | Errors captured | Yield lift vs random |
+|--------|-----------------|-----------------|---------------------|
+| 10% (36 samples) | 36 | 45.5% | **4.5×** |
+| 15% (54 samples) | 54 | 50.0% | 3.3× |
+| 20% (72 samples) | 72 | 81.8% | **4.1×** |
+
+Reviewing the top 20% highest-entropy samples captures 82% of all defects at 4× better yield than random inspection.
+
+---
 
 ## Stack
 
-- Python
-- Flask
-- OpenCV
-- scikit-learn
-- Pandas
-- SQLite
-- XlsxWriter
+| Layer | Technology |
+|-------|-----------|
+| Feature engineering | Python, NumPy, scikit-image (HOG, Gabor) |
+| Modeling | scikit-learn (Random Forest, Logistic Regression) |
+| Dashboard | Flask, SQLite historian, Excel export |
+| Visualization | Matplotlib |
+| CI | GitHub Actions |
 
-## Architecture snapshot
+---
 
-- **Application shell:** Flask HMI for inspection workflow, historian logs, and export
-- **Vision workflow layer:** synthetic OpenCV inspection feed used for operator monitoring
-- **Analysis layer:** reproducible HOG plus scikit-learn benchmark on NEU-CLS
-- **Persistence layer:** SQLite production historian
-- **Proof layer:** JSON evaluation artifacts, hiring summary, and public case-study route
+## Architecture
 
-## Public proof surfaces
+```
+NEU-CLS Dataset (1,800 images)
+        |
+        v
+Feature Extraction (HOG + Gabor + grid stats)
+        |
+        v
+Model Benchmark (dummy / logistic / random forest)
+        |
+        v
+Review Queue Design (entropy-ranked routing)
+        |
+        v
+Flask Dashboard (operator UI + historian + export)
+```
 
-- Case-study notes: [`docs/case-study.md`](docs/case-study.md)
-- Hiring summary: [`docs/hiring-summary.md`](docs/hiring-summary.md)
-- Analysis notes: [`analysis/README.md`](analysis/README.md)
-- Metrics artifacts: [`docs/data/neu-cls-case-study`](docs/data/neu-cls-case-study)
-- Local route: `http://localhost:8080/case-study`
+---
 
-## What this proves
-
-- You can package industrial computer vision into a workflow that quality stakeholders can actually use.
-- You can benchmark a real surface-defect dataset and explain model tradeoffs instead of shipping a dashboard-only demo.
-- You can translate model confidence into a review-queue decision rule rather than overclaiming automation.
-
-## Local setup
+## Local Setup
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate
+# Windows:  .venv\Scripts\activate
+# macOS/Linux:  source .venv/bin/activate
+
 pip install -r requirements.txt
+
+# Run full analysis benchmark (downloads NEU-CLS dataset on first run)
 python analysis/run_neu_case_study.py
+
+# Start the dashboard
 python main.py
 ```
 
-The app runs on `http://localhost:8080`.
+App: `http://127.0.0.1:8080` | Case-study route: `http://127.0.0.1:8080/case-study`
 
-## Quality checks
+---
+
+## Tests
 
 ```bash
-python analysis/run_neu_case_study.py
-python -m py_compile main.py case_study.py analysis/run_neu_case_study.py
 python -m unittest discover -s tests -v
-python -c "import main; print(main.app.name)"
+python -m py_compile main.py case_study.py analysis/run_neu_case_study.py
 ```
+
+---
+
+## Proof Surfaces
+
+| Document | Contents |
+|----------|----------|
+| [`docs/case-study.md`](docs/case-study.md) | Full methodology, results, limitations |
+| [`docs/hiring-summary.md`](docs/hiring-summary.md) | Recruiter-facing one-page summary |
+| [`docs/data/neu-cls-case-study/`](docs/data/neu-cls-case-study/) | JSON artifacts — metrics, confusion matrix, Pareto, review queue |
+
+---
+
+## What This Proves
+
+- Multi-class image classification with imbalanced error costs — recall is not enough, per-class cost weighting matters
+- Pareto analysis identifies which defect classes to prioritise in inspection budget
+- Entropy-based review queue captures 82% of errors by reviewing only 20% of samples
+- Business framing: connects model output to quality decision routing, not just label prediction
+
+---
 
 ## Limitations
 
-- The live workflow layer still uses a simulated feed rather than a deployed inference service.
-- The benchmark uses a balanced public dataset, so plant-specific imbalance and line drift are not represented.
-- The published model is a classical CV baseline, not a production deep-learning stack.
+- HOG + Gabor descriptors are handcrafted — deep learning (ResNet, EfficientNet) would likely improve accuracy further
+- NEU-CLS is a research benchmark — results are not directly transferable to a live production line
+- The Flask dashboard uses a simulated inspection feed, not a real camera stream
 
-## Portfolio note
-
-This repository now sits above a toy CV demo but below a plant-ready deployment. The correct framing is: portfolio-grade industrial computer-vision case study with a real benchmark, review-queue logic, and operator workflow packaging.
+---
 
 ## License
 

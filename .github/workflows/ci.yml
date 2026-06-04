@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  smoke-check:
+  quality:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,13 @@ jobs:
           pip install -r requirements.txt
 
       - name: Syntax check
-        run: python -m py_compile main.py case_study.py analysis/run_neu_case_study.py
+        run: |
+          python -m py_compile main.py case_study.py
+          python -m py_compile analysis/run_neu_case_study.py
+          python -m py_compile analysis/generate_visuals.py
+
+      - name: Generate visualization assets
+        run: python analysis/generate_visuals.py
 
       - name: Unit tests
         run: python -m unittest discover -s tests -v
