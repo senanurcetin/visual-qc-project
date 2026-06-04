@@ -9,94 +9,94 @@
   ],
   "matrix": [
     [
-      58,
+      59,
       0,
       0,
-      1,
+      0,
       1,
       0
     ],
     [
       0,
       56,
-      2,
-      2,
       0,
-      0
-    ],
-    [
-      0,
-      3,
-      46,
-      11,
-      0,
-      0
-    ],
-    [
-      14,
       4,
-      8,
-      28,
-      5,
-      1
-    ],
-    [
-      3,
       0,
-      0,
-      0,
-      57,
       0
     ],
     [
-      0,
-      10,
-      0,
       1,
       0,
-      49
+      57,
+      2,
+      0,
+      0
+    ],
+    [
+      1,
+      3,
+      2,
+      54,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      60,
+      0
+    ],
+    [
+      0,
+      8,
+      0,
+      0,
+      0,
+      52
     ]
   ],
   "hotspots": [
     {
+      "actual": "scratches",
+      "predicted": "inclusion",
+      "count": 8
+    },
+    {
+      "actual": "inclusion",
+      "predicted": "pitted_surface",
+      "count": 4
+    },
+    {
       "actual": "pitted_surface",
-      "predicted": "crazing",
-      "count": 14
+      "predicted": "inclusion",
+      "count": 3
     },
     {
       "actual": "patches",
       "predicted": "pitted_surface",
-      "count": 11
-    },
-    {
-      "actual": "scratches",
-      "predicted": "inclusion",
-      "count": 10
+      "count": 2
     },
     {
       "actual": "pitted_surface",
       "predicted": "patches",
-      "count": 8
+      "count": 2
     },
     {
-      "actual": "pitted_surface",
+      "actual": "crazing",
       "predicted": "rolled-in_scale",
-      "count": 5
-    },
-    {
-      "actual": "pitted_surface",
-      "predicted": "inclusion",
-      "count": 4
+      "count": 1
     },
     {
       "actual": "patches",
-      "predicted": "inclusion",
-      "count": 3
+      "predicted": "crazing",
+      "count": 1
     },
     {
-      "actual": "rolled-in_scale",
+      "actual": "pitted_surface",
       "predicted": "crazing",
-      "count": 3
+      "count": 1
     }
   ]
 }

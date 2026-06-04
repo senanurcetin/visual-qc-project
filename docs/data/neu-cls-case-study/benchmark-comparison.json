@@ -5,22 +5,22 @@
     "macro_precision": 0.0278,
     "macro_recall": 0.1667,
     "macro_f1": 0.0476,
-    "training_seconds": 0.001
+    "training_seconds": 0.002
   },
   {
     "model": "logistic_regression",
-    "accuracy": 0.6972,
-    "macro_precision": 0.7106,
-    "macro_recall": 0.6972,
-    "macro_f1": 0.7019,
-    "training_seconds": 2.4116
+    "accuracy": 0.8694,
+    "macro_precision": 0.8723,
+    "macro_recall": 0.8694,
+    "macro_f1": 0.8681,
+    "training_seconds": 16.4745
   },
   {
     "model": "random_forest",
-    "accuracy": 0.8167,
-    "macro_precision": 0.8163,
-    "macro_recall": 0.8167,
-    "macro_f1": 0.8093,
-    "training_seconds": 5.0962
+    "accuracy": 0.9389,
+    "macro_precision": 0.9421,
+    "macro_recall": 0.9389,
+    "macro_f1": 0.9392,
+    "training_seconds": 8.7953
   }
 ]

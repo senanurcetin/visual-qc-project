@@ -1,0 +1,41 @@
+{
+  "total_errors": 22,
+  "total_test_samples": 360,
+  "overall_error_rate": 0.0611,
+  "pareto": [
+    {
+      "class_name": "scratches",
+      "error_count": 8,
+      "share_of_errors": 0.3636,
+      "cumulative_share": 0.3636
+    },
+    {
+      "class_name": "pitted_surface",
+      "error_count": 6,
+      "share_of_errors": 0.2727,
+      "cumulative_share": 0.6364
+    },
+    {
+      "class_name": "inclusion",
+      "error_count": 4,
+      "share_of_errors": 0.1818,
+      "cumulative_share": 0.8182
+    },
+    {
+      "class_name": "patches",
+      "error_count": 3,
+      "share_of_errors": 0.1364,
+      "cumulative_share": 0.9545
+    },
+    {
+      "class_name": "crazing",
+      "error_count": 1,
+      "share_of_errors": 0.0455,
+      "cumulative_share": 1.0
+    }
+  ],
+  "eighty_percent_classes": [
+    "scratches",
+    "pitted_surface"
+  ]
+}

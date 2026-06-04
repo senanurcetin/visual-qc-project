@@ -3,103 +3,121 @@
     {
       "review_fraction": 0.1,
       "reviewed_samples": 36,
-      "captured_errors": 18,
-      "error_capture_rate": 0.2727,
-      "review_yield": 0.5,
-      "random_review_yield": 0.1833,
-      "yield_lift_vs_random": 2.7273
+      "captured_errors": 10,
+      "error_capture_rate": 0.4545,
+      "review_yield": 0.2778,
+      "random_review_yield": 0.0611,
+      "yield_lift_vs_random": 4.5455
     },
     {
       "review_fraction": 0.15,
       "reviewed_samples": 54,
-      "captured_errors": 22,
-      "error_capture_rate": 0.3333,
-      "review_yield": 0.4074,
-      "random_review_yield": 0.1833,
-      "yield_lift_vs_random": 2.2222
+      "captured_errors": 11,
+      "error_capture_rate": 0.5,
+      "review_yield": 0.2037,
+      "random_review_yield": 0.0611,
+      "yield_lift_vs_random": 3.3333
     },
     {
       "review_fraction": 0.2,
       "reviewed_samples": 72,
-      "captured_errors": 28,
-      "error_capture_rate": 0.4242,
-      "review_yield": 0.3889,
-      "random_review_yield": 0.1833,
-      "yield_lift_vs_random": 2.1212
+      "captured_errors": 18,
+      "error_capture_rate": 0.8182,
+      "review_yield": 0.25,
+      "random_review_yield": 0.0611,
+      "yield_lift_vs_random": 4.0909
     }
   ],
+  "entropy_statistics": {
+    "mean_entropy": 1.4026,
+    "median_entropy": 1.3633,
+    "p90_entropy": 2.0801,
+    "max_entropy": 2.5213
+  },
   "misclassified_examples": [
     {
-      "file": "patches_37.jpg",
+      "file": "patches_219.jpg",
+      "actual": "patches",
+      "predicted": "crazing",
+      "confidence": 0.252,
+      "prediction_entropy": 2.4377
+    },
+    {
+      "file": "patches_162.jpg",
       "actual": "patches",
       "predicted": "pitted_surface",
-      "confidence": 0.228
+      "confidence": 0.256,
+      "prediction_entropy": 2.5068
     },
     {
-      "file": "patches_171.jpg",
+      "file": "patches_117.jpg",
       "actual": "patches",
       "predicted": "pitted_surface",
-      "confidence": 0.264
+      "confidence": 0.256,
+      "prediction_entropy": 2.4886
     },
     {
-      "file": "inclusion_253.jpg",
-      "actual": "inclusion",
-      "predicted": "pitted_surface",
-      "confidence": 0.268
-    },
-    {
-      "file": "pitted_surface_237.jpg",
+      "file": "pitted_surface_155.jpg",
       "actual": "pitted_surface",
-      "predicted": "rolled-in_scale",
-      "confidence": 0.276
+      "predicted": "crazing",
+      "confidence": 0.292,
+      "prediction_entropy": 2.2515
     },
     {
-      "file": "patches_271.jpg",
-      "actual": "patches",
-      "predicted": "pitted_surface",
-      "confidence": 0.28
-    },
-    {
-      "file": "pitted_surface_226.jpg",
-      "actual": "pitted_surface",
-      "predicted": "patches",
-      "confidence": 0.28
-    },
-    {
-      "file": "patches_1.jpg",
-      "actual": "patches",
-      "predicted": "pitted_surface",
-      "confidence": 0.28
-    },
-    {
-      "file": "scratches_18.jpg",
+      "file": "scratches_3.jpg",
       "actual": "scratches",
       "predicted": "inclusion",
-      "confidence": 0.284
+      "confidence": 0.352,
+      "prediction_entropy": 2.1078
     },
     {
-      "file": "patches_243.jpg",
-      "actual": "patches",
-      "predicted": "pitted_surface",
-      "confidence": 0.288
+      "file": "pitted_surface_235.jpg",
+      "actual": "pitted_surface",
+      "predicted": "inclusion",
+      "confidence": 0.36,
+      "prediction_entropy": 2.08
     },
     {
-      "file": "inclusion_144.jpg",
-      "actual": "inclusion",
-      "predicted": "patches",
-      "confidence": 0.288
+      "file": "crazing_19.jpg",
+      "actual": "crazing",
+      "predicted": "rolled-in_scale",
+      "confidence": 0.372,
+      "prediction_entropy": 2.0797
     },
     {
-      "file": "patches_244.jpg",
-      "actual": "patches",
-      "predicted": "pitted_surface",
-      "confidence": 0.288
+      "file": "scratches_73.jpg",
+      "actual": "scratches",
+      "predicted": "inclusion",
+      "confidence": 0.376,
+      "prediction_entropy": 2.1968
     },
     {
-      "file": "patches_85.jpg",
-      "actual": "patches",
-      "predicted": "pitted_surface",
-      "confidence": 0.292
+      "file": "pitted_surface_217.jpg",
+      "actual": "pitted_surface",
+      "predicted": "inclusion",
+      "confidence": 0.404,
+      "prediction_entropy": 2.1178
+    },
+    {
+      "file": "scratches_1.jpg",
+      "actual": "scratches",
+      "predicted": "inclusion",
+      "confidence": 0.42,
+      "prediction_entropy": 1.8426
+    },
+    {
+      "file": "pitted_surface_299.jpg",
+      "actual": "pitted_surface",
+      "predicted": "inclusion",
+      "confidence": 0.464,
+      "prediction_entropy": 1.8825
+    },
+    {
+      "file": "scratches_208.jpg",
+      "actual": "scratches",
+      "predicted": "inclusion",
+      "confidence": 0.48,
+      "prediction_entropy": 1.4735
     }
   ]
 }

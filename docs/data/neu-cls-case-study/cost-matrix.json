@@ -1,0 +1,75 @@
+{
+  "cost_assumptions": {
+    "fn_costs_by_class": {
+      "inclusion": 500,
+      "rolled-in_scale": 400,
+      "pitted_surface": 350,
+      "patches": 200,
+      "scratches": 150,
+      "crazing": 100
+    },
+    "fp_cost": 25
+  },
+  "total_fn_cost": 6000.0,
+  "total_fp_cost": 550.0,
+  "total_model_cost": 6550.0,
+  "naive_no_model_cost": 102000,
+  "cost_savings_vs_naive": 95450.0,
+  "cost_savings_share": 0.9358,
+  "per_class_cost_breakdown": [
+    {
+      "class_name": "inclusion",
+      "fn_cost_per_missed": 500,
+      "missed_defects": 4,
+      "false_positives": 11,
+      "total_fn_cost": 2000,
+      "total_fp_cost": 275,
+      "combined_cost": 2275
+    },
+    {
+      "class_name": "pitted_surface",
+      "fn_cost_per_missed": 350,
+      "missed_defects": 6,
+      "false_positives": 6,
+      "total_fn_cost": 2100,
+      "total_fp_cost": 150,
+      "combined_cost": 2250
+    },
+    {
+      "class_name": "scratches",
+      "fn_cost_per_missed": 150,
+      "missed_defects": 8,
+      "false_positives": 0,
+      "total_fn_cost": 1200,
+      "total_fp_cost": 0,
+      "combined_cost": 1200
+    },
+    {
+      "class_name": "patches",
+      "fn_cost_per_missed": 200,
+      "missed_defects": 3,
+      "false_positives": 2,
+      "total_fn_cost": 600,
+      "total_fp_cost": 50,
+      "combined_cost": 650
+    },
+    {
+      "class_name": "crazing",
+      "fn_cost_per_missed": 100,
+      "missed_defects": 1,
+      "false_positives": 2,
+      "total_fn_cost": 100,
+      "total_fp_cost": 50,
+      "combined_cost": 150
+    },
+    {
+      "class_name": "rolled-in_scale",
+      "fn_cost_per_missed": 400,
+      "missed_defects": 0,
+      "false_positives": 1,
+      "total_fn_cost": 0,
+      "total_fp_cost": 25,
+      "combined_cost": 25
+    }
+  ]
+}

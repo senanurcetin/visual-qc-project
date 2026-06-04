@@ -31,31 +31,55 @@
     }
   },
   "feature_pipeline": {
-    "representation": "64x64 grayscale HOG descriptors",
-    "feature_count": 1764,
-    "reason": "Fast classical baseline that keeps the pipeline free-tier friendly and reproducible."
+    "representation": "HOG (1764) + Gabor-filter stats (16) + local-grid stats (32)",
+    "feature_count": 1812,
+    "components": {
+      "hog": "64\u00d764 grayscale HOG \u2014 captures edge and gradient structure",
+      "gabor": "4 orientations \u00d7 2 frequencies, mean+std per response \u2014 captures directional texture",
+      "local_grid_stats": "4\u00d74 grid of mean+std values \u2014 captures spatial intensity variation"
+    }
   },
   "final_model": {
-    "name": "Random forest on HOG descriptors",
-    "accuracy": 0.8167,
-    "macro_precision": 0.8163,
-    "macro_recall": 0.8167,
-    "macro_f1": 0.8093
+    "name": "Random forest on HOG + Gabor + grid stats",
+    "accuracy": 0.9389,
+    "macro_precision": 0.9421,
+    "macro_recall": 0.9389,
+    "macro_f1": 0.9392
   },
   "review_queue": {
     "selected_budget_fraction": 0.15,
     "selected_budget_label": "15% lowest-confidence predictions",
     "reviewed_samples": 54,
-    "captured_errors": 22,
-    "error_capture_rate": 0.3333,
-    "review_yield": 0.4074,
-    "random_review_yield": 0.1833,
-    "yield_lift_vs_random": 2.2222
+    "captured_errors": 11,
+    "error_capture_rate": 0.5,
+    "review_yield": 0.2037,
+    "random_review_yield": 0.0611,
+    "yield_lift_vs_random": 3.3333
   },
-  "operational_takeaway": "The model is strong enough to triage defect classes automatically, while a low-confidence review queue concentrates a meaningful share of routing errors into a small analyst workload.",
+  "cost_model_summary": {
+    "total_model_cost": 6550.0,
+    "naive_no_model_cost": 102000,
+    "cost_savings_share": 0.9358,
+    "highest_cost_class": "inclusion"
+  },
+  "spc_summary": {
+    "p_bar": 0.0611,
+    "ucl": 0.1923,
+    "lcl": 0.0,
+    "out_of_control_batches": 0
+  },
+  "pareto_summary": {
+    "total_errors": 22,
+    "eighty_percent_classes": [
+      "scratches",
+      "pitted_surface"
+    ]
+  },
+  "operational_takeaway": "Enriched features (Gabor + local grid stats alongside HOG) improve texture discrimination. Per-defect cost thresholds route high-risk misses to manual review. SPC p-chart enables shift-level quality monitoring with statistical control limits.",
   "limitations": [
     "This is a public balanced dataset, so real plant imbalance and line drift are not represented.",
     "The model is a classical CV baseline rather than a production deep-learning stack.",
-    "Holdout metrics should be treated as portfolio-grade evidence, not as a production claim."
+    "Holdout metrics should be treated as portfolio-grade evidence, not as a production claim.",
+    "Cost values are illustrative; actual costs depend on downstream product and customer contracts."
   ]
 }

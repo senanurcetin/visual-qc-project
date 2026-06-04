@@ -1,0 +1,56 @@
+[
+  {
+    "class_name": "inclusion",
+    "fn_cost": 500,
+    "fp_cost": 25,
+    "recall_at_0_5_threshold": 0.9333,
+    "recommended_entropy_threshold": 0.6756,
+    "max_entropy": 2.585,
+    "note": "Predictions with entropy > 0.6756 should be routed to manual review for this class."
+  },
+  {
+    "class_name": "rolled-in_scale",
+    "fn_cost": 400,
+    "fp_cost": 25,
+    "recall_at_0_5_threshold": 1.0,
+    "recommended_entropy_threshold": 0.9019,
+    "max_entropy": 2.585,
+    "note": "Predictions with entropy > 0.9019 should be routed to manual review for this class."
+  },
+  {
+    "class_name": "pitted_surface",
+    "fn_cost": 350,
+    "fp_cost": 25,
+    "recall_at_0_5_threshold": 0.9,
+    "recommended_entropy_threshold": 0.5534,
+    "max_entropy": 2.585,
+    "note": "Predictions with entropy > 0.5534 should be routed to manual review for this class."
+  },
+  {
+    "class_name": "patches",
+    "fn_cost": 200,
+    "fp_cost": 25,
+    "recall_at_0_5_threshold": 0.95,
+    "recommended_entropy_threshold": 0.9374,
+    "max_entropy": 2.585,
+    "note": "Predictions with entropy > 0.9374 should be routed to manual review for this class."
+  },
+  {
+    "class_name": "scratches",
+    "fn_cost": 150,
+    "fp_cost": 25,
+    "recall_at_0_5_threshold": 0.8667,
+    "recommended_entropy_threshold": 1.188,
+    "max_entropy": 2.585,
+    "note": "Predictions with entropy > 1.188 should be routed to manual review for this class."
+  },
+  {
+    "class_name": "crazing",
+    "fn_cost": 100,
+    "fp_cost": 25,
+    "recall_at_0_5_threshold": 0.9833,
+    "recommended_entropy_threshold": 0.847,
+    "max_entropy": 2.585,
+    "note": "Predictions with entropy > 0.847 should be routed to manual review for this class."
+  }
+]
