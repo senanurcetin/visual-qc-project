@@ -21,7 +21,7 @@ Surface inspection projects often stop at a model demo. Real quality teams still
 
 ## Modeling approach
 
-- Feature pipeline: `64x64` grayscale HOG descriptors
+- Feature pipeline: `64x64` grayscale HOG (1,764) + Gabor filter-bank stats (16) + 4x4 local-grid stats (32) = `1,812` features
 - Benchmarks:
   - dummy baseline
   - logistic regression
@@ -37,11 +37,12 @@ The random-forest baseline is the published model because it produced the strong
 
 ## Current results
 
-- Accuracy: `0.8167`
-- Macro precision: `0.8163`
-- Macro recall: `0.8167`
-- Macro F1: `0.8093`
-- Review queue: the `15%` lowest-confidence predictions capture `33.3%` of routing errors with `2.22x` better error yield than random review
+- Accuracy: `0.9389`
+- Macro precision: `0.9421`
+- Macro recall: `0.9389`
+- Macro F1: `0.9392`
+- Holdout misclassifications: `22` of `360`
+- Review queue: the `15%` lowest-confidence predictions capture `50.0%` of misclassifications (11 of 22) with `3.33x` better error yield than random review; at a `20%` budget the queue captures `81.8%` (18 of 22) with `4.09x` lift
 
 ## Operational framing
 
