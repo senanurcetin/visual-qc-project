@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steel QC RAG Map</title>
+    <meta name="description" content="An embedding-based RAG system for steel quality engineering, visualised: every passage is a point, and each question shows which passages the system actually retrieved.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/rag/static/rag.css">
+    <!-- Three.js is only fetched when the map scrolls into view (see rag.js). -->
+    <script type="importmap">
+        {"imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }}
+    </script>
+    <script type="module" src="/rag/static/rag.js"></script>
+</head>
+<body data-src="/api/rag">
+    <header class="topbar">
+        <div class="topbar-inner">
+            <span class="brand">Visual QC</span>
+            <nav aria-label="Project pages">
+                <a href="/">Dashboard</a>
+                <a href="/case-study">CV case study</a>
+                <a href="/rag" aria-current="page">RAG map</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <p class="eyebrow">AI engineering layer · embedding retrieval · measured generation</p>
+            <h1>Steel QC knowledge assistant</h1>
+            <p class="lede">A retrieval-augmented assistant over a steel quality-engineering knowledge base. Each passage is a point below. Pick a question to see which passages the system actually read before answering, and how much of the answer those passages support.</p>
+            <dl class="kpis" id="kpis" aria-live="polite"></dl>
+        </section>
+
+        <section class="how" aria-labelledby="how-title">
+            <h2 id="how-title" class="section-title">How it works</h2>
+            <ol class="steps">
+                <li><span class="step-n">1</span><div><strong>Chunk</strong><p id="step-chunk">Knowledge-base articles are split into short, section-aware passages.</p></div></li>
+                <li><span class="step-n">2</span><div><strong>Embed</strong><p id="step-embed">An embedding model turns each passage into a vector; passages with similar meaning land close together. The vectors live in a Chroma vector database.</p></div></li>
+                <li><span class="step-n">3</span><div><strong>Retrieve &amp; answer</strong><p id="step-answer">The question is embedded the same way, the nearest passages are retrieved, and a language model answers from them with citations.</p></div></li>
+            </ol>
+        </section>
+
+        <section class="map-section" id="map-section" aria-labelledby="map-title">
+            <div class="section-head">
+                <div>
+                    <h2 id="map-title" class="section-title">Where the answer came from</h2>
+                    <p class="section-copy">Each dot is a passage, coloured by topic. The map is a UMAP projection of the embedding space. Drag to rotate, scroll to zoom, hover a dot to read it.</p>
+                </div>
+                <div class="mode-toggle" id="mode-toggle" role="group" aria-label="Map view" hidden>
+                    <button type="button" data-mode="3d">3D</button>
+                    <button type="button" data-mode="2d">2D</button>
+                </div>
+            </div>
+
+            <div class="map-layout">
+                <div class="map-col">
+                    <div class="map-frame" id="map-frame">
+                        <div class="map-placeholder" id="map-placeholder">Loading map…</div>
+                        <div class="tooltip" id="tooltip" role="status" hidden></div>
+                    </div>
+                    <ul class="legend" id="legend" aria-label="Topics"></ul>
+                    <p class="honesty" id="honesty"></p>
+                </div>
+
+                <aside class="panel" aria-label="Question and answer">
+                    <p class="panel-label">Precomputed example questions</p>
+                    <div class="questions" id="questions"></div>
+                    <article class="answer" id="answer" aria-live="polite"></article>
+                </aside>
+            </div>
+        </section>
+
+        <section class="eval" aria-labelledby="eval-title">
+            <h2 id="eval-title" class="section-title">Measured, not assumed</h2>
+            <p class="section-copy">Retrieval is scored on questions with a known source passage. Answers are scored for faithfulness: an NLI model checks whether each sentence is entailed by the retrieved passages.</p>
+            <div class="eval-grid">
+                <article class="card" id="card-retrieval"></article>
+                <article class="card" id="card-faithfulness"></article>
+                <article class="card" id="card-fidelity"></article>
+            </div>
+        </section>
+
+        <section class="method" aria-labelledby="method-title">
+            <h2 id="method-title" class="section-title">Method and limits</h2>
+            <div class="method-grid" id="method"></div>
+        </section>
+    </main>
+
+    <footer class="footer" id="footer"></footer>
+</body>
+</html>

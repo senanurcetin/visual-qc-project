@@ -1,0 +1,16 @@
+{
+  "neighbors_k": 10,
+  "trustworthiness": {
+    "umap_3d": 0.9923,
+    "umap_2d": 0.9913,
+    "pca_3d": 0.9098
+  },
+  "query_neighbor_overlap": {
+    "k": 4,
+    "mean_overlap_3d": 1.596,
+    "mean_overlap_2d": 1.4242,
+    "share_all_match_3d": 0.0202,
+    "share_none_match_3d": 0.1818,
+    "queries": 99
+  }
+}

@@ -10,9 +10,11 @@ from flask import Flask, Response, render_template_string, jsonify, request, sen
 from datetime import datetime
 import pandas as pd  # Excel raporlama ve veri manipülasyonu için
 from case_study import case_study_bp
+from rag_demo import rag_bp
 
 app = Flask(__name__)
 app.register_blueprint(case_study_bp)
+app.register_blueprint(rag_bp)
 
 # --- MİMARİ YAPITAŞI: THREAD SAFETY ---
 # Standart 'Lock' yerine 'RLock' (Re-entrant Lock) kullanıyoruz.
@@ -96,6 +98,7 @@ HTML_TEMPLATE = """
         .btn-estop { background: #991b1b; border-bottom: 3px solid #7f1d1d; } .btn-estop:active { transform: translateY(2px); border-bottom: 0px; }
         .btn-sim-fail { background: #6b21a8; border-bottom: 3px solid #581c87; } .btn-sim-fail:active { transform: translateY(2px); border-bottom: 0px; }
         .btn-case-study { background: #0369a1; border-bottom: 3px solid #075985; } .btn-case-study:active { transform: translateY(2px); border-bottom: 0px; }
+        .btn-rag { background: #4338ca; border-bottom: 3px solid #3730a3; } .btn-rag:active { transform: translateY(2px); border-bottom: 0px; }
         .btn-export { background: var(--teal); border-bottom: 3px solid #0f766e; } .btn-export:active { transform: translateY(2px); border-bottom: 0px; }
 
         .main-grid { flex-grow: 1; display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 12px; padding: 12px; min-height: 0; }
@@ -134,6 +137,7 @@ HTML_TEMPLATE = """
         <button class="btn btn-estop" onclick="sendCmd('ESTOP')">Emergency Stop</button>
         <button class="btn btn-sim-fail" onclick="sendCmd('SIMULATE_FAIL')">Simulate Defect</button>
         <a href="/case-study" class="btn btn-case-study">Case Study</a>
+        <a href="/rag" class="btn btn-rag">RAG Map</a>
         <a href="/api/export_report" class="btn btn-export">&#x1F4E5; Export Report</a>
     </div>
     <div class="main-grid">

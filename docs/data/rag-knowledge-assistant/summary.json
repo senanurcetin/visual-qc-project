@@ -1,0 +1,49 @@
+{
+  "project": "Steel QC knowledge assistant (embedding RAG)",
+  "corpus": {
+    "articles": 43,
+    "passages": 728,
+    "topics": 6,
+    "license": "CC BY-SA 4.0"
+  },
+  "embedding_model": "BAAI/bge-base-en-v1.5",
+  "dimensions": 768,
+  "vector_db": "Chroma (HNSW, cosine)",
+  "chroma_exact_agreement_top_k": 1.0,
+  "generator": "Qwen/Qwen2.5-3B-Instruct",
+  "nli_model": "cross-encoder/nli-deberta-v3-base",
+  "retrieval": {
+    "hit_at_1": 0.7273,
+    "hit_at_4": 0.9481,
+    "mrr_at_10": 0.8325,
+    "curated_article_hit_at_5": 1.0
+  },
+  "tfidf_baseline": {
+    "hit_at_1": 0.6883,
+    "hit_at_4": 0.8961,
+    "mrr_at_10": 0.7732,
+    "curated_article_hit_at_5": 1.0
+  },
+  "faithfulness": {
+    "rag": 0.7852,
+    "closed_book": 0.2018,
+    "rag_abstention_rate": 0.0202,
+    "selected_prompt": "v2_strict",
+    "selected_config": "qwen2.5-3b/v2_strict",
+    "by_config": {
+      "qwen2.5-1.5b/v1_basic": 0.5433,
+      "qwen2.5-1.5b/v2_strict": 0.5066,
+      "qwen2.5-3b/v1_basic": 0.6139,
+      "qwen2.5-3b/v2_strict": 0.7852
+    }
+  },
+  "projection": {
+    "trustworthiness_3d": 0.9923,
+    "mean_query_overlap_3d": 1.596,
+    "k": 4
+  },
+  "eval_questions": {
+    "generated": 77,
+    "curated": 22
+  }
+}

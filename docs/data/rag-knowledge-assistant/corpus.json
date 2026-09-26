@@ -1,0 +1,310 @@
+{
+  "source": "English Wikipedia",
+  "license": "CC BY-SA 4.0",
+  "articles": [
+    {
+      "title": "Mill scale",
+      "topic": "Surface defects",
+      "url": "https://en.wikipedia.org/wiki/Mill_scale",
+      "revid": 1358793644,
+      "chunks": 5
+    },
+    {
+      "title": "Non-metallic inclusions",
+      "topic": "Surface defects",
+      "url": "https://en.wikipedia.org/wiki/Non-metallic_inclusions",
+      "revid": 1360401124,
+      "chunks": 6
+    },
+    {
+      "title": "Crazing",
+      "topic": "Surface defects",
+      "url": "https://en.wikipedia.org/wiki/Crazing",
+      "revid": 1365089902,
+      "chunks": 21
+    },
+    {
+      "title": "Surface roughness",
+      "topic": "Surface defects",
+      "url": "https://en.wikipedia.org/wiki/Surface_roughness",
+      "revid": 1368981143,
+      "chunks": 13
+    },
+    {
+      "title": "Surface finish",
+      "topic": "Surface defects",
+      "url": "https://en.wikipedia.org/wiki/Surface_finish",
+      "revid": 1366987201,
+      "chunks": 9
+    },
+    {
+      "title": "Fatigue (material)",
+      "topic": "Surface defects",
+      "url": "https://en.wikipedia.org/wiki/Fatigue_(material)",
+      "revid": 1372946764,
+      "chunks": 32
+    },
+    {
+      "title": "Rolling (metalworking)",
+      "topic": "Rolling & steelmaking",
+      "url": "https://en.wikipedia.org/wiki/Rolling_(metalworking)",
+      "revid": 1366876369,
+      "chunks": 32
+    },
+    {
+      "title": "Hot working",
+      "topic": "Rolling & steelmaking",
+      "url": "https://en.wikipedia.org/wiki/Hot_working",
+      "revid": 1278637154,
+      "chunks": 5
+    },
+    {
+      "title": "Cold working",
+      "topic": "Rolling & steelmaking",
+      "url": "https://en.wikipedia.org/wiki/Cold_working",
+      "revid": 1373936429,
+      "chunks": 5
+    },
+    {
+      "title": "Steelmaking",
+      "topic": "Rolling & steelmaking",
+      "url": "https://en.wikipedia.org/wiki/Steelmaking",
+      "revid": 1373528399,
+      "chunks": 32
+    },
+    {
+      "title": "Continuous casting",
+      "topic": "Rolling & steelmaking",
+      "url": "https://en.wikipedia.org/wiki/Continuous_casting",
+      "revid": 1366063565,
+      "chunks": 27
+    },
+    {
+      "title": "Pickling (metal)",
+      "topic": "Rolling & steelmaking",
+      "url": "https://en.wikipedia.org/wiki/Pickling_(metal)",
+      "revid": 1375546048,
+      "chunks": 7
+    },
+    {
+      "title": "Annealing (materials science)",
+      "topic": "Rolling & steelmaking",
+      "url": "https://en.wikipedia.org/wiki/Annealing_(materials_science)",
+      "revid": 1351704356,
+      "chunks": 16
+    },
+    {
+      "title": "Shot peening",
+      "topic": "Rolling & steelmaking",
+      "url": "https://en.wikipedia.org/wiki/Shot_peening",
+      "revid": 1361887060,
+      "chunks": 16
+    },
+    {
+      "title": "Corrosion",
+      "topic": "Corrosion & protection",
+      "url": "https://en.wikipedia.org/wiki/Corrosion",
+      "revid": 1372207240,
+      "chunks": 32
+    },
+    {
+      "title": "Pitting corrosion",
+      "topic": "Corrosion & protection",
+      "url": "https://en.wikipedia.org/wiki/Pitting_corrosion",
+      "revid": 1374357716,
+      "chunks": 19
+    },
+    {
+      "title": "Rust",
+      "topic": "Corrosion & protection",
+      "url": "https://en.wikipedia.org/wiki/Rust",
+      "revid": 1374332056,
+      "chunks": 21
+    },
+    {
+      "title": "Galvanization",
+      "topic": "Corrosion & protection",
+      "url": "https://en.wikipedia.org/wiki/Galvanization",
+      "revid": 1371697546,
+      "chunks": 9
+    },
+    {
+      "title": "Hot-dip galvanization",
+      "topic": "Corrosion & protection",
+      "url": "https://en.wikipedia.org/wiki/Hot-dip_galvanization",
+      "revid": 1365851113,
+      "chunks": 6
+    },
+    {
+      "title": "Passivation (chemistry)",
+      "topic": "Corrosion & protection",
+      "url": "https://en.wikipedia.org/wiki/Passivation_(chemistry)",
+      "revid": 1362780743,
+      "chunks": 16
+    },
+    {
+      "title": "Stainless steel",
+      "topic": "Corrosion & protection",
+      "url": "https://en.wikipedia.org/wiki/Stainless_steel",
+      "revid": 1375674999,
+      "chunks": 32
+    },
+    {
+      "title": "Statistical process control",
+      "topic": "Quality control & SPC",
+      "url": "https://en.wikipedia.org/wiki/Statistical_process_control",
+      "revid": 1347350052,
+      "chunks": 19
+    },
+    {
+      "title": "Control chart",
+      "topic": "Quality control & SPC",
+      "url": "https://en.wikipedia.org/wiki/Control_chart",
+      "revid": 1374768971,
+      "chunks": 26
+    },
+    {
+      "title": "Pareto chart",
+      "topic": "Quality control & SPC",
+      "url": "https://en.wikipedia.org/wiki/Pareto_chart",
+      "revid": 1370351294,
+      "chunks": 3
+    },
+    {
+      "title": "Pareto principle",
+      "topic": "Quality control & SPC",
+      "url": "https://en.wikipedia.org/wiki/Pareto_principle",
+      "revid": 1363858000,
+      "chunks": 17
+    },
+    {
+      "title": "Acceptance sampling",
+      "topic": "Quality control & SPC",
+      "url": "https://en.wikipedia.org/wiki/Acceptance_sampling",
+      "revid": 1362365234,
+      "chunks": 6
+    },
+    {
+      "title": "Six Sigma",
+      "topic": "Quality control & SPC",
+      "url": "https://en.wikipedia.org/wiki/Six_Sigma",
+      "revid": 1376483479,
+      "chunks": 32
+    },
+    {
+      "title": "Root-cause analysis",
+      "topic": "Quality control & SPC",
+      "url": "https://en.wikipedia.org/wiki/Root-cause_analysis",
+      "revid": 1375864474,
+      "chunks": 26
+    },
+    {
+      "title": "Failure mode and effects analysis",
+      "topic": "Quality control & SPC",
+      "url": "https://en.wikipedia.org/wiki/Failure_mode_and_effects_analysis",
+      "revid": 1375610910,
+      "chunks": 32
+    },
+    {
+      "title": "Process capability index",
+      "topic": "Quality control & SPC",
+      "url": "https://en.wikipedia.org/wiki/Process_capability_index",
+      "revid": 1326707184,
+      "chunks": 6
+    },
+    {
+      "title": "Nondestructive testing",
+      "topic": "Inspection & NDT",
+      "url": "https://en.wikipedia.org/wiki/Nondestructive_testing",
+      "revid": 1375712038,
+      "chunks": 30
+    },
+    {
+      "title": "Ultrasonic testing",
+      "topic": "Inspection & NDT",
+      "url": "https://en.wikipedia.org/wiki/Ultrasonic_testing",
+      "revid": 1330711489,
+      "chunks": 11
+    },
+    {
+      "title": "Eddy-current testing",
+      "topic": "Inspection & NDT",
+      "url": "https://en.wikipedia.org/wiki/Eddy-current_testing",
+      "revid": 1356496614,
+      "chunks": 13
+    },
+    {
+      "title": "Magnetic particle inspection",
+      "topic": "Inspection & NDT",
+      "url": "https://en.wikipedia.org/wiki/Magnetic_particle_inspection",
+      "revid": 1362375965,
+      "chunks": 14
+    },
+    {
+      "title": "Dye penetrant inspection",
+      "topic": "Inspection & NDT",
+      "url": "https://en.wikipedia.org/wiki/Dye_penetrant_inspection",
+      "revid": 1345265117,
+      "chunks": 11
+    },
+    {
+      "title": "Visual inspection",
+      "topic": "Inspection & NDT",
+      "url": "https://en.wikipedia.org/wiki/Visual_inspection",
+      "revid": 1355004219,
+      "chunks": 4
+    },
+    {
+      "title": "Weld quality assurance",
+      "topic": "Inspection & NDT",
+      "url": "https://en.wikipedia.org/wiki/Weld_quality_assurance",
+      "revid": 1353638487,
+      "chunks": 14
+    },
+    {
+      "title": "Automated optical inspection",
+      "topic": "Inspection & NDT",
+      "url": "https://en.wikipedia.org/wiki/Automated_optical_inspection",
+      "revid": 1375196571,
+      "chunks": 4
+    },
+    {
+      "title": "Machine vision",
+      "topic": "Machine vision & ML",
+      "url": "https://en.wikipedia.org/wiki/Machine_vision",
+      "revid": 1364783408,
+      "chunks": 16
+    },
+    {
+      "title": "Histogram of oriented gradients",
+      "topic": "Machine vision & ML",
+      "url": "https://en.wikipedia.org/wiki/Histogram_of_oriented_gradients",
+      "revid": 1368082534,
+      "chunks": 17
+    },
+    {
+      "title": "Gabor filter",
+      "topic": "Machine vision & ML",
+      "url": "https://en.wikipedia.org/wiki/Gabor_filter",
+      "revid": 1374826645,
+      "chunks": 8
+    },
+    {
+      "title": "Random forest",
+      "topic": "Machine vision & ML",
+      "url": "https://en.wikipedia.org/wiki/Random_forest",
+      "revid": 1373673788,
+      "chunks": 32
+    },
+    {
+      "title": "Anomaly detection",
+      "topic": "Machine vision & ML",
+      "url": "https://en.wikipedia.org/wiki/Anomaly_detection",
+      "revid": 1375691298,
+      "chunks": 26
+    }
+  ],
+  "passages": 728,
+  "max_passages_per_article": 32,
+  "chunking": "Section-aware sentence packing, ~140 words (max 200), never crossing a section"
+}
