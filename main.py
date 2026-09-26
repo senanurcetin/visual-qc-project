@@ -12,7 +12,7 @@ import pandas as pd  # Excel raporlama ve veri manipülasyonu için
 from case_study import case_study_bp
 from rag_demo import rag_bp
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="web/line", static_url_path="/line/static")
 app.register_blueprint(case_study_bp)
 app.register_blueprint(rag_bp)
 
@@ -77,6 +77,14 @@ HTML_TEMPLATE = """
     <title>VisionQC - Pro HMI v34.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/line/static/line3d.css">
+    <script type="importmap">
+        {"imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }}
+    </script>
+    <script type="module" src="/line/static/line3d.js"></script>
     <style>
         :root { 
             --bg: #111827; --card: #1f293b; --border: #374151; --text: #f3f4f6; 
@@ -141,7 +149,10 @@ HTML_TEMPLATE = """
         <a href="/api/export_report" class="btn btn-export">&#x1F4E5; Export Report</a>
     </div>
     <div class="main-grid">
-        <div class="panel video-box"><img src="/video_feed"></div>
+        <div class="panel video-box" id="line-twin">
+            <div class="twin-loading" id="twin-loading">Loading 3D line…</div>
+            <img id="twin-fallback" alt="Simulated 2D inspection camera feed" hidden>
+        </div>
         <div class="right-col">
             <div class="panel profit-sec"><div class="section-header">Trend Analysis</div><div class="chart-container"><canvas id="profitChart"></canvas></div></div>
             <div class="panel oee-sec"><div class="section-header">OEE Breakdown</div><div class="chart-container"><canvas id="oeeChart"></canvas></div></div>
@@ -200,7 +211,7 @@ HTML_TEMPLATE = """
                 // Log Tablosu Güncelleme
                 const tbody = document.getElementById('log-tbody');
                 if(tbody && data.recent_logs) {
-                    tbody.innerHTML = data.recent_logs.map(log => `<tr><td>${log.time}</td><td>${log.id}</td><td class="${log.status=='OK'?'text-ok':'text-fail'}">${log.status}</td></tr>`).join('');
+                    tbody.innerHTML = data.recent_logs.map(log => `<tr><td>${log.time}</td><td>${log.id}</td><td class="${log.status=='OK'?'text-ok':'text-fail'}">${log.status}${log.defect ? ' · ' + log.defect.replace(/_/g, ' ') : ''}</td></tr>`).join('');
                 }
                 
                 // Grafik Güncellemeleri
@@ -233,6 +244,16 @@ HTML_TEMPLATE = """
         }).then(() => setTimeout(update, 50)); 
     }
 
+    // 3D hat ikizi yüklenemezse (WebGL yok / CDN erişilemiyor) eski 2D kamera akışına düş.
+    window.showLineFallback = function () {
+        const img = document.getElementById('twin-fallback');
+        if (!img.src) img.src = '/video_feed';
+        img.hidden = false;
+        const loading = document.getElementById('twin-loading');
+        if (loading) loading.hidden = true;
+    };
+    setTimeout(() => { if (!window.lineTwinReady) window.showLineFallback(); }, 8000);
+
     setInterval(update, 1000);
     window.onload = initCharts;
 </script>
@@ -247,11 +268,14 @@ def get_initial_state():
         "revenue": 0.0, "cost": 0.0, "net_profit": 0.0, "sim_start_time": None, 
         "sim_accumulated_time": 0.0, "session_start_time": time.time(), "recent_logs": [],
         "is_new_cycle": True, "current_unit_status": "PENDING", "force_fail_next": False,
-        "availability": 0.0, "performance": 0.96, "quality": 1.0, "oee": 0.0, 
+        "current_defect": None, "status_cycle": -1,
+        "availability": 0.0, "performance": 0.96, "quality": 1.0, "oee": 0.0,
     }
 
 factory_state = get_initial_state()
 ANIMATION_CYCLE = 4.0
+# NEU-CLS sınıfları: simüle edilen hatalı ürünler bu sınıflardan birini taşır (3D sahnede doku olarak görünür).
+DEFECT_CLASSES = ["crazing", "inclusion", "patches", "pitted_surface", "rolled-in_scale", "scratches"]
 
 def get_simulation_time():
     """Thread-safe olarak simülasyon çalışma süresini hesaplar."""
@@ -299,25 +323,36 @@ def control():
 @app.route('/api/data')
 def data():
     """Anlık sistem verilerini JSON olarak döner."""
+    start_simulation()
     try:
         with data_lock:
             state_copy = factory_state.copy()
             state_copy['availability'], state_copy['performance'], state_copy['quality'], state_copy['oee'] = calculate_oee(factory_state)
+            # 3D hat ikizi bu alanlarla kendi saatini sunucuya senkronlar.
+            state_copy['sim_time'] = get_simulation_time()
+            state_copy['cycle_seconds'] = ANIMATION_CYCLE
+            state_copy['current_unit_id'] = f"U_{factory_state['total_units']:04}"
         return jsonify(state_copy)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 # --- SIMULATOR ENGINE (PRODUCER) ---
-def generate_frame():
+SIM_TICK_SECONDS = 0.03
+_sim_thread = None
+_sim_thread_lock = threading.Lock()
+
+
+def advance_simulation():
     """
-    Simülasyon Döngüsü: 
-    1. Video karesi çizer (OpenCV).
-    2. Hata senaryolarını yönetir.
-    3. Veritabanı kaydını yönetir (Non-blocking I/O).
+    Simülasyon adımı (durum mantığı):
+    1. Döngü başında ürünün OK/FAIL kararını verir.
+    2. Döngü sonunda sayaçları ve canlı logu günceller.
+    3. Veritabanı kaydını kilit dışında yapar (Non-blocking I/O).
+    Arka plan thread'inden çağrılır; video akışı açık olmasa da üretim ilerler.
     """
     sim_time = get_simulation_time()
     progress = (sim_time % ANIMATION_CYCLE) / ANIMATION_CYCLE
-    
+
     # DB Yazma verilerini tutmak için geçici değişken
     db_write_data = None
 
@@ -327,7 +362,10 @@ def generate_frame():
             # Yeni Döngü Başlangıcı
             if progress < 0.1 and factory_state["is_new_cycle"]:
                 factory_state["is_new_cycle"] = False
-                factory_state["current_unit_status"] = "FAIL" if (factory_state["force_fail_next"] or random.random() < 0.15) else "OK"
+                failed = factory_state["force_fail_next"] or random.random() < 0.15
+                factory_state["current_unit_status"] = "FAIL" if failed else "OK"
+                factory_state["current_defect"] = random.choice(DEFECT_CLASSES) if failed else None
+                factory_state["status_cycle"] = int(sim_time // ANIMATION_CYCLE)
                 factory_state["force_fail_next"] = False
 
             # Döngü Sonu ve Veri Kaydı
@@ -348,21 +386,45 @@ def generate_frame():
                 _, _, _, oee_score = calculate_oee(factory_state)
                 
                 # Canlı Log Listesi (RAM)
-                log_entry = {"time": datetime.now().strftime("%H:%M:%S"), "id": unit_id, "status": status}
+                log_entry = {"time": datetime.now().strftime("%H:%M:%S"), "id": unit_id, "status": status,
+                             "defect": factory_state["current_defect"]}
                 factory_state["recent_logs"].insert(0, log_entry)
                 if len(factory_state["recent_logs"]) > 20: factory_state["recent_logs"].pop()
                 
                 # DB verilerini hazırla ama YAZMA! (Kilit süresini kısaltmak için)
                 db_write_data = (unit_id, status, oee_score)
 
-        # Görsel Çizim için state kopyala (Kilit içinde)
-        current_mode = factory_state["system_mode"]
-        current_status = factory_state["current_unit_status"]
-
     # --- KİLİT DIŞI (NON-BLOCKING I/O) ---
     # Bu işlem yavaştır, kilit dışında yaparak "504 Gateway Timeout" hatasını engelliyoruz.
     if db_write_data:
         save_log_to_db(*db_write_data)
+
+
+def _simulation_loop():
+    while True:
+        try:
+            advance_simulation()
+        except Exception as e:
+            print(f"Simülasyon Hatası: {e}")
+        time.sleep(SIM_TICK_SECONDS)
+
+
+def start_simulation():
+    """Simülasyon thread'ini ilk istekte bir kez başlatır (import sırasında yan etki yok)."""
+    global _sim_thread
+    with _sim_thread_lock:
+        if _sim_thread is None or not _sim_thread.is_alive():
+            _sim_thread = threading.Thread(target=_simulation_loop, name="qc-simulation", daemon=True)
+            _sim_thread.start()
+
+
+def generate_frame():
+    """Yedek 2D kamera görüntüsü (WebGL olmayan tarayıcılar için OpenCV çizimi)."""
+    sim_time = get_simulation_time()
+    progress = (sim_time % ANIMATION_CYCLE) / ANIMATION_CYCLE
+    with data_lock:
+        current_mode = factory_state["system_mode"]
+        current_status = factory_state["current_unit_status"]
 
     # Görsel Çizim (OpenCV)
     w, h = 1280, 720
@@ -494,10 +556,14 @@ def export_report():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/')
-def index(): return render_template_string(HTML_TEMPLATE)
+def index():
+    start_simulation()
+    return render_template_string(HTML_TEMPLATE)
 
 @app.route('/video_feed')
-def video_feed(): return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
+def video_feed():
+    start_simulation()
+    return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
     init_db()
