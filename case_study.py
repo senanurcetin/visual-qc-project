@@ -180,7 +180,7 @@ CASE_STUDY_TEMPLATE = """
     <main class="page">
         <section class="hero">
             <div>
-                <div class="eyebrow">Support Case Study</div>
+                <div class="eyebrow">Support Case Study · <a href="/">Dashboard</a> · <a href="/rag">RAG map</a></div>
                 <h1>{{ summary.project }}</h1>
             </div>
             <p class="lede">{{ summary.operational_takeaway }}</p>

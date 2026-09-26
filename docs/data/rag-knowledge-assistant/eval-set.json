@@ -1,0 +1,720 @@
+{
+  "generated": {
+    "generator": "Qwen/Qwen2.5-1.5B-Instruct",
+    "questions_per_article": 2,
+    "items": [
+      {
+        "question": "What causes mill scale to form on the outer surfaces of steel products during production?",
+        "gold_chunk": "c0000",
+        "gold_article": "Mill scale",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.5556
+      },
+      {
+        "question": "What is the composition of mill scale?",
+        "gold_chunk": "c0004",
+        "gold_article": "Mill scale",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.6667
+      },
+      {
+        "question": "What types of chemical compounds are included in the classification of non-metallic inclusions based on their chemical composition?",
+        "gold_chunk": "c0007",
+        "gold_article": "Non-metallic inclusions",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.3333
+      },
+      {
+        "question": "What types of non-metallic inclusions are classified as natural or indigenous?",
+        "gold_chunk": "c0006",
+        "gold_article": "Non-metallic inclusions",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.6667
+      },
+      {
+        "question": "What is the initial condition required for craze growth in polymers before leading to a subcritical crack?",
+        "gold_chunk": "c0019",
+        "gold_article": "Crazing",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What does the presence of triaxial tensile stresses in defects of bulky samples contribute to regarding the initiation of crazing?",
+        "gold_chunk": "c0016",
+        "gold_article": "Crazing",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.8182
+      },
+      {
+        "question": "What does roughness primarily affect in terms of material interaction?",
+        "gold_chunk": "c0033",
+        "gold_article": "Surface roughness",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.1667
+      },
+      {
+        "question": "What does the term \"mean spacing between peaks\" specifically refer to in the context of describing repetitive roughness profiles?",
+        "gold_chunk": "c0041",
+        "gold_article": "Surface roughness",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.5455
+      },
+      {
+        "question": "What are the three main characteristics that define surface finish?",
+        "gold_chunk": "c0045",
+        "gold_article": "Surface finish",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.6667
+      },
+      {
+        "question": "What is an example given to illustrate how proper surface finishing can improve both functionality and aesthetic appeal?",
+        "gold_chunk": "c0052",
+        "gold_article": "Surface finish",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.1818
+      },
+      {
+        "question": "What phenomenon causes microscopic cracks to initiate in materials subjected to fatigue?",
+        "gold_chunk": "c0055",
+        "gold_article": "Fatigue (material)",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What causes the initiation and growth of fatigue cracks in materials?",
+        "gold_chunk": "c0054",
+        "gold_article": "Fatigue (material)",
+        "topic": "Surface defects",
+        "lexical_overlap": 0.6667
+      },
+      {
+        "question": "What invention did Thomas Blockley receive a patent for in 1759?",
+        "gold_chunk": "c0088",
+        "gold_article": "Rolling (metalworking)",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.6
+      },
+      {
+        "question": "What is the purpose of monitoring the temperature during hot rolling?",
+        "gold_chunk": "c0093",
+        "gold_article": "Rolling (metalworking)",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.6
+      },
+      {
+        "question": "What percentage of a material's melting temperature determines its lower limit for hot working?",
+        "gold_chunk": "c0119",
+        "gold_article": "Hot working",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.7778
+      },
+      {
+        "question": "What does it mean when metals undergo plastic deformation at temperatures above their recrystallization point?",
+        "gold_chunk": "c0118",
+        "gold_article": "Hot working",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.4444
+      },
+      {
+        "question": "How does the amount a material spring back relate to the yield strain?",
+        "gold_chunk": "c0127",
+        "gold_article": "Cold working",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.7143
+      },
+      {
+        "question": "What percentage of the world's steel comes from recycled components as of 2023?",
+        "gold_chunk": "c0158",
+        "gold_article": "Steelmaking",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.6667
+      },
+      {
+        "question": "What percentage reduction in blast furnace CO2 emissions was suggested by the 2012 study?",
+        "gold_chunk": "c0154",
+        "gold_article": "Steelmaking",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.5714
+      },
+      {
+        "question": "What potential issue arises when the incoming metal is severely overheated during continuous casting?",
+        "gold_chunk": "c0176",
+        "gold_article": "Continuous casting",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.4444
+      },
+      {
+        "question": "What are the potential consequences of not maintaining precise control over the temperature during the melting process?",
+        "gold_chunk": "c0169",
+        "gold_article": "Continuous casting",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.2
+      },
+      {
+        "question": "What are the main challenges associated with using acid cleaning for pickling metals?",
+        "gold_chunk": "c0191",
+        "gold_article": "Pickling (metal)",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.4286
+      },
+      {
+        "question": "What causes sheet steel to oxidize when exposed to moderate humidity after being pickled?",
+        "gold_chunk": "c0190",
+        "gold_article": "Pickling (metal)",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.5556
+      },
+      {
+        "question": "What does annealing involve in terms of heating, holding at a certain temperature, and cooling?",
+        "gold_chunk": "c0194",
+        "gold_article": "Annealing (materials science)",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What does heat do to increase the rate of diffusion during the annealing process?",
+        "gold_chunk": "c0196",
+        "gold_article": "Annealing (materials science)",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.8333
+      },
+      {
+        "question": "What innovative process has been developed to address the limitations of traditional peen plating methods?",
+        "gold_chunk": "c0223",
+        "gold_article": "Shot peening",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.3333
+      },
+      {
+        "question": "What advantage does cut wire shot have over cast shot in terms of durability?",
+        "gold_chunk": "c0215",
+        "gold_article": "Shot peening",
+        "topic": "Rolling & steelmaking",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What chemical substance is commonly used to remove rust from ferrous tools?",
+        "gold_chunk": "c0231",
+        "gold_article": "Corrosion",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.5714
+      },
+      {
+        "question": "What causes the strong decrease in the solubility of Fe(OH)2 as pH increases due to the common ion effect?",
+        "gold_chunk": "c0264",
+        "gold_article": "Pitting corrosion",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.5556
+      },
+      {
+        "question": "What specific combination of alloy and environment causes pitting corrosion?",
+        "gold_chunk": "c0269",
+        "gold_article": "Pitting corrosion",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.7143
+      },
+      {
+        "question": "What type of rust occurs when iron reacts with chloride in an oxygen-deprived environment?",
+        "gold_chunk": "c0278",
+        "gold_article": "Rust",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What causes the collapse of the Mianus River bridge in 1983?",
+        "gold_chunk": "c0296",
+        "gold_article": "Rust",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.8
+      },
+      {
+        "question": "What does galvanization primarily protect against?",
+        "gold_chunk": "c0301",
+        "gold_article": "Galvanization",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.0
+      },
+      {
+        "question": "What is the most common method for applying a protective zinc coating to steel or iron?",
+        "gold_chunk": "c0298",
+        "gold_article": "Galvanization",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 1.0
+      },
+      {
+        "question": "What additive is often added to the molten zinc bath to improve the fluidity of the bath?",
+        "gold_chunk": "c0309",
+        "gold_article": "Hot-dip galvanization",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.875
+      },
+      {
+        "question": "What does BS EN ISO 1461 specify as the minimum coating thickness required for steel sections thicker than 6 mm?",
+        "gold_chunk": "c0312",
+        "gold_article": "Hot-dip galvanization",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.7778
+      },
+      {
+        "question": "What is the primary mechanism by which some aluminum alloys fail to form an effective oxide layer?",
+        "gold_chunk": "c0317",
+        "gold_article": "Passivation (chemistry)",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What does the AISI three-digit number label in relation to different types of stainless steel?",
+        "gold_chunk": "c0330",
+        "gold_article": "Stainless steel",
+        "topic": "Corrosion & protection",
+        "lexical_overlap": 0.7778
+      },
+      {
+        "question": "What are some alternative methods besides detection rules for identifying the source of excessive variation when using statistical process control?",
+        "gold_chunk": "c0376",
+        "gold_article": "Statistical process control",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.5385
+      },
+      {
+        "question": "What does statistical process control aim to detect when there is a change in the production process?",
+        "gold_chunk": "c0370",
+        "gold_article": "Statistical process control",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.4286
+      },
+      {
+        "question": "What is the average time between false alarms for a Shewhart control chart with 3-sigma limits?",
+        "gold_chunk": "c0401",
+        "gold_article": "Control chart",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.7778
+      },
+      {
+        "question": "What does Wilkinson's algorithm do for Pareto charts?",
+        "gold_chunk": "c0408",
+        "gold_article": "Pareto chart",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 1.0
+      },
+      {
+        "question": "What does the right vertical axis of a Pareto chart represent?",
+        "gold_chunk": "c0407",
+        "gold_article": "Pareto chart",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 1.0
+      },
+      {
+        "question": "What does the Pareto analysis help managers prioritize when identifying important causes?",
+        "gold_chunk": "c0418",
+        "gold_article": "Pareto principle",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What does the Pareto distribution define regarding the fraction of the population with wealth?",
+        "gold_chunk": "c0413",
+        "gold_article": "Pareto principle",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.7143
+      },
+      {
+        "question": "What does the acceptance sampling process involve when determining whether a lot should be accepted based on the number of nonconformities?",
+        "gold_chunk": "c0430",
+        "gold_article": "Acceptance sampling",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.4167
+      },
+      {
+        "question": "What are two key components of a sampling plan in terms of quality standards?",
+        "gold_chunk": "c0429",
+        "gold_article": "Acceptance sampling",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.375
+      },
+      {
+        "question": "What specific improvement did Six Sigma help Bank of America achieve according to their announcement?",
+        "gold_chunk": "c0453",
+        "gold_article": "Six Sigma",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.4
+      },
+      {
+        "question": "What does proactive management entail regarding the prevention of problems?",
+        "gold_chunk": "c0466",
+        "gold_article": "Root-cause analysis",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What does the term \"risk\" specifically refer to in the context of Failure Mode and Effects Analysis?",
+        "gold_chunk": "c0514",
+        "gold_article": "Failure mode and effects analysis",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.3333
+      },
+      {
+        "question": "What does the term \"ground rules\" specifically refer to in the context of Failure Mode and Effects Analysis?",
+        "gold_chunk": "c0498",
+        "gold_article": "Failure mode and effects analysis",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What does it mean when a process capability index value is near or below zero?",
+        "gold_chunk": "c0525",
+        "gold_article": "Process capability index",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.75
+      },
+      {
+        "question": "What does the process capability index measure regarding a manufacturing process?",
+        "gold_chunk": "c0522",
+        "gold_article": "Process capability index",
+        "topic": "Quality control & SPC",
+        "lexical_overlap": 0.6667
+      },
+      {
+        "question": "What significant technological advancement occurred in non-destructive testing methods during the early 20th century?",
+        "gold_chunk": "c0538",
+        "gold_article": "Nondestructive testing",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.0
+      },
+      {
+        "question": "What type of material is typically tested using liquid penetrant testing?",
+        "gold_chunk": "c0531",
+        "gold_article": "Nondestructive testing",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.5714
+      },
+      {
+        "question": "What does the diagnostic machine display in the form of a signal when using ultrasonic testing?",
+        "gold_chunk": "c0562",
+        "gold_article": "Ultrasonic testing",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.8571
+      },
+      {
+        "question": "What advantage does eddy current array (ECA) provide over conventional ECT?",
+        "gold_chunk": "c0579",
+        "gold_article": "Eddy-current testing",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.6667
+      },
+      {
+        "question": "What type of inspection is optimized ECT array particularly effective for detecting?",
+        "gold_chunk": "c0576",
+        "gold_article": "Eddy-current testing",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.5
+      },
+      {
+        "question": "What advantage does half-wave direct current (HWDC) have over full-wave direct current (FWDC) in magnetic particle inspection?",
+        "gold_chunk": "c0585",
+        "gold_article": "Magnetic particle inspection",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.6364
+      },
+      {
+        "question": "What are the effects of passing a part through an AC demagnetizing coil?",
+        "gold_chunk": "c0588",
+        "gold_article": "Magnetic particle inspection",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.6667
+      },
+      {
+        "question": "What precautions should be taken when removing excess penetrant before applying the developer?",
+        "gold_chunk": "c0601",
+        "gold_article": "Dye penetrant inspection",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.3333
+      },
+      {
+        "question": "What is the purpose of pre-cleaning before applying penetrant during liquid penetrant inspection?",
+        "gold_chunk": "c0599",
+        "gold_article": "Dye penetrant inspection",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.5714
+      },
+      {
+        "question": "What does the term \"eyeball search\" specifically refer to in the context of data analysis?",
+        "gold_chunk": "c0609",
+        "gold_article": "Visual inspection",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.375
+      },
+      {
+        "question": "What is the average duration of eye fixations during visual inspections according to the study?",
+        "gold_chunk": "c0608",
+        "gold_article": "Visual inspection",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.625
+      },
+      {
+        "question": "What is a key difference between conventional, phased array, and TOFD methods in ultrasonic testing?",
+        "gold_chunk": "c0615",
+        "gold_article": "Weld quality assurance",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.7778
+      },
+      {
+        "question": "What are some key benefits of using visual weld monitoring during the welding process?",
+        "gold_chunk": "c0616",
+        "gold_article": "Weld quality assurance",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.625
+      },
+      {
+        "question": "What type of defect detection does automated optical inspection primarily rely on?",
+        "gold_chunk": "c0627",
+        "gold_article": "Automated optical inspection",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.125
+      },
+      {
+        "question": "What is the main purpose of Automated Optical Inspection (AOI) in PCB manufacturing?",
+        "gold_chunk": "c0625",
+        "gold_article": "Automated optical inspection",
+        "topic": "Inspection & NDT",
+        "lexical_overlap": 0.75
+      },
+      {
+        "question": "What does the term \"machine vision\" encompass beyond its narrow definition?",
+        "gold_chunk": "c0631",
+        "gold_article": "Machine vision",
+        "topic": "Machine vision & ML",
+        "lexical_overlap": 0.5714
+      },
+      {
+        "question": "What are some common applications of machine vision in industrial quality control?",
+        "gold_chunk": "c0640",
+        "gold_article": "Machine vision",
+        "topic": "Machine vision & ML",
+        "lexical_overlap": 0.125
+      },
+      {
+        "question": "What normalization technique did Dalal and Triggs find provided the most consistent performance among the L2-hys, L2-norm, and L1-sqrt schemes?",
+        "gold_chunk": "c0653",
+        "gold_article": "Histogram of oriented gradients",
+        "topic": "Machine vision & ML",
+        "lexical_overlap": 0.6154
+      },
+      {
+        "question": "What is the formula for calculating the values of Gabor filters in the discrete domain?",
+        "gold_chunk": "c0667",
+        "gold_article": "Gabor filter",
+        "topic": "Machine vision & ML",
+        "lexical_overlap": 0.5714
+      },
+      {
+        "question": "What application specifically uses Gabor filters for facial expression recognition?",
+        "gold_chunk": "c0668",
+        "gold_article": "Gabor filter",
+        "topic": "Machine vision & ML",
+        "lexical_overlap": 0.625
+      },
+      {
+        "question": "What is an example of how random forests handle mixed variable types effectively?",
+        "gold_chunk": "c0688",
+        "gold_article": "Random forest",
+        "topic": "Machine vision & ML",
+        "lexical_overlap": 0.625
+      },
+      {
+        "question": "How does feature bagging differ from regular bagging in the context of random forests?",
+        "gold_chunk": "c0677",
+        "gold_article": "Random forest",
+        "topic": "Machine vision & ML",
+        "lexical_overlap": 0.5714
+      },
+      {
+        "question": "What is an example of how the performance of anomaly detection methods can vary depending on the type of data set?",
+        "gold_chunk": "c0718",
+        "gold_article": "Anomaly detection",
+        "topic": "Machine vision & ML",
+        "lexical_overlap": 0.6
+      },
+      {
+        "question": "What significant change occurred in the evolution of intrusion detection compared to its initial manual process?",
+        "gold_chunk": "c0708",
+        "gold_article": "Anomaly detection",
+        "topic": "Machine vision & ML",
+        "lexical_overlap": 0.4
+      }
+    ],
+    "mean_lexical_overlap": 0.561
+  },
+  "curated": [
+    {
+      "question": "What causes mill scale on hot-rolled steel and how is it removed before painting?",
+      "gold_articles": [
+        "Mill scale",
+        "Pickling (metal)"
+      ],
+      "showcase": true
+    },
+    {
+      "question": "How does pitting corrosion start on stainless steel?",
+      "gold_articles": [
+        "Pitting corrosion",
+        "Stainless steel",
+        "Passivation (chemistry)"
+      ],
+      "showcase": true
+    },
+    {
+      "question": "When is a process considered out of statistical control on a control chart?",
+      "gold_articles": [
+        "Control chart",
+        "Statistical process control"
+      ],
+      "showcase": true
+    },
+    {
+      "question": "How can machine vision detect surface defects on a production line?",
+      "gold_articles": [
+        "Machine vision",
+        "Automated optical inspection",
+        "Visual inspection"
+      ],
+      "showcase": true
+    },
+    {
+      "question": "Why do quality teams sort defect causes with a Pareto chart?",
+      "gold_articles": [
+        "Pareto chart",
+        "Pareto principle"
+      ],
+      "showcase": true
+    },
+    {
+      "question": "What image structure does a histogram of oriented gradients descriptor capture?",
+      "gold_articles": [
+        "Histogram of oriented gradients"
+      ],
+      "showcase": true
+    },
+    {
+      "question": "What is the difference between hot rolling and cold rolling of steel?",
+      "gold_articles": [
+        "Rolling (metalworking)",
+        "Hot working",
+        "Cold working"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "Why are non-metallic inclusions harmful to steel quality?",
+      "gold_articles": [
+        "Non-metallic inclusions",
+        "Steelmaking"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "How does acid pickling clean the surface of steel strip?",
+      "gold_articles": [
+        "Pickling (metal)"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "How does a zinc coating protect steel from rusting?",
+      "gold_articles": [
+        "Galvanization",
+        "Hot-dip galvanization",
+        "Corrosion"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "What does the Cpk index say about whether a process can meet its specification limits?",
+      "gold_articles": [
+        "Process capability index"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "How is a failure mode prioritised in an FMEA?",
+      "gold_articles": [
+        "Failure mode and effects analysis"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "How does ultrasonic testing find internal flaws in metal?",
+      "gold_articles": [
+        "Ultrasonic testing",
+        "Nondestructive testing"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "Which surface cracks can magnetic particle inspection reveal, and on which materials does it work?",
+      "gold_articles": [
+        "Magnetic particle inspection"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "How does a random forest reduce overfitting compared with a single decision tree?",
+      "gold_articles": [
+        "Random forest"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "What texture information does a Gabor filter extract from an image?",
+      "gold_articles": [
+        "Gabor filter"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "How is surface roughness measured and expressed?",
+      "gold_articles": [
+        "Surface roughness",
+        "Surface finish"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "Why does shot peening improve the fatigue life of metal parts?",
+      "gold_articles": [
+        "Shot peening",
+        "Fatigue (material)"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "How does acceptance sampling decide whether to accept a production lot?",
+      "gold_articles": [
+        "Acceptance sampling"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "What is the goal of root cause analysis after a quality failure?",
+      "gold_articles": [
+        "Root-cause analysis"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "How does continuous casting turn molten steel into slabs?",
+      "gold_articles": [
+        "Continuous casting",
+        "Steelmaking"
+      ],
+      "showcase": false
+    },
+    {
+      "question": "How can anomaly detection flag unusual products when defect examples are rare?",
+      "gold_articles": [
+        "Anomaly detection"
+      ],
+      "showcase": false
+    }
+  ]
+}

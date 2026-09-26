@@ -1,0 +1,10 @@
+# Extra dependencies for analysis/run_rag_case_study.py (not needed to run the dashboard).
+# Install on top of requirements.txt. For GPU inference install a CUDA build of torch first:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+torch>=2.5
+sentence-transformers==6.1.0
+transformers==5.17.0
+accelerate
+chromadb==1.5.9
+umap-learn==0.5.12
+bitsandbytes  # 4-bit loading of the 3B generator

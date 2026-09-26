@@ -1,0 +1,693 @@
+{
+  "top_k": 4,
+  "precomputed": true,
+  "generator": "Qwen/Qwen2.5-3B-Instruct",
+  "prompt": "v2_strict",
+  "nli_model": "cross-encoder/nli-deberta-v3-base",
+  "samples": [
+    {
+      "question": "What causes mill scale on hot-rolled steel and how is it removed before painting?",
+      "gold_articles": [
+        "Mill scale",
+        "Pickling (metal)"
+      ],
+      "query_3d": [
+        0.0629,
+        -0.3963,
+        0.2008
+      ],
+      "query_2d": [
+        -0.0568,
+        -0.574
+      ],
+      "retrieved": [
+        {
+          "rank": 1,
+          "id": "c0001",
+          "index": 1,
+          "similarity": 0.8243,
+          "article": "Mill scale",
+          "section": "Introduction",
+          "topic": "Surface defects",
+          "text": "Mill scale becomes a nuisance when the steel is to be processed. Any paint applied over it is wasted, since it will come off with the scale as moisture-laden air gets under it. Thus mill scale needs to be removed from steel surfaces by flame cleaning, pickling, or abrasive blasting, which are all tedious operations that consume energy. This is why shipbuilders and steel fixers used to leave steel and rebar delivered freshly rolled from mills out in the open to allow it to 'weather' until most of the scale fell off due to atmospheric action. Nowadays, most steel mills can supply their product with mill scale removed and steel coated with shop primers over which welding or painting can be done safely. Mill scale generated in rolling mills will be collected and sent to a sinter plant for recycling."
+        },
+        {
+          "rank": 2,
+          "id": "c0002",
+          "index": 2,
+          "similarity": 0.7906,
+          "article": "Mill scale",
+          "section": "In art",
+          "topic": "Surface defects",
+          "text": "Mill scale is sought after by abstract expressionist artists for its unpredicted and seemingly random organic visual effects. Although the majority of mill scale is removed from steel during its passage through scale breaker rolls during manufacturing, smaller structurally inconsequential residue can be visible. Leveraging this processing vestige by accelerating its corrosive effects through the metallurgical use of phosphoric acid or in conjunction with selenium dioxide can create a high contrast visual substrate onto which other compositional elements can be added."
+        },
+        {
+          "rank": 3,
+          "id": "c0000",
+          "index": 0,
+          "similarity": 0.7856,
+          "article": "Mill scale",
+          "section": "Introduction",
+          "topic": "Surface defects",
+          "text": "Mill scale, often shortened to just scale, is the flaky surface of hot rolled steel, consisting of the mixed iron oxides iron(II) oxide (FeO, wüstite), iron(III) oxide (Fe2O3, hematite), and iron(II,III) oxide (Fe3O4, magnetite). Mill scale is formed on the outer surfaces of plates, sheets or profiles when they are produced by passing red hot iron or steel billets through rolling mills. Mill scale is bluish-black in color. It is usually less than 1 mm (0.039 in) thick, and initially adheres to the steel surface and protects it from atmospheric corrosion provided no break occurs in this coating. Because it is electrochemically cathodic to steel, any break in the mill scale coating will cause accelerated corrosion of steel exposed at the break. Mill scale is thus a boon for a while, until its coating breaks due to handling of the steel product or due to any other mechanical cause."
+        },
+        {
+          "rank": 4,
+          "id": "c0188",
+          "index": 188,
+          "similarity": 0.6539,
+          "article": "Pickling (metal)",
+          "section": "Process",
+          "topic": "Rolling & steelmaking",
+          "text": "Metal surfaces can contain impurities that may affect usage of the product or further processing like plating with metal or painting. Various chemical solutions are usually used to clean these impurities. Strong acids, such as hydrochloric acid and sulfuric acid are common, but different applications use various other acids. Alkaline solutions can also be used for cleaning metal surfaces. Solutions usually also contain additives such as wetting agents and corrosion inhibitors. Pickling is sometimes called acid cleaning if descaling is not needed. Many hot working processes and other processes that occur at high temperatures leave a discoloring oxide layer or scale on the surface. In order to remove the scale the workpiece is dipped into a vat of pickle liquor. Prior to cold rolling operation, hot rolled steel is normally passed through a pickling line so as to eradicate the scale from the surface."
+        }
+      ],
+      "nearest_in_3d": [
+        3,
+        0,
+        1,
+        2
+      ],
+      "nearest_in_2d": [
+        3,
+        0,
+        2,
+        4
+      ],
+      "overlap_3d": 3,
+      "overlap_2d": 2,
+      "answer": "Mill scale forms on the outer surfaces of hot-rolled steel when it passes through rolling mills, becoming bluish-black and less than 1 mm thick. Before painting, the mill scale is removed by dipping the hot-rolled steel into a vat of pickle liquor, which is part of the pickling process.",
+      "faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.5,
+        "sentences": [
+          {
+            "text": "Mill scale forms on the outer surfaces of hot-rolled steel when it passes through rolling mills, becoming bluish-black and less than 1 mm thick.",
+            "entailment": 0.9982,
+            "supported": true,
+            "best_passage": 3,
+            "evidence": "Mill scale is formed on the outer surfaces of plates, sheets or profiles when they are produced by passing red hot iron or steel billets through rolling mills. Mill scale is bluish-black in color. It is usually less than 1 mm (0.039 in) thick, and initially adheres to the steel surface and protects it from atmospheric corrosion provided no break occurs in this coating."
+          },
+          {
+            "text": "Before painting, the mill scale is removed by dipping the hot-rolled steel into a vat of pickle liquor, which is part of the pickling process.",
+            "entailment": 0.0249,
+            "supported": false,
+            "best_passage": 4,
+            "evidence": null
+          }
+        ]
+      },
+      "closed_book_answer": "Mill scale, also known as bloom scale or skin effect, forms during the rolling process when the surface of the hot-rolled steel comes into contact with the metal rollers. It is typically composed of iron oxide (rust) and other contaminants. Before painting, this scale is usually removed through a process called pickling, which involves immersing the steel in a solution of acid to dissolve the scale, followed by thorough rinsing and drying.",
+      "closed_book_faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.0,
+        "sentences": [
+          {
+            "text": "Mill scale, also known as bloom scale or skin effect, forms during the rolling process when the surface of the hot-rolled steel comes into contact with the metal rollers.",
+            "entailment": 0.0175,
+            "supported": false,
+            "best_passage": 4,
+            "evidence": null
+          },
+          {
+            "text": "It is typically composed of iron oxide (rust) and other contaminants.",
+            "entailment": 0.0003,
+            "supported": false,
+            "best_passage": 3,
+            "evidence": null
+          },
+          {
+            "text": "Before painting, this scale is usually removed through a process called pickling, which involves immersing the steel in a solution of acid to dissolve the scale, followed by thorough rinsing and drying.",
+            "entailment": 0.0017,
+            "supported": false,
+            "best_passage": 4,
+            "evidence": null
+          }
+        ]
+      }
+    },
+    {
+      "question": "How does pitting corrosion start on stainless steel?",
+      "gold_articles": [
+        "Pitting corrosion",
+        "Stainless steel",
+        "Passivation (chemistry)"
+      ],
+      "query_3d": [
+        -0.1612,
+        -0.4345,
+        0.248
+      ],
+      "query_2d": [
+        0.1524,
+        -0.4336
+      ],
+      "retrieved": [
+        {
+          "rank": 1,
+          "id": "c0267",
+          "index": 267,
+          "similarity": 0.7821,
+          "article": "Pitting corrosion",
+          "section": "Mechanism / Pit growth",
+          "topic": "Corrosion & protection",
+          "text": "The pits on the surface are often obscured by corrosion products. Pitting can be initiated by a small surface defect, being a scratch or a local change in the alloy composition (or local impurities, e.g. metallic sulfide inclusions such as MnS or NiS), or a damage to the protective coating. Polished surfaces display a higher resistance to pitting."
+        },
+        {
+          "rank": 2,
+          "id": "c0259",
+          "index": 259,
+          "similarity": 0.7574,
+          "article": "Pitting corrosion",
+          "section": "Development and kinetics of pitting",
+          "topic": "Corrosion & protection",
+          "text": "According to Frankel (1998) who performed a review on pitting corrosion, it develops in three successive steps: (1) initiation (or nucleation) by breakdown of the passive film protecting the metal surface from oxidation, (2) growth of metastable pits (growing up to the micron scale and then repassivating), and (3) the growth of larger and stable pits. The evolution of the pit density (number of pits per surface area) as a function of time follows a sigmoid curve with the characteristic shape of a logistic function curve, or a hyperbolic tangent. Guo et al. (2018), after a statistical analysis of hundreds of individual pits observed on carbon steel surfaces at the nano-to-micro- scales, distinguish three stages of pitting corrosion: induction, propagation, and saturation."
+        },
+        {
+          "rank": 3,
+          "id": "c0258",
+          "index": 258,
+          "similarity": 0.7552,
+          "article": "Pitting corrosion",
+          "section": "Introduction",
+          "topic": "Corrosion & protection",
+          "text": "Pitting corrosion, or pitting, is a form of extremely localized corrosion that leads to the random creation of small holes in metal. The driving power for pitting corrosion is the depassivation of a small area, which becomes anodic (oxidation reaction) while an unknown but potentially vast area becomes cathodic (reduction reaction), leading to very localized galvanic corrosion. The corrosion penetrates the mass of the metal, with a limited diffusion of ions. Another term arises, pitting factor, which is defined as the ratio of the depth of the deepest pit (from localized corrosion) to the average penetration depth (mean thickness of the corrosion layer produced by the general uniform corrosion), which can be calculated based on the weight loss and corrosion products density."
+        },
+        {
+          "rank": 4,
+          "id": "c0269",
+          "index": 269,
+          "similarity": 0.7551,
+          "article": "Pitting corrosion",
+          "section": "Susceptible alloys and environment conditions",
+          "topic": "Corrosion & protection",
+          "text": "Pitting corrosion is defined by localized attack, ranging from microns to millimeters in diameter, in an otherwise passive surface and only occurs for specific alloy and environmental combinations. Thus, this type of corrosion typically occurs in alloys that are protected by a tenacious (passivating) oxide film such as stainless steels, nickel alloys, aluminum alloys in environments that contain an aggressive species such as chlorides (Cl–) or thiosulfates (S2O32–). In contrast, alloy/environment combinations where the passive film is not very protective usually will not produce pitting corrosion. A good example of the importance of alloy/environment combinations is carbon steel. In environments where the pH value is lower than 10, carbon steel does not form a passivating oxide film and the addition of chloride results in uniform attack over the entire surface. However, at pH greater than 10 (alkaline) the oxide is protective and the addition of chloride results in pitting corrosion."
+        }
+      ],
+      "nearest_in_3d": [
+        269,
+        267,
+        238,
+        260
+      ],
+      "nearest_in_2d": [
+        267,
+        238,
+        260,
+        261
+      ],
+      "overlap_3d": 2,
+      "overlap_2d": 1,
+      "answer": "Pitting corrosion starts when the passive film protecting the stainless steel surface from oxidation breaks down, initiating the process by breaking down the passive film protecting the metal surface from oxidation, according to Frankel (1998).",
+      "faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.0,
+        "sentences": [
+          {
+            "text": "Pitting corrosion starts when the passive film protecting the stainless steel surface from oxidation breaks down, initiating the process by breaking down the passive film protecting the metal surface from oxidation, according to Frankel (1998).",
+            "entailment": 0.4982,
+            "supported": false,
+            "best_passage": 2,
+            "evidence": null
+          }
+        ]
+      },
+      "closed_book_answer": "Pitting corrosion in stainless steel typically starts when small localized areas of the metal surface become more susceptible to corrosion due to changes in the microenvironment, such as the formation of an anodic area where oxygen is scarce or depleted. This anodic area becomes more prone to corrosion, leading to the initiation of pits. The process often begins with the formation of a thin oxide layer that can be unstable and prone to cracking under certain conditions, allowing corrosive agents to penetrate and initiate pit formation.",
+      "closed_book_faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.3333,
+        "sentences": [
+          {
+            "text": "Pitting corrosion in stainless steel typically starts when small localized areas of the metal surface become more susceptible to corrosion due to changes in the microenvironment, such as the formation of an anodic area where oxygen is scarce or depleted.",
+            "entailment": 0.0078,
+            "supported": false,
+            "best_passage": 3,
+            "evidence": null
+          },
+          {
+            "text": "This anodic area becomes more prone to corrosion, leading to the initiation of pits.",
+            "entailment": 0.9774,
+            "supported": true,
+            "best_passage": 4,
+            "evidence": "However, at pH greater than 10 (alkaline) the oxide is protective and the addition of chloride results in pitting corrosion."
+          },
+          {
+            "text": "The process often begins with the formation of a thin oxide layer that can be unstable and prone to cracking under certain conditions, allowing corrosive agents to penetrate and initiate pit formation.",
+            "entailment": 0.0003,
+            "supported": false,
+            "best_passage": 2,
+            "evidence": null
+          }
+        ]
+      }
+    },
+    {
+      "question": "When is a process considered out of statistical control on a control chart?",
+      "gold_articles": [
+        "Control chart",
+        "Statistical process control"
+      ],
+      "query_3d": [
+        0.229,
+        0.8944,
+        -0.2924
+      ],
+      "query_2d": [
+        -0.263,
+        0.6694
+      ],
+      "retrieved": [
+        {
+          "rank": 1,
+          "id": "c0400",
+          "index": 400,
+          "similarity": 0.7495,
+          "article": "Control chart",
+          "section": "Performance of control charts",
+          "topic": "Quality control & SPC",
+          "text": "When a point falls outside the limits established for a given control chart, those responsible for the underlying process are expected to determine whether a special cause has occurred. If one has, it is appropriate to determine if the results with the special cause are better than or worse than results from common causes alone. If worse, then that cause should be eliminated if possible. If better, it may be appropriate to intentionally retain the special cause within the system producing the results. Even when a process is in control (that is, no special causes are present in the system), there is approximately a 0.27% probability of a point exceeding 3-sigma control limits. So, even an in control process plotted on a properly constructed control chart will eventually signal the possible presence of a special cause, even though one may not have actually occurred."
+        },
+        {
+          "rank": 2,
+          "id": "c0391",
+          "index": 391,
+          "similarity": 0.734,
+          "article": "Control chart",
+          "section": "Chart details / Chart usage",
+          "topic": "Quality control & SPC",
+          "text": "If the process is in control (and the process statistic is normal), 99.7300% of all the points will fall between the control limits. Any observations outside the limits, or systematic patterns within, suggest the introduction of a new (and likely unanticipated) source of variation, known as a special-cause variation. Since increased variation means increased quality costs, a control chart \"signaling\" the presence of a special-cause requires immediate investigation. This makes the control limits very important decision aids. The control limits provide information about the process behavior and have no intrinsic relationship to any specification targets or engineering tolerance. In practice, the process mean (and hence the centre line) may not coincide with the specified value (or target) of the quality characteristic because the process design simply cannot deliver the process characteristic at the desired level. Control charts limit specification limits or targets because of the tendency of those involved with the process (e.g., machine operators) to focus on performing to specification when in fact the least-cost course of action is to keep process variation as low as possible."
+        },
+        {
+          "rank": 3,
+          "id": "c0381",
+          "index": 381,
+          "similarity": 0.7311,
+          "article": "Control chart",
+          "section": "Overview",
+          "topic": "Quality control & SPC",
+          "text": "If analysis of the control chart indicates that the process is currently under control (i.e., is stable, with variation only coming from sources common to the process), then no corrections or changes to process control parameters are needed or desired. In addition, data from the process can be used to predict the future performance of the process. If the chart indicates that the monitored process is not in control, analysis of the chart can help determine the sources of variation, as this will result in degraded process performance. A process that is stable but operating outside desired (specification) limits (e.g., scrap rates may be in statistical control but above desired limits) needs to be improved through a deliberate effort to understand the causes of current performance and fundamentally improve the process. The control chart is one of the seven basic tools of quality control."
+        },
+        {
+          "rank": 4,
+          "id": "c0375",
+          "index": 375,
+          "similarity": 0.7265,
+          "article": "Statistical process control",
+          "section": "Application / Stable process",
+          "topic": "Quality control & SPC",
+          "text": "When the process does not trigger any of the control chart \"detection rules\" for the control chart, it is said to be \"stable\". A process capability analysis may be performed on a stable process to predict the ability of the process to produce \"conforming product\" in the future. A stable process can be demonstrated by a process signature that is free of variances outside of the capability index. A process signature is the plotted points compared with the capability index."
+        }
+      ],
+      "nearest_in_3d": [
+        387,
+        378,
+        390,
+        401
+      ],
+      "nearest_in_2d": [
+        388,
+        393,
+        396,
+        401
+      ],
+      "overlap_3d": 0,
+      "overlap_2d": 0,
+      "answer": "A process is considered out of statistical control on a control chart when a point falls outside the established control limits, indicating the presence of a special cause that affects the process performance beyond common causes. This suggests the introduction of a new source of variation, which may require immediate investigation to determine if it is beneficial or detrimental to the process performance.",
+      "faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.0,
+        "sentences": [
+          {
+            "text": "A process is considered out of statistical control on a control chart when a point falls outside the established control limits, indicating the presence of a special cause that affects the process performance beyond common causes.",
+            "entailment": 0.0024,
+            "supported": false,
+            "best_passage": 2,
+            "evidence": null
+          },
+          {
+            "text": "This suggests the introduction of a new source of variation, which may require immediate investigation to determine if it is beneficial or detrimental to the process performance.",
+            "entailment": 0.0011,
+            "supported": false,
+            "best_passage": 1,
+            "evidence": null
+          }
+        ]
+      },
+      "closed_book_answer": "A process is considered to be out of statistical control on a control chart when one or more data points fall outside the upper or lower control limits, or when there are patterns or trends within the data that suggest the process is not stable and predictable. This indicates that special causes of variation are present, which could lead to unpredictable process behavior and potentially produce defective products.",
+      "closed_book_faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.0,
+        "sentences": [
+          {
+            "text": "A process is considered to be out of statistical control on a control chart when one or more data points fall outside the upper or lower control limits, or when there are patterns or trends within the data that suggest the process is not stable and predictable.",
+            "entailment": 0.0063,
+            "supported": false,
+            "best_passage": 2,
+            "evidence": null
+          },
+          {
+            "text": "This indicates that special causes of variation are present, which could lead to unpredictable process behavior and potentially produce defective products.",
+            "entailment": 0.0003,
+            "supported": false,
+            "best_passage": 3,
+            "evidence": null
+          }
+        ]
+      }
+    },
+    {
+      "question": "How can machine vision detect surface defects on a production line?",
+      "gold_articles": [
+        "Machine vision",
+        "Automated optical inspection",
+        "Visual inspection"
+      ],
+      "query_3d": [
+        -0.0776,
+        -0.1535,
+        -0.2337
+      ],
+      "query_2d": [
+        0.402,
+        0.4185
+      ],
+      "retrieved": [
+        {
+          "rank": 1,
+          "id": "c0629",
+          "index": 629,
+          "similarity": 0.7712,
+          "article": "Machine vision",
+          "section": "Introduction",
+          "topic": "Machine vision & ML",
+          "text": "Machine vision is the technology and methods used to provide imaging-based automatic inspection and analysis for such applications as automatic inspection, process control, and robot guidance, usually in industry. Machine vision refers to many technologies, software and hardware products, integrated systems, actions, methods and expertise. Machine vision as a systems engineering discipline can be considered distinct from computer vision, a form of computer science. It attempts to integrate existing technologies in new ways and apply them to solve real world problems. The term is the prevalent one for these functions in industrial automation environments but is also used for these functions in other environment vehicle guidance. The overall machine vision process includes planning the details of the requirements and project, and then creating a solution. During run-time, the process starts with imaging, followed by automated analysis of the image and extraction of the required information."
+        },
+        {
+          "rank": 2,
+          "id": "c0630",
+          "index": 630,
+          "similarity": 0.7317,
+          "article": "Machine vision",
+          "section": "Definition",
+          "topic": "Machine vision & ML",
+          "text": "Definitions of the term \"Machine vision\" vary, but all include the technology and methods used to extract information from an image on an automated basis, as opposed to image processing, where the output is another image. The information extracted can be a simple good-part/bad-part signal, or more a complex set of data such as the identity, position and orientation of each object in an image. The information can be used for such applications as automatic inspection and robot and process guidance in industry, for security monitoring and vehicle guidance. This field encompasses a large number of technologies, software and hardware products, integrated systems, actions, methods and expertise. Machine vision is practically the only term used for these functions in industrial automation applications; the term is less universal for these functions in other environments such as security and vehicle guidance. Machine vision as a systems engineering discipline can be considered distinct from computer vision, a form of basic computer science; machine vision attempts to integrate existing technologies in new ways and apply them to solve real world problems in a way that meets the requirements of industrial automation and similar application areas."
+        },
+        {
+          "rank": 3,
+          "id": "c0636",
+          "index": 636,
+          "similarity": 0.7216,
+          "article": "Machine vision",
+          "section": "Imaging based automatic inspection and sorting / Imaging",
+          "topic": "Machine vision & ML",
+          "text": "Key differentiations within MV 2D visible light imaging are monochromatic vs. color, frame rate, resolution, and whether or not the imaging process is simultaneous over the entire image, making it suitable for moving processes. Though the vast majority of machine vision applications are solved using two-dimensional imaging, machine vision applications utilizing 3D imaging are a growing niche within the industry. The most commonly used method for 3D imaging is scanning based triangulation which utilizes motion of the product or image during the imaging process. A laser is projected onto the surfaces of an object. In machine vision this is accomplished with a scanning motion, either by moving the workpiece, or by moving the camera & laser imaging system. The line is viewed by a camera from a different angle; the deviation of the line represents shape variations. Lines from multiple scans are assembled into a depth map or point cloud."
+        },
+        {
+          "rank": 4,
+          "id": "c0643",
+          "index": 643,
+          "similarity": 0.7077,
+          "article": "Machine vision",
+          "section": "Imaging based robot guidance",
+          "topic": "Machine vision & ML",
+          "text": "Machine vision commonly provides location and orientation information to a robot to allow the robot to properly grasp the product. This capability is also used to guide motion that is simpler than robots, such as a 1 or 2 axis motion controller. The overall process includes planning the details of the requirements and project, and then creating a solution. This section describes the technical process that occurs during the operation of the solution. Many of the process steps are the same as with automatic inspection except with a focus on providing position and orientation information as the result."
+        }
+      ],
+      "nearest_in_3d": [
+        639,
+        638,
+        630,
+        637
+      ],
+      "nearest_in_2d": [
+        630,
+        644,
+        642,
+        636
+      ],
+      "overlap_3d": 1,
+      "overlap_2d": 2,
+      "answer": "I don't know based on the provided sources.",
+      "faithfulness": {
+        "abstained": true,
+        "faithfulness": null,
+        "sentences": []
+      },
+      "closed_book_answer": "Machine vision systems use cameras and advanced algorithms to capture images of the steel strip as it moves along the production line. These systems analyze the images to detect any deviations from the standard, such as scratches, pits, or other defects, by comparing them against a database of normal and defective images. This allows for real-time inspection and immediate removal of faulty products, ensuring high-quality output.",
+      "closed_book_faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.0,
+        "sentences": [
+          {
+            "text": "Machine vision systems use cameras and advanced algorithms to capture images of the steel strip as it moves along the production line.",
+            "entailment": 0.0045,
+            "supported": false,
+            "best_passage": 4,
+            "evidence": null
+          },
+          {
+            "text": "These systems analyze the images to detect any deviations from the standard, such as scratches, pits, or other defects, by comparing them against a database of normal and defective images.",
+            "entailment": 0.0044,
+            "supported": false,
+            "best_passage": 4,
+            "evidence": null
+          },
+          {
+            "text": "This allows for real-time inspection and immediate removal of faulty products, ensuring high-quality output.",
+            "entailment": 0.0007,
+            "supported": false,
+            "best_passage": 1,
+            "evidence": null
+          }
+        ]
+      }
+    },
+    {
+      "question": "Why do quality teams sort defect causes with a Pareto chart?",
+      "gold_articles": [
+        "Pareto chart",
+        "Pareto principle"
+      ],
+      "query_3d": [
+        0.4,
+        0.9425,
+        -0.2007
+      ],
+      "query_2d": [
+        -0.2858,
+        0.7813
+      ],
+      "retrieved": [
+        {
+          "rank": 1,
+          "id": "c0408",
+          "index": 408,
+          "similarity": 0.7632,
+          "article": "Pareto chart",
+          "section": "Description",
+          "topic": "Quality control & SPC",
+          "text": "It often represents the most common sources of defects, the highest occurring type of defect, or the most frequent reasons for customer complaints, and so on. Wilkinson (2006) devised an algorithm for producing statistically based acceptance limits (similar to confidence intervals) for each bar in the Pareto chart. These charts can be generated by simple spreadsheet programs, specialized statistical software tools, and online quality charts generators. The Pareto chart is one of the seven basic tools of quality control."
+        },
+        {
+          "rank": 2,
+          "id": "c0406",
+          "index": 406,
+          "similarity": 0.7265,
+          "article": "Pareto chart",
+          "section": "Introduction",
+          "topic": "Quality control & SPC",
+          "text": "A Pareto chart is a type of chart that contains both bars and a line graph, where individual values are represented in descending order by bars, and the cumulative total is represented by the line. The chart is named for the Pareto principle, which, in turn, derives its name from Vilfredo Pareto, a noted Italian economist. Its purpose is to assess the most frequently occurring defects by category."
+        },
+        {
+          "rank": 3,
+          "id": "c0407",
+          "index": 407,
+          "similarity": 0.7248,
+          "article": "Pareto chart",
+          "section": "Description",
+          "topic": "Quality control & SPC",
+          "text": "The left vertical axis is the frequency of occurrence, but it can alternatively represent cost or another important unit of measure. The right vertical axis is the cumulative percentage of the total number of occurrences, total cost, or total of the particular unit of measure. Because the values are in decreasing order, the cumulative function is a concave function. To take the example below, in order to lower the amount of late arrivals by 78%, it is sufficient to solve the first three issues. The Pareto Chart demonstrates a power law relationship between the rank of a quality issue and that issue's contribution to cost. This means one can find a linear relationship on a log-log plot. The purpose of the Pareto chart is to highlight the most important among a (typically large) set of factors. In quality control, Pareto charts are useful to find the defects to prioritize in order to observe the greatest overall improvement."
+        },
+        {
+          "rank": 4,
+          "id": "c0422",
+          "index": 422,
+          "similarity": 0.7107,
+          "article": "Pareto principle",
+          "section": "Applications / Engineering and quality control",
+          "topic": "Quality control & SPC",
+          "text": "The Pareto principle provides the basis for the Pareto chart, one of the key tools used in total quality control and Six Sigma techniques. The Pareto principle serves as a baseline for ABC-analysis and XYZ-analysis, widely used in logistics and procurement for the purpose of optimizing stock of goods, as well as costs of keeping and replenishing that stock. In engineering control theory, such as for electromechanical energy converters, the 80:20 principle applies to optimization efforts. The remarkable success of statistically based searches for root causes is based upon a combination of an empirical principle and mathematical logic. The empirical principle is usually known as the Pareto principle. With regard to variation causality, this principle states that there is a non-random distribution of the slopes of the numerous (theoretically infinite) terms in the general equation. All of the terms are independent of each other by definition."
+        }
+      ],
+      "nearest_in_3d": [
+        407,
+        406,
+        419,
+        408
+      ],
+      "nearest_in_2d": [
+        407,
+        406,
+        419,
+        417
+      ],
+      "overlap_3d": 3,
+      "overlap_2d": 2,
+      "answer": "Quality teams use Pareto charts to assess the most common sources of defects, the highest occurring type of defect, or the most frequent reasons for customer complaints [1]. The Pareto chart helps identify the most important among a large set of factors, highlighting defects to prioritize for greatest overall improvement [3].",
+      "faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.5,
+        "sentences": [
+          {
+            "text": "Quality teams use Pareto charts to assess the most common sources of defects, the highest occurring type of defect, or the most frequent reasons for customer complaints.",
+            "entailment": 0.0093,
+            "supported": false,
+            "best_passage": 1,
+            "evidence": null
+          },
+          {
+            "text": "The Pareto chart helps identify the most important among a large set of factors, highlighting defects to prioritize for greatest overall improvement.",
+            "entailment": 0.998,
+            "supported": true,
+            "best_passage": 3,
+            "evidence": "This means one can find a linear relationship on a log-log plot. The purpose of the Pareto chart is to highlight the most important among a (typically large) set of factors. In quality control, Pareto charts are useful to find the defects to prioritize in order to observe the greatest overall improvement."
+          }
+        ]
+      },
+      "closed_book_answer": "Quality teams use a Pareto chart to identify the most common defects or causes of problems, which helps prioritize efforts to address the issues that have the greatest impact on quality. The chart visually organizes data to show which factors contribute the most to the overall problem, allowing for focused improvement strategies.",
+      "closed_book_faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.0,
+        "sentences": [
+          {
+            "text": "Quality teams use a Pareto chart to identify the most common defects or causes of problems, which helps prioritize efforts to address the issues that have the greatest impact on quality.",
+            "entailment": 0.0162,
+            "supported": false,
+            "best_passage": 3,
+            "evidence": null
+          },
+          {
+            "text": "The chart visually organizes data to show which factors contribute the most to the overall problem, allowing for focused improvement strategies.",
+            "entailment": 0.0117,
+            "supported": false,
+            "best_passage": 3,
+            "evidence": null
+          }
+        ]
+      }
+    },
+    {
+      "question": "What image structure does a histogram of oriented gradients descriptor capture?",
+      "gold_articles": [
+        "Histogram of oriented gradients"
+      ],
+      "query_3d": [
+        -0.3885,
+        -0.1053,
+        -0.4247
+      ],
+      "query_2d": [
+        0.4508,
+        0.6437
+      ],
+      "retrieved": [
+        {
+          "rank": 1,
+          "id": "c0646",
+          "index": 646,
+          "similarity": 0.8119,
+          "article": "Histogram of oriented gradients",
+          "section": "Theory",
+          "topic": "Machine vision & ML",
+          "text": "The essential thought behind the histogram of oriented gradients descriptor is that local object appearance and shape within an image can be described by the distribution of intensity gradients or edge directions. The image is divided into small connected regions called cells, and for the pixels within each cell, a histogram of gradient directions is compiled. The descriptor is the concatenation of these histograms. For improved accuracy, the local histograms can be contrast-normalized by calculating a measure of the intensity across a larger region of the image, called a block, and then using this value to normalize all cells within the block. This normalization results in better invariance to changes in illumination and shadowing. The HOG descriptor has a few key advantages over other descriptors. Since it operates on local cells, it is invariant to geometric and photometric transformations, except for object orientation."
+        },
+        {
+          "rank": 2,
+          "id": "c0645",
+          "index": 645,
+          "similarity": 0.7598,
+          "article": "Histogram of oriented gradients",
+          "section": "Introduction",
+          "topic": "Machine vision & ML",
+          "text": "The histogram of oriented gradients (HOG) is a feature descriptor used in computer vision and image processing for the purpose of object detection. The technique counts occurrences of gradient orientation in localized portions of an image. This method is similar to that of edge orientation histograms, scale-invariant feature transform descriptors, and shape contexts, but differs in that it is computed on a dense grid of uniformly spaced cells and uses overlapping local contrast normalization for improved accuracy. Robert K. McConnell of Wayland Research Inc. first described the concepts behind HOG without using the term HOG in a patent application in 1986. In 1994 the concepts were used by Mitsubishi Electric Research Laboratories. However, usage only became widespread in 2005 when Navneet Dalal and Bill Triggs, researchers for the French National Institute for Research in Computer Science and Automation (INRIA), presented their supplementary work on HOG descriptors at the Conference on Computer Vision and Pattern Recognition (CVPR). In this work they focused on pedestrian detection in static images, although since then they expanded their tests to include human detection in videos, as well as to a variety of common animals and vehicles in static imagery."
+        },
+        {
+          "rank": 3,
+          "id": "c0661",
+          "index": 661,
+          "similarity": 0.7403,
+          "article": "Histogram of oriented gradients",
+          "section": "Further development",
+          "topic": "Machine vision & ML",
+          "text": "At the IEEE International Conference on Image Processing in 2010, Rui Hu, Mark Banard, and John Collomosse extended the HOG descriptor for use in sketch based image retrieval (SBIR). A dense orientation field was extrapolated from dominant responses in the Canny edge detector under a Laplacian smoothness constraint, and HOG computed over this field. The resulting gradient field HOG (GF-HOG) descriptor captured local spatial structure in sketches or image edge maps. This enabled the descriptor to be used within a content-based image retrieval system searchable by free-hand sketched shapes. The GF-HOG adaptation was shown to outperform existing gradient histogram descriptors such as SIFT, SURF, and HOG by around 15 percent at the task of SBIR. In 2010, Martin Krückhans introduced an enhancement of the HOG descriptor for 3D pointclouds. Instead of image gradients he used distances between points (pixels) and planes, so called residuals, to characterize a local region in a pointcloud. His histogram of oriented residuals descriptor (HOR) was successfully used in object detection tasks of 3d pointclouds."
+        },
+        {
+          "rank": 4,
+          "id": "c0658",
+          "index": 658,
+          "similarity": 0.7356,
+          "article": "Histogram of oriented gradients",
+          "section": "Further development",
+          "topic": "Machine vision & ML",
+          "text": "As part of the Pascal Visual Object Classes 2006 Workshop, Dalal and Triggs presented results on applying histogram of oriented gradients descriptors to image objects other than humans, such as cars, buses, and bicycles, as well as common animals such as dogs, cats, and cows. They included with their results the optimal parameters for block formulation and normalization in each case. The image in the below reference shows some of their detection examples for motorbikes. As part of the 2006 European Conference on Computer Vision (ECCV), Dalal and Triggs teamed up with Cordelia Schmid to apply HOG detectors to the problem of human detection in films and videos. They combined HOG descriptors on individual video frames with their newly introduced internal motion histograms (IMH) on pairs of subsequent video frames. These internal motion histograms use the gradient magnitudes from optical flow fields obtained from two consecutive frames."
+        }
+      ],
+      "nearest_in_3d": [
+        657,
+        647,
+        649,
+        653
+      ],
+      "nearest_in_2d": [
+        649,
+        650,
+        653,
+        659
+      ],
+      "overlap_3d": 0,
+      "overlap_2d": 0,
+      "answer": "The histogram of oriented gradients descriptor captures local spatial structure in images. It operates on a dense grid of uniformly spaced cells and uses overlapping local contrast normalization to improve accuracy.",
+      "faithfulness": {
+        "abstained": false,
+        "faithfulness": 1.0,
+        "sentences": [
+          {
+            "text": "The histogram of oriented gradients descriptor captures local spatial structure in images.",
+            "entailment": 0.9965,
+            "supported": true,
+            "best_passage": 1,
+            "evidence": "The essential thought behind the histogram of oriented gradients descriptor is that local object appearance and shape within an image can be described by the distribution of intensity gradients or edge directions. The image is divided into small connected regions called cells, and for the pixels within each cell, a histogram of gradient directions is compiled."
+          },
+          {
+            "text": "It operates on a dense grid of uniformly spaced cells and uses overlapping local contrast normalization to improve accuracy.",
+            "entailment": 0.9972,
+            "supported": true,
+            "best_passage": 2,
+            "evidence": "This method is similar to that of edge orientation histograms, scale-invariant feature transform descriptors, and shape contexts, but differs in that it is computed on a dense grid of uniformly spaced cells and uses overlapping local contrast normalization for improved accuracy."
+          }
+        ]
+      },
+      "closed_book_answer": "A Histogram of Oriented Gradients (HoG) descriptor captures the distribution of gradient orientations at different scales across an image. This means it visualizes how frequently each orientation occurs within the image, which can be used to describe the texture and structure of the image content.",
+      "closed_book_faithfulness": {
+        "abstained": false,
+        "faithfulness": 0.5,
+        "sentences": [
+          {
+            "text": "A Histogram of Oriented Gradients (HoG) descriptor captures the distribution of gradient orientations at different scales across an image.",
+            "entailment": 0.9538,
+            "supported": true,
+            "best_passage": 2,
+            "evidence": "The histogram of oriented gradients (HOG) is a feature descriptor used in computer vision and image processing for the purpose of object detection. The technique counts occurrences of gradient orientation in localized portions of an image. This method is similar to that of edge orientation histograms, scale-invariant feature transform descriptors, and shape contexts, but differs in that it is computed on a dense grid of uniformly spaced cells and uses overlapping local contrast normalization for improved accuracy."
+          },
+          {
+            "text": "This means it visualizes how frequently each orientation occurs within the image, which can be used to describe the texture and structure of the image content.",
+            "entailment": 0.0009,
+            "supported": false,
+            "best_passage": 1,
+            "evidence": null
+          }
+        ]
+      }
+    }
+  ]
+}
