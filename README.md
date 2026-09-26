@@ -94,7 +94,7 @@ Inclusion has the lowest precision/recall and the highest false-negative cost �
 | Patches | 3 | 13.6% | 95.5% |
 | Crazing | 1 | 4.5% | 100% |
 
-**Two classes (scratches + pitted_surface) account for 64% of all errors** — prioritizing inspection budget on these two classes maximises defect capture.
+**Two classes (scratches + pitted_surface) account for 64% of all errors** — focusing review effort on these two classes addresses most of the classifier's misclassifications.
 
 ---
 
@@ -110,7 +110,7 @@ Samples ranked by prediction entropy (high entropy = low confidence = route to h
 | 15% (54 samples) | 54 | 50.0% | 3.3× |
 | 20% (72 samples) | 72 | 81.8% | **4.1×** |
 
-Reviewing the top 20% highest-entropy samples captures 82% of all defects at 4× better yield than random inspection.
+Reviewing the top 20% highest-entropy samples captures 82% of the classifier's misclassifications (18 of 22) at 4.1× the yield of random review.
 
 ---
 
