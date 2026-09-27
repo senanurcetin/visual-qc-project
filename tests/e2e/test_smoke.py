@@ -18,21 +18,21 @@ class BrowserSmokeTests(unittest.TestCase):
         cls.browser.close()
         cls.pw.stop()
 
-    def open(self, path, **ctx):
+    def open(self, path, wait_until="networkidle", **ctx):
         context = self.browser.new_context(**ctx)
         self.addCleanup(context.close)
         page = context.new_page()
         self.errors = []
         page.on("pageerror", lambda e: self.errors.append(str(e)))
         page.on("console", lambda m: m.type == "error" and self.errors.append(m.text))
-        page.goto(BASE + path, wait_until="networkidle")
+        page.goto(BASE + path, wait_until=wait_until)
         return page
 
     def kpi(self, page, element_id):
         return page.locator(f"#{element_id}").inner_text().strip()
 
     def test_dashboard_buttons_drive_the_line(self):
-        page = self.open("/", viewport={"width": 1440, "height": 900})
+        page = self.open("/", wait_until="load", viewport={"width": 1440, "height": 900})  # dashboard polls, never idle
         page.wait_for_function("window.lineTwinReady === true", timeout=15000)
         page.get_by_role("button", name="Master Reset").click()
         page.get_by_role("button", name="Start Cycle").click()
@@ -52,8 +52,9 @@ class BrowserSmokeTests(unittest.TestCase):
         self.assertEqual(self.errors, [])
 
     def test_rag_loads_three_only_on_scroll_and_switches_questions(self):
-        page = self.open("/rag", viewport={"width": 1280, "height": 720})
+        page = self.open("/rag", viewport={"width": 1280, "height": 420})  # map well below the fold
         loaded = "performance.getEntriesByType('resource').some(e => /three\.module/.test(e.name))"
+        self.assertGreater(page.evaluate("document.getElementById('map-frame').getBoundingClientRect().top - innerHeight"), 200)
         self.assertFalse(page.evaluate(loaded))
         page.locator("#map-section").scroll_into_view_if_needed()
         page.wait_for_selector("#map-frame canvas", timeout=15000)
