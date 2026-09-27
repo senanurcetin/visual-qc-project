@@ -2,75 +2,22 @@ import os
 import cv2
 import numpy as np
 import time
-import random
-import threading
-import uuid
-import contextvars
-from collections import OrderedDict
-import sqlite3
 import io
-import csv
-from flask import Flask, Response, render_template_string, jsonify, request, send_file, g
-from werkzeug.local import LocalProxy
+from flask import Flask, Response, render_template_string, jsonify, request, send_file, session
+from datetime import timedelta
+import line_sim
 from datetime import datetime
 import pandas as pd  # Excel raporlama ve veri manipülasyonu için
 from case_study import case_study_bp
 from rag_demo import rag_bp
 
 app = Flask(__name__, static_folder="web/line", static_url_path="/line/static")
+# Session çerezi yalnızca demo hattının kontrol durumunu imzalar; gizli veri taşımaz.
+app.secret_key = os.environ.get("SECRET_KEY", "visual-qc-public-demo")
+app.permanent_session_lifetime = timedelta(days=7)
+app.config.update(SESSION_COOKIE_SAMESITE="Lax", SESSION_COOKIE_HTTPONLY=True)
 app.register_blueprint(case_study_bp)
 app.register_blueprint(rag_bp)
-
-# --- MİMARİ YAPITAŞI: THREAD SAFETY ---
-# Standart 'Lock' yerine 'RLock' (Re-entrant Lock) kullanıyoruz.
-# Bu, aynı thread'in kilidi tekrar alabilmesini sağlar ve karmaşık akışlarda kilitlenmeyi önler.
-data_lock = threading.RLock()
-# Serverless ortamlarda (Vercel) yalnızca /tmp yazılabilir.
-DB_FILE = os.path.join("/tmp" if os.environ.get("VERCEL") else ".", "vision_qc.db")
-
-# --- VERİTABANI YÖNETİMİ (PERSISTENCE LAYER) ---
-def init_db():
-    """
-    Veritabanı tablosunu oluşturur.
-    'timeout=10': Veritabanı o an meşgulse hata vermek yerine 10 saniye bekler (Concurrency için kritik).
-    """
-    try:
-        with sqlite3.connect(DB_FILE, timeout=10) as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS production_logs (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp TEXT NOT NULL,
-                    unit_id TEXT NOT NULL,
-                    status TEXT NOT NULL,
-                    oee_score REAL NOT NULL
-                )
-            """)
-            conn.commit()
-        print("Sistem: Veritabanı bağlantısı başarılı ve tablo hazır.")
-    except Exception as e:
-        print(f"KRİTİK HATA: Veritabanı başlatılamadı - {e}")
-
-def save_log_to_db(unit_id, status, oee_score):
-    """
-    Tekil bir üretim kaydını veritabanına işler.
-    Bu fonksiyon simülasyon döngüsünde 'Non-Blocking' olarak çağrılır.
-    """
-    try:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # Her yazma işleminde 'taze' bir bağlantı açıyoruz (Stateless Architecture)
-        with sqlite3.connect(DB_FILE, timeout=10) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO production_logs (timestamp, unit_id, status, oee_score) VALUES (?, ?, ?, ?)",
-                (timestamp, unit_id, status, oee_score)
-            )
-            conn.commit()
-    except Exception as e:
-        print(f"DB Yazma Hatası (Simülasyon devam ediyor): {e}")
-
-# Uygulama başlarken veritabanını hazırla
-init_db()
 
 # --- 1. FRONTEND: HMI ARAYÜZÜ (HTML/JS) ---
 # Gerçek bir endüstriyel panel (HMI) simülasyonu için karanlık tema ve yüksek kontrastlı tasarım.
@@ -268,225 +215,44 @@ HTML_TEMPLATE = """
 """
 
 # --- 2. BACKEND: İŞ MANTIĞI & DURUM YÖNETİMİ ---
-def get_initial_state():
-    return {
-        "system_mode": "PAUSED", "total_units": 0, "ok_units": 0, "nok_units": 0,
-        "revenue": 0.0, "cost": 0.0, "net_profit": 0.0, "sim_start_time": None, 
-        "sim_accumulated_time": 0.0, "session_start_time": time.time(), "recent_logs": [],
-        "decided_cycle": -1, "completed_cycle": -1, "current_unit_status": "PENDING", "force_fail_next": False,
-        "current_defect": None, "status_cycle": -1,
-        "availability": 0.0, "performance": 0.96, "quality": 1.0, "oee": 0.0,
-    }
-
-# --- ZİYARETÇİ BAŞINA HAT DURUMU ---
-# Canlı demoda bir ziyaretçinin START/ESTOP/RESET komutu diğerlerini etkilemesin diye her tarayıcı
-# (qc_sid çerezi) kendi hat durumuna sahiptir. `factory_state` o isteğin durumuna işaret eden bir proxy'dir;
-# istek dışında (testler, CLI) varsayılan duruma düşer.
-SESSION_COOKIE = "qc_sid"
-MAX_SESSIONS = 500
-_sessions = OrderedDict()
-_default_state = get_initial_state()
-_active_state = contextvars.ContextVar("qc_active_state", default=None)
-factory_state = LocalProxy(lambda: _active_state.get() or _default_state)
+# --- HAT SİMÜLASYONU (DURUMSUZ) ---
+# Hattın tamamı line_sim içinde, ziyaretçinin imzalı session çerezindeki küçük bir kontrol
+# durumundan deterministik olarak hesaplanır. Böylece her ziyaretçinin hattı bağımsızdır ve
+# eşzamanlı istekleri farklı serverless instance'lar karşılasa bile aynı sayaçlar görülür.
+ANIMATION_CYCLE = line_sim.CYCLE_SECONDS
+DEFECT_CLASSES = line_sim.DEFECT_CLASSES
 
 
-@app.before_request
-def _bind_session_state():
-    sid = request.cookies.get(SESSION_COOKIE)
-    if not sid or len(sid) > 64:
-        sid = uuid.uuid4().hex
-        g.new_sid = sid
-    with data_lock:
-        state = _sessions.get(sid)
-        if state is None:
-            state = _sessions[sid] = get_initial_state()
-            while len(_sessions) > MAX_SESSIONS:
-                _sessions.popitem(last=False)
-        _sessions.move_to_end(sid)
-    g.state_token = _active_state.set(state)
+def line_state():
+    state = session.get("line")
+    if not line_sim.is_valid(state):
+        state = line_sim.new_state(time.time())
+        session["line"] = state
+        session.permanent = True
+    return state
 
-
-@app.after_request
-def _persist_session_cookie(response):
-    if getattr(g, "new_sid", None):
-        response.set_cookie(SESSION_COOKIE, g.new_sid, max_age=7 * 24 * 3600, httponly=True, samesite="Lax",
-                            secure=request.is_secure)
-    return response
-
-
-@app.teardown_request
-def _unbind_session_state(_exc=None):
-    token = g.pop("state_token", None)
-    if token is not None:
-        _active_state.reset(token)
-ANIMATION_CYCLE = 4.0
-# NEU-CLS sınıfları: simüle edilen hatalı ürünler bu sınıflardan birini taşır (3D sahnede doku olarak görünür).
-DEFECT_CLASSES = ["crazing", "inclusion", "patches", "pitted_surface", "rolled-in_scale", "scratches"]
-
-def get_simulation_time():
-    """Thread-safe olarak simülasyon çalışma süresini hesaplar."""
-    with data_lock:
-        if factory_state["system_mode"] == "RUNNING" and factory_state["sim_start_time"] is not None:
-            return factory_state["sim_accumulated_time"] + (time.time() - factory_state["sim_start_time"])
-        return factory_state["sim_accumulated_time"]
-
-def calculate_oee(state):
-    """Endüstriyel OEE (Overall Equipment Effectiveness) Formülü"""
-    total_session_time = time.time() - state['session_start_time']
-    running_time = get_simulation_time() 
-    availability = min(running_time / total_session_time, 1.0) if total_session_time > 1 else 0
-    quality = state['ok_units'] / state['total_units'] if state['total_units'] > 0 else 1.0
-    performance = state['performance'] 
-    oee = availability * performance * quality
-    return availability, performance, quality, oee
 
 # --- API ENDPOINTS (FRONTEND İLE İLETİŞİM) ---
 @app.route('/api/control', methods=['POST'])
 def control():
-    """HMI butonlarından gelen komutları işler."""
-    cmd = (request.get_json(silent=True) or {}).get('command')
-    now = time.time()
-    with data_lock:
-        if cmd == 'START' and factory_state["system_mode"] != 'RUNNING':
-            factory_state["sim_start_time"] = now
-            factory_state["system_mode"] = "RUNNING"
-        elif cmd == 'PAUSE' and factory_state["system_mode"] == 'RUNNING':
-            factory_state["sim_accumulated_time"] += (now - factory_state["sim_start_time"])
-            factory_state["sim_start_time"] = None
-            factory_state["system_mode"] = "PAUSED"
-        elif cmd == 'RESET':
-            factory_state.clear()
-            factory_state.update(get_initial_state())
-        elif cmd == 'ESTOP':
-            if factory_state["system_mode"] == 'RUNNING' and factory_state["sim_start_time"] is not None:
-                 factory_state["sim_accumulated_time"] += (now - factory_state["sim_start_time"])
-            factory_state["system_mode"] = "ESTOP"
-            factory_state["sim_start_time"] = None
-        elif cmd == 'SIMULATE_FAIL':
-            factory_state["force_fail_next"] = True
+    """HMI butonlarından gelen komutları işler (yalnızca bu ziyaretçinin hattını etkiler)."""
+    command = (request.get_json(silent=True) or {}).get('command')
+    session["line"] = line_sim.apply_command(line_state(), command, time.time())
     return jsonify({"status": "ok"})
+
 
 @app.route('/api/data')
 def data():
-    """Anlık sistem verilerini JSON olarak döner."""
-    start_simulation()
-    advance_simulation()
-    try:
-        with data_lock:
-            state_copy = factory_state.copy()
-            state_copy['availability'], state_copy['performance'], state_copy['quality'], state_copy['oee'] = calculate_oee(factory_state)
-            # 3D hat ikizi bu alanlarla kendi saatini sunucuya senkronlar.
-            state_copy['sim_time'] = get_simulation_time()
-            state_copy['cycle_seconds'] = ANIMATION_CYCLE
-            state_copy['current_unit_id'] = f"U_{factory_state['total_units']:04}"
-        return jsonify(state_copy)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-# --- SIMULATOR ENGINE (PRODUCER) ---
-SIM_TICK_SECONDS = 0.03
-_sim_thread = None
-_sim_thread_lock = threading.Lock()
+    """Anlık sistem verilerini JSON olarak döner (3D ikiz saatini bununla senkronlar)."""
+    return jsonify(line_sim.snapshot(line_state(), time.time()))
 
 
-MAX_CATCH_UP_CYCLES = 20
-
-
-def _decide_unit(cycle):
-    """Döngünün ürününe OK/FAIL kararı verir (kilit içinde çağrılır)."""
-    failed = factory_state["force_fail_next"] or random.random() < 0.15
-    factory_state["current_unit_status"] = "FAIL" if failed else "OK"
-    factory_state["current_defect"] = random.choice(DEFECT_CLASSES) if failed else None
-    factory_state["status_cycle"] = cycle
-    factory_state["decided_cycle"] = cycle
-    factory_state["force_fail_next"] = False
-
-
-def _complete_unit(cycle):
-    """Döngünün ürününü sayar, loglar ve DB satırını döner (kilit içinde çağrılır)."""
-    if factory_state["decided_cycle"] != cycle:
-        _decide_unit(cycle)
-    status = factory_state["current_unit_status"]
-    unit_id = f"U_{factory_state['total_units']:04}"
-    factory_state["total_units"] += 1
-    factory_state["cost"] += 25.0
-    if status == "OK":
-        factory_state["ok_units"] += 1
-        factory_state["revenue"] += 45.0
-    else:
-        factory_state["nok_units"] += 1
-    factory_state["net_profit"] = factory_state["revenue"] - factory_state["cost"]
-    factory_state["completed_cycle"] = cycle
-    _, _, _, oee_score = calculate_oee(factory_state)
-    log_entry = {"time": datetime.now().strftime("%H:%M:%S"), "id": unit_id, "status": status,
-                 "defect": factory_state["current_defect"]}
-    factory_state["recent_logs"].insert(0, log_entry)
-    if len(factory_state["recent_logs"]) > 20: factory_state["recent_logs"].pop()
-    return (unit_id, status, oee_score)
-
-
-def advance_simulation():
-    """
-    Simülasyon adımı (durum mantığı), idempotent ve 'catch-up' destekli:
-    1. Mevcut döngünün ürününe karar verir.
-    2. Döngü sonuna (%90) gelen ve arada atlanmış döngüleri sayar/loglar.
-    3. Veritabanı kaydını kilit dışında yapar (Non-blocking I/O).
-    Hem arka plan thread'inden hem her /api/data isteğinden çağrılır; böylece süreç
-    istekler arasında dondurulsa bile (serverless) sayaçlar simülasyon saatiyle tutarlı kalır.
-    """
-    sim_time = get_simulation_time()
-    cycle = int(sim_time // ANIMATION_CYCLE)
-    progress = (sim_time % ANIMATION_CYCLE) / ANIMATION_CYCLE
-    db_rows = []
-
-    # --- KRİTİK BÖLGE (SADECE HESAPLAMA) ---
-    with data_lock:
-        if factory_state['system_mode'] == 'RUNNING':
-            first_open = max(factory_state["completed_cycle"] + 1, cycle - MAX_CATCH_UP_CYCLES)
-            for missed in range(first_open, cycle):
-                db_rows.append(_complete_unit(missed))
-            if factory_state["decided_cycle"] != cycle:
-                _decide_unit(cycle)
-            if progress > 0.9 and factory_state["completed_cycle"] < cycle:
-                db_rows.append(_complete_unit(cycle))
-
-    # --- KİLİT DIŞI (NON-BLOCKING I/O) ---
-    # Bu işlem yavaştır, kilit dışında yaparak "504 Gateway Timeout" hatasını engelliyoruz.
-    for row in db_rows:
-        save_log_to_db(*row)
-
-
-def _simulation_loop():
-    while True:
-        with data_lock:
-            states = list(_sessions.values())
-        for state in states:
-            token = _active_state.set(state)
-            try:
-                advance_simulation()
-            except Exception as e:
-                print(f"Simülasyon Hatası: {e}")
-            finally:
-                _active_state.reset(token)
-        time.sleep(SIM_TICK_SECONDS)
-
-
-def start_simulation():
-    """Simülasyon thread'ini ilk istekte bir kez başlatır (import sırasında yan etki yok)."""
-    global _sim_thread
-    with _sim_thread_lock:
-        if _sim_thread is None or not _sim_thread.is_alive():
-            _sim_thread = threading.Thread(target=_simulation_loop, name="qc-simulation", daemon=True)
-            _sim_thread.start()
-
-
-def generate_frame():
+def generate_frame(state):
     """Yedek 2D kamera görüntüsü (WebGL olmayan tarayıcılar için OpenCV çizimi)."""
-    sim_time = get_simulation_time()
-    progress = (sim_time % ANIMATION_CYCLE) / ANIMATION_CYCLE
-    with data_lock:
-        current_mode = factory_state["system_mode"]
-        current_status = factory_state["current_unit_status"]
+    snap = line_sim.snapshot(state, time.time())
+    progress = (snap["sim_time"] % ANIMATION_CYCLE) / ANIMATION_CYCLE
+    current_mode = snap["system_mode"]
+    current_status = snap["current_unit_status"]
 
     # Görsel Çizim (OpenCV)
     w, h = 1280, 720
@@ -515,9 +281,9 @@ def generate_frame():
 
     return frame
 
-def gen():
+def gen(state):
     while True:
-        frame = generate_frame()
+        frame = generate_frame(state)
         (flag, encodedImage) = cv2.imencode('.jpg', frame)
         if not flag: continue
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + encodedImage.tobytes() + b'\r\n')
@@ -527,14 +293,11 @@ def gen():
 @app.route('/api/export_report')
 def export_report():
     try:
-        # Veritabanından veriyi çek (SQL -> Pandas DataFrame)
-        with sqlite3.connect(DB_FILE, timeout=10) as conn:
-            df = pd.read_sql_query("SELECT timestamp, unit_id, status, oee_score FROM production_logs ORDER BY id ASC", conn)
-            if not df.empty:
-                df['timestamp'] = pd.to_datetime(df['timestamp'])
-
+        # Ziyaretçinin hattındaki tamamlanmış üniteler (deterministik geçmiş -> Pandas DataFrame)
+        df = pd.DataFrame(line_sim.history(line_state(), time.time()), columns=['timestamp', 'unit_id', 'status', 'defect', 'oee_score'])
         if df.empty:
-            return "Raporlanacak veri bulunamadı (Veritabanı boş).", 404
+            return "Raporlanacak veri yok: hattı başlatıp en az bir ünite tamamlanmasını bekleyin.", 404
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
 
         # Excel oluşturma (Bellekte / In-Memory)
         output = io.BytesIO()
@@ -619,14 +382,11 @@ def export_report():
 
 @app.route('/')
 def index():
-    start_simulation()
     return render_template_string(HTML_TEMPLATE)
 
 @app.route('/video_feed')
 def video_feed():
-    start_simulation()
-    return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen(line_state()), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
-    init_db()
     app.run(host='0.0.0.0', port=8080, debug=False)

@@ -171,7 +171,7 @@ The glowing passages on the map always come from the full 768-dimensional Chroma
 
 The operator dashboard renders the simulated inspection line in 3D (Three.js): steel plates leave a feed hood, pass under a QC gantry with a camera and laser scan sheet, and are either stacked on an OK pallet or pushed into a reject bin by a pneumatic pusher. Rejected plates carry a procedural texture for one of the six NEU-CLS defect classes, and the event historian logs that class.
 
-- The simulation runs in a background thread on the server; the 3D scene keeps its own clock in sync through `/api/data` (`sim_time`, `status_cycle`, `current_defect`), so counters, historian and scene agree.
+- The line is a pure function of a small control state kept in each visitor's signed session cookie (`line_sim.py`): unit outcomes come from a hash of (seed, cycle), so any server instance returns the same counters, historian and verdicts, and one visitor's Emergency Stop never affects another. The 3D scene syncs its clock through `/api/data` (`sim_time`, `status_cycle`, `current_defect`).
 - A stack-light tower mirrors the machine state (green running, amber paused, flashing red e-stop); orbit the camera to inspect the line.
 - If WebGL or the CDN is unavailable, the page falls back to the original OpenCV 2D camera feed.
 
@@ -183,7 +183,7 @@ The operator dashboard renders the simulated inspection line in 3D (Three.js): s
 |-------|-----------|
 | Feature engineering | Python, NumPy, scikit-image (HOG, Gabor) |
 | Modeling | scikit-learn (Random Forest, Logistic Regression) |
-| Dashboard | Flask, SQLite historian, Excel export, Three.js 3D line twin (OpenCV 2D feed as fallback) |
+| Dashboard | Flask, deterministic per-visitor line simulation (signed session cookie), Excel export, Three.js 3D line twin (OpenCV 2D feed as fallback) |
 | Visualization | Matplotlib, Three.js (lazy-loaded), Canvas 2D |
 | Retrieval & RAG | sentence-transformers (BGE), Chroma, UMAP, Qwen2.5 via transformers, NLI cross-encoder |
 | CI | GitHub Actions |
@@ -282,7 +282,7 @@ python -m py_compile main.py case_study.py rag_demo.py analysis/run_neu_case_stu
 - HOG + Gabor descriptors are handcrafted — deep learning (ResNet, EfficientNet) would likely improve accuracy further
 - NEU-CLS is a research benchmark — results are not directly transferable to a live production line
 - The Flask dashboard runs a simulated line (rendered as a 3D digital twin), not a real camera stream; defect classes on rejected plates are drawn procedurally, not taken from NEU-CLS images
-- The hosted demo runs on Vercel serverless functions: simulation state lives in instance memory, so a cold start resets the counters and concurrent instances can show different totals; the historian database is ephemeral (`/tmp`)
+- The historian and Excel export are derived from the visitor's simulated line, not persisted to a database
 - The RAG knowledge base is encyclopaedic (Wikipedia), not plant SOPs; generated eval questions make retrieval easier than real queries, and NLI faithfulness is not answer correctness
 
 ---
