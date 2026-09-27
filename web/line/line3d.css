@@ -37,3 +37,19 @@
 @media (max-width: 900px) {
     .twin-tl span, .twin-label { display: none; }
 }
+
+/* ── HMI polish (dashboard shell) ────────────────────────────────────────── */
+body { background: radial-gradient(60% 50% at 20% 0%, rgba(59, 130, 246, 0.12), transparent 70%), radial-gradient(50% 40% at 90% 10%, rgba(16, 185, 129, 0.10), transparent 70%), #0b1220 !important; }
+.header { background: rgba(3, 7, 18, 0.72) !important; backdrop-filter: blur(10px); }
+.kpi-card { border-radius: 10px !important; background: linear-gradient(160deg, #16233a, #111a2c) !important; border-color: #22324d !important; position: relative; overflow: hidden; }
+.kpi-card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: linear-gradient(90deg, #3b82f6, #10b981); opacity: .7; }
+.kpi-val { font-size: 1.55rem !important; letter-spacing: -0.02em; }
+.control-bar { background: transparent !important; gap: 8px !important; }
+.btn { border-radius: 10px !important; border-bottom-width: 0 !important; letter-spacing: 0.04em; box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 8px 18px -10px rgba(0, 0, 0, 0.8); transition: transform .15s ease, filter .15s ease, box-shadow .15s ease !important; }
+.btn:hover { filter: brightness(1.15); transform: translateY(-1px); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1) inset, 0 12px 24px -12px currentColor; }
+.btn:active { transform: translateY(1px) !important; }
+.btn:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+.panel, .right-col { border-radius: 12px !important; border-color: #22324d !important; }
+.right-col { background: rgba(15, 23, 42, 0.7) !important; }
+.section-header { background: linear-gradient(90deg, #1e2d45, #172338) !important; letter-spacing: 0.08em; }
+.log-table tr:hover td { background: rgba(59, 130, 246, 0.06); }
