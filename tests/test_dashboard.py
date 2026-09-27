@@ -83,6 +83,10 @@ class DashboardRouteTests(unittest.TestCase):
         other.set_cookie("session", cookie.value)
         self.assertEqual(other.get("/api/data").get_json()["system_mode"], "RUNNING")
 
+    def test_polls_do_not_rewrite_the_session_cookie(self):
+        self.client.get("/api/data")  # creates the line
+        self.assertNotIn("Set-Cookie", self.client.get("/api/data").headers)
+
     def test_control_without_json_body_is_ignored(self):
         self.assertEqual(self.client.post("/api/control", data="x").status_code, 200)
 
