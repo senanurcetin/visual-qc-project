@@ -146,3 +146,29 @@ h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.1; margin: 0 0 14px; lett
 @media (prefers-reduced-motion: reduce) {
     * { scroll-behavior: auto !important; transition: none !important; }
 }
+
+/* ── Visual layer shared by /rag and /case-study ─────────────────────────── */
+body::before {
+    content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none;
+    background:
+        radial-gradient(40% 35% at 20% 20%, rgba(96, 165, 250, 0.18), transparent 70%),
+        radial-gradient(35% 30% at 80% 10%, rgba(110, 231, 183, 0.14), transparent 70%),
+        radial-gradient(30% 30% at 60% 80%, rgba(192, 132, 252, 0.10), transparent 70%);
+    animation: aurora 24s ease-in-out infinite alternate;
+}
+@keyframes aurora { to { transform: translate3d(4%, 3%, 0) rotate(6deg) scale(1.05); } }
+.hero h1 { background: linear-gradient(120deg, #e6efff 25%, #6ee7b7 60%, #60a5fa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.kpi, .card, .panel, .steps li, .map-frame {
+    background: linear-gradient(160deg, rgba(19, 37, 59, 0.78), rgba(15, 28, 45, 0.9));
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 18px 40px -24px rgba(0, 0, 0, 0.7);
+}
+.kpi, .card, .steps li { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+.kpi:hover, .card:hover, .steps li:hover { transform: translateY(-2px); border-color: #2f5f93; box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.15), 0 22px 44px -22px rgba(96, 165, 250, 0.35); }
+.kpi dd { font-size: 30px; letter-spacing: -0.02em; }
+.section-title { font-size: 26px; }
+.section-title::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 10px; border-radius: 3px; background: linear-gradient(135deg, #6ee7b7, #60a5fa); vertical-align: middle; }
+.q-btn { transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+.q-btn:hover { transform: translateX(3px); }
+.map-frame { box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.12), 0 30px 60px -30px rgba(56, 189, 248, 0.35); }
+@media (prefers-reduced-motion: reduce) { body::before { animation: none; } .kpi:hover, .card:hover, .steps li:hover, .q-btn:hover { transform: none; } }
