@@ -42,3 +42,34 @@ jobs:
 
       - name: Import app
         run: python -c "import main; print(main.app.name)"
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies and Chromium
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt playwright==1.55.0
+          python -m playwright install --with-deps chromium
+
+      - name: Start app
+        run: |
+          python -m flask --app main run --port 8081 > flask.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8081/api/data > /dev/null && break; sleep 1; done
+
+      - name: Browser smoke tests
+        env:
+          E2E_BASE_URL: http://127.0.0.1:8081
+        run: python -m unittest discover -s tests/e2e -v
+
+      - name: Server log on failure
+        if: failure()
+        run: cat flask.log
