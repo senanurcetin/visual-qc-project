@@ -80,6 +80,16 @@ class DashboardRouteTests(unittest.TestCase):
         self.assertIn(b'id="twin-fallback"', html)
         self.assertIn(b"/line/static/line3d.js", html)
 
+    def test_visitors_have_independent_lines(self):
+        alice, bob = main.app.test_client(), main.app.test_client()
+        alice.post("/api/control", json={"command": "START"})
+        bob.post("/api/control", json={"command": "ESTOP"})
+        self.assertEqual(alice.get("/api/data").get_json()["system_mode"], "RUNNING")
+        self.assertEqual(bob.get("/api/data").get_json()["system_mode"], "ESTOP")
+
+    def test_control_without_json_body_is_ignored(self):
+        self.assertEqual(self.client.post("/api/control", data="x").status_code, 200)
+
     def test_twin_assets_are_served(self):
         for asset in ("line3d.js", "line3d.css"):
             response = self.client.get(f"/line/static/{asset}")

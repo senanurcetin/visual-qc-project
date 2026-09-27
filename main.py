@@ -4,10 +4,14 @@ import numpy as np
 import time
 import random
 import threading
+import uuid
+import contextvars
+from collections import OrderedDict
 import sqlite3
 import io
 import csv
-from flask import Flask, Response, render_template_string, jsonify, request, send_file
+from flask import Flask, Response, render_template_string, jsonify, request, send_file, g
+from werkzeug.local import LocalProxy
 from datetime import datetime
 import pandas as pd  # Excel raporlama ve veri manipülasyonu için
 from case_study import case_study_bp
@@ -274,7 +278,47 @@ def get_initial_state():
         "availability": 0.0, "performance": 0.96, "quality": 1.0, "oee": 0.0,
     }
 
-factory_state = get_initial_state()
+# --- ZİYARETÇİ BAŞINA HAT DURUMU ---
+# Canlı demoda bir ziyaretçinin START/ESTOP/RESET komutu diğerlerini etkilemesin diye her tarayıcı
+# (qc_sid çerezi) kendi hat durumuna sahiptir. `factory_state` o isteğin durumuna işaret eden bir proxy'dir;
+# istek dışında (testler, CLI) varsayılan duruma düşer.
+SESSION_COOKIE = "qc_sid"
+MAX_SESSIONS = 500
+_sessions = OrderedDict()
+_default_state = get_initial_state()
+_active_state = contextvars.ContextVar("qc_active_state", default=None)
+factory_state = LocalProxy(lambda: _active_state.get() or _default_state)
+
+
+@app.before_request
+def _bind_session_state():
+    sid = request.cookies.get(SESSION_COOKIE)
+    if not sid or len(sid) > 64:
+        sid = uuid.uuid4().hex
+        g.new_sid = sid
+    with data_lock:
+        state = _sessions.get(sid)
+        if state is None:
+            state = _sessions[sid] = get_initial_state()
+            while len(_sessions) > MAX_SESSIONS:
+                _sessions.popitem(last=False)
+        _sessions.move_to_end(sid)
+    g.state_token = _active_state.set(state)
+
+
+@app.after_request
+def _persist_session_cookie(response):
+    if getattr(g, "new_sid", None):
+        response.set_cookie(SESSION_COOKIE, g.new_sid, max_age=7 * 24 * 3600, httponly=True, samesite="Lax",
+                            secure=request.is_secure)
+    return response
+
+
+@app.teardown_request
+def _unbind_session_state(_exc=None):
+    token = g.pop("state_token", None)
+    if token is not None:
+        _active_state.reset(token)
 ANIMATION_CYCLE = 4.0
 # NEU-CLS sınıfları: simüle edilen hatalı ürünler bu sınıflardan birini taşır (3D sahnede doku olarak görünür).
 DEFECT_CLASSES = ["crazing", "inclusion", "patches", "pitted_surface", "rolled-in_scale", "scratches"]
@@ -300,8 +344,7 @@ def calculate_oee(state):
 @app.route('/api/control', methods=['POST'])
 def control():
     """HMI butonlarından gelen komutları işler."""
-    global factory_state
-    cmd = request.json.get('command')
+    cmd = (request.get_json(silent=True) or {}).get('command')
     now = time.time()
     with data_lock:
         if cmd == 'START' and factory_state["system_mode"] != 'RUNNING':
@@ -312,7 +355,8 @@ def control():
             factory_state["sim_start_time"] = None
             factory_state["system_mode"] = "PAUSED"
         elif cmd == 'RESET':
-            factory_state = get_initial_state()
+            factory_state.clear()
+            factory_state.update(get_initial_state())
         elif cmd == 'ESTOP':
             if factory_state["system_mode"] == 'RUNNING' and factory_state["sim_start_time"] is not None:
                  factory_state["sim_accumulated_time"] += (now - factory_state["sim_start_time"])
@@ -414,10 +458,16 @@ def advance_simulation():
 
 def _simulation_loop():
     while True:
-        try:
-            advance_simulation()
-        except Exception as e:
-            print(f"Simülasyon Hatası: {e}")
+        with data_lock:
+            states = list(_sessions.values())
+        for state in states:
+            token = _active_state.set(state)
+            try:
+                advance_simulation()
+            except Exception as e:
+                print(f"Simülasyon Hatası: {e}")
+            finally:
+                _active_state.reset(token)
         time.sleep(SIM_TICK_SECONDS)
 
 
