@@ -15,6 +15,11 @@ class CaseStudyRouteTests(unittest.TestCase):
         response = client.get("/case-study")
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Industrial surface defect triage benchmark", response.data)
+        response.close()
+        for asset in ("case.js", "case.css"):
+            static = client.get(f"/case/static/{asset}")
+            self.assertEqual(static.status_code, 200, asset)
+            static.close()
 
     def test_case_study_api(self):
         client = app.test_client()

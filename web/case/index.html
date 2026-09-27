@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual QC Case Study</title>
+    <meta name="description" content="Industrial surface defect triage benchmark: steel defect classification on NEU-CLS, cost-weighted errors and an entropy-ranked human review queue.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/rag/static/rag.css">
+    <link rel="stylesheet" href="/case/static/case.css">
+    <script type="module" src="/case/static/case.js"></script>
+</head>
+<body data-src="/api/case-study">
+    <header class="topbar">
+        <div class="topbar-inner">
+            <span class="brand">Visual QC</span>
+            <nav aria-label="Project pages">
+                <a href="/">Dashboard</a>
+                <a href="/case-study" aria-current="page">CV case study</a>
+                <a href="/rag">RAG map</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="hero cs-hero">
+            <p class="eyebrow">Industrial surface defect triage benchmark · NEU-CLS</p>
+            <h1>Which 6% should a human look at?</h1>
+            <p class="lede">A steel-defect classifier is right 94% of the time. The interesting question is what to do with the rest: which parts to route to an inspector, in what order, and which mistakes are expensive.</p>
+            <dl class="kpis" id="kpis"></dl>
+        </section>
+
+        <section aria-labelledby="defects-title">
+            <h2 id="defects-title" class="section-title">Six ways steel strip goes wrong</h2>
+            <p class="section-copy">1,800 grayscale images, 300 per class, evaluated on a fixed 80/20 holdout (seed 42).</p>
+            <div class="defect-grid" id="defects"></div>
+        </section>
+
+        <section aria-labelledby="race-title">
+            <h2 id="race-title" class="section-title">The model race</h2>
+            <p class="section-copy">A dummy baseline anchors the score: on a balanced six-class problem, guessing gets 16.7%.</p>
+            <div class="card race" id="race"></div>
+        </section>
+
+        <section aria-labelledby="cm-title">
+            <h2 id="cm-title" class="section-title">Where it gets confused</h2>
+            <p class="section-copy">Rows are the true class, columns the prediction. Hover a cell. Off-diagonal cells are the 22 mistakes out of 360.</p>
+            <div class="cm-layout">
+                <div class="card cm-card"><div class="cm" id="cm" role="grid" aria-label="Confusion matrix"></div></div>
+                <div class="card cm-side">
+                    <p class="panel-label">Selected cell</p>
+                    <div id="cm-readout" class="cm-readout"></div>
+                    <p class="panel-label" style="margin-top:18px">Pareto of misses by true class</p>
+                    <div id="pareto"></div>
+                </div>
+            </div>
+        </section>
+
+        <section aria-labelledby="queue-title">
+            <h2 id="queue-title" class="section-title">Spend the inspector's time where it counts</h2>
+            <p class="section-copy">Predictions are ranked by entropy (least confident first). Pick a review budget and see how many of the classifier's 22 misclassifications land in front of a human.</p>
+            <div class="card queue">
+                <div class="budget" id="budget" role="group" aria-label="Review budget"></div>
+                <div class="queue-body">
+                    <div class="queue-big"><span id="q-capture">—</span><small id="q-caption"></small></div>
+                    <div class="waffle" id="waffle" aria-live="polite"></div>
+                </div>
+                <div class="queue-bars" id="q-bars"></div>
+            </div>
+        </section>
+
+        <section aria-labelledby="cost-title">
+            <h2 id="cost-title" class="section-title">Not all misses cost the same</h2>
+            <p class="section-copy">Per-class false-negative costs are illustrative, chosen to show cost-weighted reasoning rather than taken from a plant.</p>
+            <div class="cost-layout">
+                <div class="card" id="cost-classes"></div>
+                <div class="card cost-total" id="cost-total"></div>
+            </div>
+        </section>
+
+        <section aria-labelledby="limits-title">
+            <h2 id="limits-title" class="section-title">Limits, stated</h2>
+            <div class="card"><ul class="limits" id="limits"></ul></div>
+        </section>
+    </main>
+    <footer class="footer">Dataset: NEU-CLS (CC BY 4.0), downloaded on demand by <code>analysis/run_neu_case_study.py</code>. Every number on this page is read from <code>docs/data/neu-cls-case-study/</code>.</footer>
+</body>
+</html>
