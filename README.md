@@ -8,7 +8,9 @@
 
 **AI engineering layer** — an embedding-based RAG assistant over a steel quality-engineering knowledge base, with a retriever benchmark, a Chroma vector index, NLI-scored answer faithfulness, and a 3D map of the embedding space that shows which passages each answer came from ([details](#ai-engineering-layer--steel-qc-knowledge-assistant-rag)).
 
-Demo: [Portfolio project entry](https://senanur-cetin.vercel.app/projects/visual-qc-project)
+**Live demo:** [visual-qc-project-pearl.vercel.app](https://visual-qc-project-pearl.vercel.app) — HMI with 3D line twin · [RAG map](https://visual-qc-project-pearl.vercel.app/rag) · [CV case study](https://visual-qc-project-pearl.vercel.app/case-study)
+
+Portfolio entry: [senanur-cetin.vercel.app/projects/visual-qc-project](https://senanur-cetin.vercel.app/projects/visual-qc-project)
 
 Short video: [`docs/assets/visual-qc-dashboard.webm`](docs/assets/visual-qc-dashboard.webm)
 
@@ -280,6 +282,7 @@ python -m py_compile main.py case_study.py rag_demo.py analysis/run_neu_case_stu
 - HOG + Gabor descriptors are handcrafted — deep learning (ResNet, EfficientNet) would likely improve accuracy further
 - NEU-CLS is a research benchmark — results are not directly transferable to a live production line
 - The Flask dashboard runs a simulated line (rendered as a 3D digital twin), not a real camera stream; defect classes on rejected plates are drawn procedurally, not taken from NEU-CLS images
+- The hosted demo runs on Vercel serverless functions: simulation state lives in instance memory, so a cold start resets the counters and concurrent instances can show different totals; the historian database is ephemeral (`/tmp`)
 - The RAG knowledge base is encyclopaedic (Wikipedia), not plant SOPs; generated eval questions make retrieval easier than real queries, and NLI faithfulness is not answer correctness
 
 ---

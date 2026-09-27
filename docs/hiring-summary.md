@@ -1,5 +1,7 @@
 # Hiring Summary — Visual QC Project
 
+Live demo: https://visual-qc-project-pearl.vercel.app (HMI + 3D line twin) · https://visual-qc-project-pearl.vercel.app/rag (RAG map)
+
 ## One-line summary
 
 Computer vision analytics case study: steel surface defect classification on NEU-CLS (1,800 images, 6 classes), with per-class cost weighting, Pareto error analysis, entropy-based review queue, and operator-facing Flask dashboard. An AI engineering layer adds an embedding-based RAG assistant over a steel QC knowledge base, with measured retrieval and answer faithfulness.
