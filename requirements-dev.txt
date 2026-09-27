@@ -1,0 +1,4 @@
+# Analysis scripts, chart generation and tests (CI installs this file).
+-r requirements.txt
+scikit-learn==1.8.0
+matplotlib==3.10.3
