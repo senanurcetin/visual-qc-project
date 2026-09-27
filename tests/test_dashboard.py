@@ -87,6 +87,11 @@ class DashboardRouteTests(unittest.TestCase):
         self.client.get("/api/data")  # creates the line
         self.assertNotIn("Set-Cookie", self.client.get("/api/data").headers)
 
+    def test_security_headers(self):
+        headers = self.client.get("/").headers
+        for header in main.SECURITY_HEADERS:
+            self.assertIn(header, headers)
+
     def test_control_without_json_body_is_ignored(self):
         self.assertEqual(self.client.post("/api/control", data="x").status_code, 200)
 
