@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 import time
@@ -20,7 +21,8 @@ app.register_blueprint(rag_bp)
 # Standart 'Lock' yerine 'RLock' (Re-entrant Lock) kullanıyoruz.
 # Bu, aynı thread'in kilidi tekrar alabilmesini sağlar ve karmaşık akışlarda kilitlenmeyi önler.
 data_lock = threading.RLock()
-DB_FILE = "vision_qc.db"
+# Serverless ortamlarda (Vercel) yalnızca /tmp yazılabilir.
+DB_FILE = os.path.join("/tmp" if os.environ.get("VERCEL") else ".", "vision_qc.db")
 
 # --- VERİTABANI YÖNETİMİ (PERSISTENCE LAYER) ---
 def init_db():
@@ -267,7 +269,7 @@ def get_initial_state():
         "system_mode": "PAUSED", "total_units": 0, "ok_units": 0, "nok_units": 0,
         "revenue": 0.0, "cost": 0.0, "net_profit": 0.0, "sim_start_time": None, 
         "sim_accumulated_time": 0.0, "session_start_time": time.time(), "recent_logs": [],
-        "is_new_cycle": True, "current_unit_status": "PENDING", "force_fail_next": False,
+        "decided_cycle": -1, "completed_cycle": -1, "current_unit_status": "PENDING", "force_fail_next": False,
         "current_defect": None, "status_cycle": -1,
         "availability": 0.0, "performance": 0.96, "quality": 1.0, "oee": 0.0,
     }
@@ -324,6 +326,7 @@ def control():
 def data():
     """Anlık sistem verilerini JSON olarak döner."""
     start_simulation()
+    advance_simulation()
     try:
         with data_lock:
             state_copy = factory_state.copy()
@@ -342,62 +345,71 @@ _sim_thread = None
 _sim_thread_lock = threading.Lock()
 
 
+MAX_CATCH_UP_CYCLES = 20
+
+
+def _decide_unit(cycle):
+    """Döngünün ürününe OK/FAIL kararı verir (kilit içinde çağrılır)."""
+    failed = factory_state["force_fail_next"] or random.random() < 0.15
+    factory_state["current_unit_status"] = "FAIL" if failed else "OK"
+    factory_state["current_defect"] = random.choice(DEFECT_CLASSES) if failed else None
+    factory_state["status_cycle"] = cycle
+    factory_state["decided_cycle"] = cycle
+    factory_state["force_fail_next"] = False
+
+
+def _complete_unit(cycle):
+    """Döngünün ürününü sayar, loglar ve DB satırını döner (kilit içinde çağrılır)."""
+    if factory_state["decided_cycle"] != cycle:
+        _decide_unit(cycle)
+    status = factory_state["current_unit_status"]
+    unit_id = f"U_{factory_state['total_units']:04}"
+    factory_state["total_units"] += 1
+    factory_state["cost"] += 25.0
+    if status == "OK":
+        factory_state["ok_units"] += 1
+        factory_state["revenue"] += 45.0
+    else:
+        factory_state["nok_units"] += 1
+    factory_state["net_profit"] = factory_state["revenue"] - factory_state["cost"]
+    factory_state["completed_cycle"] = cycle
+    _, _, _, oee_score = calculate_oee(factory_state)
+    log_entry = {"time": datetime.now().strftime("%H:%M:%S"), "id": unit_id, "status": status,
+                 "defect": factory_state["current_defect"]}
+    factory_state["recent_logs"].insert(0, log_entry)
+    if len(factory_state["recent_logs"]) > 20: factory_state["recent_logs"].pop()
+    return (unit_id, status, oee_score)
+
+
 def advance_simulation():
     """
-    Simülasyon adımı (durum mantığı):
-    1. Döngü başında ürünün OK/FAIL kararını verir.
-    2. Döngü sonunda sayaçları ve canlı logu günceller.
+    Simülasyon adımı (durum mantığı), idempotent ve 'catch-up' destekli:
+    1. Mevcut döngünün ürününe karar verir.
+    2. Döngü sonuna (%90) gelen ve arada atlanmış döngüleri sayar/loglar.
     3. Veritabanı kaydını kilit dışında yapar (Non-blocking I/O).
-    Arka plan thread'inden çağrılır; video akışı açık olmasa da üretim ilerler.
+    Hem arka plan thread'inden hem her /api/data isteğinden çağrılır; böylece süreç
+    istekler arasında dondurulsa bile (serverless) sayaçlar simülasyon saatiyle tutarlı kalır.
     """
     sim_time = get_simulation_time()
+    cycle = int(sim_time // ANIMATION_CYCLE)
     progress = (sim_time % ANIMATION_CYCLE) / ANIMATION_CYCLE
-
-    # DB Yazma verilerini tutmak için geçici değişken
-    db_write_data = None
+    db_rows = []
 
     # --- KRİTİK BÖLGE (SADECE HESAPLAMA) ---
     with data_lock:
         if factory_state['system_mode'] == 'RUNNING':
-            # Yeni Döngü Başlangıcı
-            if progress < 0.1 and factory_state["is_new_cycle"]:
-                factory_state["is_new_cycle"] = False
-                failed = factory_state["force_fail_next"] or random.random() < 0.15
-                factory_state["current_unit_status"] = "FAIL" if failed else "OK"
-                factory_state["current_defect"] = random.choice(DEFECT_CLASSES) if failed else None
-                factory_state["status_cycle"] = int(sim_time // ANIMATION_CYCLE)
-                factory_state["force_fail_next"] = False
-
-            # Döngü Sonu ve Veri Kaydı
-            elif progress > 0.9 and not factory_state["is_new_cycle"]:
-                factory_state["is_new_cycle"] = True
-                status = factory_state["current_unit_status"]
-                unit_id = f"U_{factory_state['total_units']:04}"
-                
-                factory_state["total_units"] += 1
-                factory_state["cost"] += 25.0
-                if status == "OK": 
-                    factory_state["ok_units"] += 1
-                    factory_state["revenue"] += 45.0
-                else: 
-                    factory_state["nok_units"] += 1
-                factory_state["net_profit"] = factory_state["revenue"] - factory_state["cost"]
-                
-                _, _, _, oee_score = calculate_oee(factory_state)
-                
-                # Canlı Log Listesi (RAM)
-                log_entry = {"time": datetime.now().strftime("%H:%M:%S"), "id": unit_id, "status": status,
-                             "defect": factory_state["current_defect"]}
-                factory_state["recent_logs"].insert(0, log_entry)
-                if len(factory_state["recent_logs"]) > 20: factory_state["recent_logs"].pop()
-                
-                # DB verilerini hazırla ama YAZMA! (Kilit süresini kısaltmak için)
-                db_write_data = (unit_id, status, oee_score)
+            first_open = max(factory_state["completed_cycle"] + 1, cycle - MAX_CATCH_UP_CYCLES)
+            for missed in range(first_open, cycle):
+                db_rows.append(_complete_unit(missed))
+            if factory_state["decided_cycle"] != cycle:
+                _decide_unit(cycle)
+            if progress > 0.9 and factory_state["completed_cycle"] < cycle:
+                db_rows.append(_complete_unit(cycle))
 
     # --- KİLİT DIŞI (NON-BLOCKING I/O) ---
     # Bu işlem yavaştır, kilit dışında yaparak "504 Gateway Timeout" hatasını engelliyoruz.
-    if db_write_data:
-        save_log_to_db(*db_write_data)
+    for row in db_rows:
+        save_log_to_db(*row)
 
 
 def _simulation_loop():

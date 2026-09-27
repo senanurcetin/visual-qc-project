@@ -1,0 +1,8 @@
+# Not needed by the running app: analysis pipelines, tests, charts and media used only by the README.
+analysis/
+tests/
+docs/assets/
+src/
+.github/
+*.db
+.claude/

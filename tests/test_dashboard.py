@@ -22,6 +22,7 @@ class SimulationTests(unittest.TestCase):
     @mock.patch("main.save_log_to_db")
     def test_forced_failure_gets_a_defect_class_and_cycle(self, save):
         main.factory_state["force_fail_next"] = True
+        main.factory_state["completed_cycle"] = 1  # cycles 0-1 already produced
         self._run_at(2 * main.ANIMATION_CYCLE + 0.1)  # start of cycle 2
         state = main.factory_state
         self.assertEqual(state["current_unit_status"], "FAIL")
@@ -41,6 +42,17 @@ class SimulationTests(unittest.TestCase):
             self._run_at(0.1)
         self.assertEqual(main.factory_state["current_unit_status"], "OK")
         self.assertIsNone(main.factory_state["current_defect"])
+
+    @mock.patch("main.save_log_to_db")
+    def test_skipped_cycles_are_caught_up(self, save):
+        # A frozen process (e.g. a serverless instance) resumes three cycles later.
+        self._run_at(3 * main.ANIMATION_CYCLE + 0.5)
+        self.assertEqual(main.factory_state["total_units"], 3)
+        self.assertEqual(main.factory_state["completed_cycle"], 2)
+        self.assertEqual(main.factory_state["status_cycle"], 3)
+        self.assertEqual(save.call_count, 3)
+        self._run_at(3 * main.ANIMATION_CYCLE + 0.6)  # idempotent within a cycle
+        self.assertEqual(main.factory_state["total_units"], 3)
 
     def test_paused_line_does_not_advance(self):
         main.advance_simulation()

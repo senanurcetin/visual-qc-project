@@ -108,7 +108,7 @@ Performance: Three.js is loaded with a dynamic `import()` only when the map sect
 ## Reproduce
 
 ```bash
-pip install -r requirements.txt -r requirements-rag.txt   # CUDA build of torch recommended
+pip install -r requirements-dev.txt -r requirements-rag.txt   # CUDA build of torch recommended
 python analysis/run_rag_case_study.py      # fetch corpus, benchmark, index, generate, score, project
 python analysis/generate_rag_visuals.py    # README charts from the JSON artifacts
 python main.py                             # http://127.0.0.1:8080/rag

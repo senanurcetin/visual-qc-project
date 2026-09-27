@@ -226,7 +226,7 @@ python -m venv .venv
 # Windows:  .venv\Scripts\activate
 # macOS/Linux:  source .venv/bin/activate
 
-pip install -r requirements.txt
+pip install -r requirements-dev.txt   # app + analysis/chart dependencies
 
 # Run full analysis benchmark (downloads NEU-CLS dataset on first run)
 python analysis/run_neu_case_study.py
