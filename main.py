@@ -15,7 +15,9 @@ app = Flask(__name__, static_folder="web/line", static_url_path="/line/static")
 # Session çerezi yalnızca demo hattının kontrol durumunu imzalar; gizli veri taşımaz.
 app.secret_key = os.environ.get("SECRET_KEY", "visual-qc-public-demo")
 app.permanent_session_lifetime = timedelta(days=7)
-app.config.update(SESSION_COOKIE_SAMESITE="Lax", SESSION_COOKIE_HTTPONLY=True)
+app.config.update(SESSION_COOKIE_SAMESITE="Lax", SESSION_COOKIE_HTTPONLY=True,
+                  # Polls must never re-send the cookie: a slow GET would overwrite a newer command.
+                  SESSION_REFRESH_EACH_REQUEST=False)
 app.register_blueprint(case_study_bp)
 app.register_blueprint(rag_bp)
 
