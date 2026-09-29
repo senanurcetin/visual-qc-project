@@ -190,7 +190,11 @@ The operator dashboard renders the simulated inspection line in 3D (Three.js): s
 
 ## CNN Baseline
 
-`analysis/run_dl_case_study.py` fine-tunes ResNet18 / EfficientNet-B0 on the **same 360-row holdout** as the Random Forest (a test pins the identity), fits a calibration temperature on a validation slice, and reports accuracy / macro-F1 with bootstrap 95% intervals, ECE before and after calibration, the calibrated review-queue budgets, optional 5-fold CV, Grad-CAM overlays and the ONNX export. `--smoke-test` runs the whole pipeline on synthetic textures in seconds without the dataset (it runs in CI); a real run needs the NEU-CLS download and, preferably, a GPU. **The real-data numbers are not in this README yet**: they will be added, and the docs-consistency test extended, once that run has been done. See [`analysis/README.md`](analysis/README.md).
+`analysis/run_dl_case_study.py` fine-tunes ResNet18 / EfficientNet-B0 on the **same 360-row holdout** as the Random Forest (a test pins the identity), fits a calibration temperature on a validation slice, and reports accuracy / macro-F1 with bootstrap 95% intervals, ECE before and after calibration, the calibrated review-queue budgets, optional 5-fold CV, Grad-CAM overlays and the ONNX export. `--smoke-test` runs the whole pipeline on synthetic textures in seconds without the dataset (it runs in CI); a real run needs the NEU-CLS download and, preferably, a GPU. See [`analysis/README.md`](analysis/README.md).
+
+<!-- DL-RESULTS:START -->
+**No real-data CNN run has been recorded yet.** After one, `python analysis/update_docs_from_dl.py` fills this block from `docs/data/neu-cls-dl/summary.json`, and the docs-consistency test keeps it in sync.
+<!-- DL-RESULTS:END -->
 
 ---
 

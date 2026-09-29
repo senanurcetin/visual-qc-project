@@ -52,3 +52,12 @@ python analysis/run_dl_case_study.py --cv-folds 5         # plus 5-fold CV over 
 If the dataset host is unreachable from your machine, download NEU-CLS manually and put the zip at `analysis/.cache/NEU-CLS.zip`; `--preflight` prints the exact path. Writes `docs/data/neu-cls-dl/{summary,reliability,review-queue}.json`. The calibration and bootstrap
 helpers (`analysis/dl/`) and the holdout-identity guarantee are covered by `tests/test_calibration.py`
 and `tests/test_dl_split.py`; the training loop itself needs a GPU machine to exercise.
+
+### After the real run
+
+```bash
+python analysis/update_docs_from_dl.py     # fills the CNN block in README.md from docs/data/neu-cls-dl/summary.json
+git add README.md docs/data/neu-cls-dl && git commit -m "docs: record CNN results"
+```
+
+The script refuses a `--smoke-test` summary, and `tests/test_docs_consistency.py` fails if the README block ever drifts from the JSON.
