@@ -5,6 +5,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Release tags are
 ## [Unreleased]
 
 ### Changed
+- CI and the Docker image now run on Python 3.12, the version Vercel actually serves (`.python-version`); CI used 3.11 before, so the tests were not exercising the production interpreter. README badge updated.
+- Dependabot runs monthly with grouped minor/patch updates, and skips `numpy` minor/major releases: `opencv-python-headless` 4.12 requires `numpy<2.3`.
 - Dev tooling: `ruff` 0.9.10 -> 0.16.9 (requirements and pre-commit hook kept in step; the codebase lints clean).
 
 ## [0.2.0] - 2026-09-29
