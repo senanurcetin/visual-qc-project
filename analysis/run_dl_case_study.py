@@ -7,6 +7,7 @@ Needs a GPU machine for a real run (CPU works but is slow):
     python analysis/run_dl_case_study.py --cv-folds 5          # plus 5-fold cross-validation
     python analysis/run_dl_case_study.py --export-onnx models/ # also write the serving model
     python analysis/run_dl_case_study.py --smoke-test          # 1-2 min pipeline check, no dataset
+    python analysis/run_dl_case_study.py --preflight           # check GPU, disk, dataset, weights first
 
 The 80/20 split reproduces the one in run_neu_case_study.py (same seed, same stratification), so
 accuracy / macro-F1 / review-queue numbers are directly comparable. A further 10% of the training
@@ -161,7 +162,7 @@ def train_model(arch, x_train, y_train, x_val, y_val, num_classes, args, device)
             scaler.step(optimizer)
             scaler.update()
             scheduler.step()
-            total_loss += float(loss) * len(idx)
+            total_loss += loss.item() * len(idx)
         val_acc = accuracy_score(y_val, predict_logits(model, x_val, device, args.batch_size).argmax(1))
         print(f"  epoch {epoch + 1:>2}/{args.epochs}  train_loss={total_loss / len(order):.4f}  val_acc={val_acc:.4f}")
         if val_acc > best_acc:
@@ -256,7 +257,19 @@ def main() -> None:
     parser.add_argument("--export-onnx", type=Path, metavar="DIR", help="write model.onnx + meta.json for /api/classify")
     parser.add_argument("--gradcam-samples", type=int, default=0, help="save Grad-CAM overlays for N test images")
     parser.add_argument("--smoke-test", action="store_true", help="tiny synthetic run to check the pipeline; no dataset")
+    parser.add_argument("--preflight", action="store_true", help="check GPU, disk, dataset and weights, then exit (no training)")
     args = parser.parse_args()
+
+    if args.preflight:
+        from analysis.dl.preflight import collect_facts, evaluate, exit_code, render
+        from analysis.run_neu_case_study import DATASET_URL, IMAGE_DIRS, ZIP_PATH
+
+        checks = evaluate(collect_facts(
+            cache_dir=CACHE_DIR, zip_path=ZIP_PATH, image_dirs=list(IMAGE_DIRS), dataset_url=DATASET_URL,
+            baseline_file=BASELINE_FILE, output_dir=OUTPUT_DIR,
+        ))
+        print(render(checks))
+        sys.exit(exit_code(checks))
 
     import torch
 
