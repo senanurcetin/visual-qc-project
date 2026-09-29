@@ -66,6 +66,9 @@ HTML_TEMPLATE = """
         .review-row .who { flex: 1; } .review-row .done { color: var(--green); }
         .review-row button, .review-row select { background: #334155; color: var(--text); border: 1px solid var(--border); border-radius: 3px; font: inherit; padding: 2px 6px; cursor: pointer; }
         .review-empty { padding: 8px; color: #9ca3af; }
+        .kb-btn { padding: 2px 7px !important; }
+        .kb-box { padding: 6px 10px 8px; background: #172033; border-bottom: 1px solid #334155; font-family: Inter, sans-serif; font-size: 0.72rem; line-height: 1.35; color: #cbd5e1; }
+        .kb-box a { color: #a78bfa; } .kb-box .kb-item { margin-bottom: 6px; } .kb-box .kb-note { color: #94a3b8; font-style: italic; }
         .warn-card { border: 1px solid var(--yellow) !important; color: var(--yellow) !important; }
     </style>
 </head>
@@ -198,6 +201,25 @@ HTML_TEMPLATE = """
 
 
     // --- Review queue: confirm or correct the predicted defect of rejected units ---
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+    const openKnowledge = new Set();      // units whose background reading is expanded
+    const knowledgeCache = {};            // defect -> passages
+
+    function knowledgeHtml(defect) {
+        const d = knowledgeCache[defect];
+        if (!d) return '<div class="kb-box">Loading&hellip;</div>';
+        const items = d.passages.map(p => `<div class="kb-item"><b>${p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(p.article)}</a>` : esc(p.article)}</b> &middot; ${esc(p.section)}<br>${esc(p.preview)}</div>`).join('');
+        return `<div class="kb-box">${items || 'No related passages.'}<div class="kb-note">Encyclopaedic background from the steel-QC knowledge base (Wikipedia), not plant procedures.</div></div>`;
+    }
+
+    function toggleKnowledge(unitId, defect) {
+        if (openKnowledge.has(unitId)) openKnowledge.delete(unitId); else openKnowledge.add(unitId);
+        if (openKnowledge.has(unitId) && !knowledgeCache[defect]) {
+            fetch('/api/defect-knowledge?defect=' + encodeURIComponent(defect)).then(r => r.json()).then(d => { knowledgeCache[defect] = d; loadReview(); }).catch(() => {});
+        }
+        loadReview();
+    }
+
     function loadReview() {
         fetch('/api/review-queue').then(r => r.json()).then(q => {
             const list = document.getElementById('review-list');
@@ -209,7 +231,9 @@ HTML_TEMPLATE = """
                     ? `<span class="done">${i.decision === 'confirm' ? '&#10003; confirmed' : '&#9998; ' + i.operator_label.replace(/_/g, ' ')}</span>`
                     : `<button onclick="submitReview('${i.unit_id}','${i.predicted_defect}')">Confirm</button>
                        <select onchange="if(this.value)submitReview('${i.unit_id}',this.value)"><option value="">Correct&hellip;</option>${options}</select>`;
-                return `<div class="review-row"><span class="who">${i.unit_id} &middot; ${i.predicted_defect.replace(/_/g, ' ')}</span>${state}</div>`;
+                const info = `<button class="kb-btn" title="Background reading on this defect" onclick="toggleKnowledge('${i.unit_id}','${i.predicted_defect}')">i</button>`;
+                const kb = openKnowledge.has(i.unit_id) ? knowledgeHtml(i.predicted_defect) : '';
+                return `<div class="review-row"><span class="who">${i.unit_id} &middot; ${i.predicted_defect.replace(/_/g, ' ')}</span>${info}${state}</div>${kb}`;
             }).join('');
         }).catch(() => {});
     }

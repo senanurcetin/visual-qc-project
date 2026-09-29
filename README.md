@@ -180,6 +180,7 @@ The operator dashboard renders the simulated inspection line in 3D (Three.js): s
 ## Operator Workflow, SPC and Persistence
 
 - **Review queue** (HMI panel): every rejected unit can be *confirmed* or *corrected* to the right defect class. Decisions are stored per visitor in Postgres when `DATABASE_URL` is set (Neon in the hosted demo, Postgres in Docker), otherwise in a local SQLite file. Schema changes are versioned migrations (`store.py`, table `schema_migrations`).
+- **Background reading**: the `i` button on a rejected unit shows the most relevant passages from the knowledge base for its defect class (`/api/defect-knowledge`, a small TF-IDF over the published passage previews, so it needs no model at request time). It is encyclopaedic Wikipedia background, not plant procedures; the *Crazing* article, for instance, is about polymers.
 - **Abuse limits**: decisions are capped per visitor and per table, expire after a retention period, and the write endpoints are rate limited per client (429 with `Retry-After`). Limits are tunable through `REVIEW_*` / `CLASSIFY_RATE_PER_MIN` (see `.env.example`); the rate limit is per server instance, the row quotas are the hard bound.
 - **Corrections export**: `/api/review/export.csv` returns the visitor's corrected labels. Quality engineers get every operator's corrections from `/api/admin/corrections.csv`, which is disabled unless `REVIEW_ADMIN_TOKEN` is set and then needs `Authorization: Bearer <token>`. These are the retraining candidates.
 - **SPC** (`/spc`): p-chart of the reject rate per batch of 10 units with 3-sigma control limits; out-of-control batches are flagged.
@@ -224,31 +225,28 @@ docker compose up --build   # app on :8080 + Postgres; mount ./models to enable 
 
 ## Architecture
 
-```
-NEU-CLS Dataset (1,800 images)
-        |
-        v
-Feature Extraction (HOG + Gabor + grid stats)
-        |
-        v
-Model Benchmark (dummy / logistic / random forest)
-        |
-        v
-Review Queue Design (entropy-ranked routing)
-        |
-        v
-Flask Dashboard (3D line twin + operator UI + historian + export)
-
-Wikipedia knowledge base (43 articles, 728 passages)
-        |
-        v
-BGE-base embeddings (768-d) -> Chroma vector DB
-        |
-        v
-Top-4 retrieval -> local LLM answer -> NLI faithfulness check
-        |
-        v
-/rag page (UMAP 3D/2D map + precomputed example questions)
+```mermaid
+flowchart LR
+    subgraph Offline["Offline analysis (GPU optional)"]
+        D[NEU-CLS<br/>1,800 images] --> F[HOG + Gabor + grid features]
+        F --> RF[Random Forest<br/>benchmark]
+        D --> CNN[ResNet18 / EfficientNet-B0<br/>calibration, bootstrap CIs, Grad-CAM]
+        CNN --> ONNX[(model.onnx + meta.json)]
+        W[Wikipedia KB<br/>43 articles, 728 passages] --> E[BGE-base embeddings] --> C[(Chroma)]
+        C --> R[Top-4 retrieval + local LLM + NLI check]
+    end
+    subgraph App["Flask app (Vercel / Docker)"]
+        SIM[Deterministic line simulation<br/>signed session cookie] --> HMI[HMI + 3D line twin]
+        HMI --> RQ[Review queue<br/>confirm / correct]
+        RQ --> DB[(Postgres or SQLite<br/>versioned migrations)]
+        HMI --> SPC["/spc p-chart"]
+        HMI --> KB[Defect background reading<br/>TF-IDF over KB previews]
+        UP["POST /api/classify"] --> ORT[ONNX Runtime]
+        DB --> ADM["/api/admin/corrections.csv<br/>retraining candidates"]
+    end
+    ONNX -. mounted at QC_MODEL_DIR .-> ORT
+    R -. precomputed artifacts .-> RAGP["/rag map"]
+    RF -. JSON artifacts .-> CS["/case-study"]
 ```
 
 ---
