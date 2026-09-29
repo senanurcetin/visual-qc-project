@@ -1,3 +1,4 @@
+import time
 import unittest
 
 import line_sim
@@ -56,6 +57,43 @@ class LineSimulationTests(unittest.TestCase):
         snap = line_sim.snapshot(self.state, now)
         self.assertEqual(len(rows), snap["total_units"])
         self.assertEqual(sum(r["status"] == "OK" for r in rows), snap["ok_units"])
+
+
+class OkCountTests(unittest.TestCase):
+    """snapshot/history must stay exact while no longer hashing every unit ever produced."""
+
+    def brute_force_ok(self, state, n):
+        return sum(line_sim.unit(state, c)[0] == "OK" for c in range(n))
+
+    def test_ok_before_matches_brute_force_around_block_edges(self):
+        state = line_sim.apply_command(line_sim.new_state(1000.0), "SIMULATE_FAIL", 1000.0)
+        state["forced"] = [0, 5, line_sim.BLOCK - 1, line_sim.BLOCK, 3 * line_sim.BLOCK + 7]
+        b = line_sim.BLOCK
+        for n in (0, 1, b - 1, b, b + 1, 2 * b, 3 * b + 7, 3 * b + 8, 4 * b + 100):
+            self.assertEqual(line_sim.ok_before(state, n), self.brute_force_ok(state, n), n)
+
+    def test_forced_cycles_change_the_count(self):
+        state = line_sim.new_state(1000.0)
+        base = line_sim.ok_before(state, 200)
+        state["forced"] = [c for c in range(200) if line_sim.unit(state, c)[0] == "OK"][:3]
+        self.assertEqual(line_sim.ok_before(state, 200), base - 3)
+
+    def test_history_with_limit_equals_tail_of_full_history(self):
+        now = 10_000_000.0
+        state = line_sim.apply_command(line_sim.new_state(now - 86400), "START", now - 86400)
+        full = line_sim.history(state, now)
+        self.assertEqual(line_sim.history(state, now, 20), full[-20:])
+
+    def test_week_old_running_line_is_fast_once_warm(self):
+        now = 10_000_000.0
+        state = line_sim.apply_command(line_sim.new_state(now - 7 * 86400), "START", now - 7 * 86400)
+        snap = line_sim.snapshot(state, now)  # warms the block cache
+        done = snap["total_units"]
+        self.assertGreater(done, 100_000)
+        self.assertEqual(snap["ok_units"], self.brute_force_ok(state, done))
+        start = time.perf_counter()
+        line_sim.snapshot(state, now)
+        self.assertLess(time.perf_counter() - start, 0.1)  # was ~0.33 s on every poll before caching
 
 
 class DashboardRouteTests(unittest.TestCase):

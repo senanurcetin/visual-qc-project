@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import secrets
 from datetime import datetime
+from functools import lru_cache
 
 CYCLE_SECONDS = 4.0
 COMPLETE_AT = 0.9          # a unit is counted when its cycle passes 90%
@@ -41,11 +42,37 @@ def _uniform(seed: str, cycle: int, salt: str) -> float:
     return int.from_bytes(digest[:8], "big") / 2 ** 64
 
 
+def _fails(seed: str, forced, cycle: int) -> bool:
+    return cycle in forced or _uniform(seed, cycle, "fail") < FAIL_RATE
+
+
 def unit(state: dict, cycle: int) -> tuple[str, str | None]:
     """(status, defect class) of the unit produced in `cycle`."""
-    if cycle in state["forced"] or _uniform(state["seed"], cycle, "fail") < FAIL_RATE:
+    if _fails(state["seed"], state["forced"], cycle):
         return "FAIL", DEFECT_CLASSES[int(_uniform(state["seed"], cycle, "defect") * len(DEFECT_CLASSES))]
     return "OK", None
+
+
+BLOCK = 512  # cycles per cached block of OK counts
+
+
+@lru_cache(maxsize=4096)
+def _block_ok(seed: str, forced: tuple, block: int) -> int:
+    start = block * BLOCK
+    return sum(not _fails(seed, forced, c) for c in range(start, start + BLOCK))
+
+
+def ok_before(state: dict, n: int) -> int:
+    """Number of OK units among cycles [0, n).
+
+    Still a pure function of (seed, forced cycles, n): full blocks are memoised per process, so a
+    poll costs a handful of cache hits plus at most BLOCK - 1 hashes instead of one hash per unit
+    the line has ever produced.
+    """
+    seed, forced = state["seed"], tuple(sorted(state["forced"]))
+    full = n // BLOCK
+    ok = sum(_block_ok(seed, forced, b) for b in range(full))
+    return ok + sum(not _fails(seed, forced, c) for c in range(full * BLOCK, n))
 
 
 def completed_units(t: float) -> int:
@@ -84,15 +111,14 @@ def history(state: dict, now: float, limit: int | None = None) -> list[dict]:
     t = sim_time(state, now)
     done = completed_units(t)
     first = 0 if limit is None else max(0, done - limit)
-    rows, ok = [], 0
-    for cycle in range(done):
+    rows, ok = [], ok_before(state, first)
+    for cycle in range(first, done):
         status, defect = unit(state, cycle)
         ok += status == "OK"
-        if cycle >= first:
-            finished = now - (t - (cycle + COMPLETE_AT) * CYCLE_SECONDS)
-            _, _, oee = _oee(state, t, now, ok, cycle + 1)
-            rows.append({"timestamp": datetime.fromtimestamp(finished), "unit_id": f"U_{cycle:04}",
-                         "status": status, "defect": defect, "oee_score": round(oee, 4)})
+        finished = now - (t - (cycle + COMPLETE_AT) * CYCLE_SECONDS)
+        _, _, oee = _oee(state, t, now, ok, cycle + 1)
+        rows.append({"timestamp": datetime.fromtimestamp(finished), "unit_id": f"U_{cycle:04}",
+                     "status": status, "defect": defect, "oee_score": round(oee, 4)})
     return rows
 
 
@@ -101,7 +127,7 @@ def snapshot(state: dict, now: float) -> dict:
     t = sim_time(state, now)
     cycle = int(t // CYCLE_SECONDS)
     done = completed_units(t)
-    ok = sum(unit(state, c)[0] == "OK" for c in range(done))
+    ok = ok_before(state, done)
     nok = done - ok
     started = t > 0 or state["mode"] == "RUNNING"
     status, defect = unit(state, cycle) if started else ("PENDING", None)

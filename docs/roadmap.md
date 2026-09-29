@@ -16,7 +16,7 @@ Her faz bağımsız PR/sürüm olarak teslim edilir. Sayılar README'ye elle yaz
 - [x] `main.py` modüllere bölündü (`hmi_page`, `camera`, `report`)
 - [x] `coverage` ölçümü ve CI eşiği; `ruff`; `pre-commit`; Dependabot. mypy henüz yok
 - [x] README/hiring-summary sayıları `tests/test_docs_consistency.py` ile JSON'a karşı doğrulanır (üretim yerine sapma koruması)
-- [ ] `line_sim.snapshot` maliyeti çalışma süresiyle artıyor (7 günlük hatta ~330 ms/istek); ayrı görev olarak açıldı
+- [x] `line_sim.snapshot` maliyeti çalışma süresiyle artıyordu (7 günlük hatta ~330 ms/istek); OK sayısı blok önbelleğine alındı, ısınmış istek ~0.4 ms
 
 ## Faz 2: Gerçek model, gerçek görüntü (kod hazır, GPU'da çalıştırılmayı bekliyor)
 
