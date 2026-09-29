@@ -44,10 +44,11 @@ the calibrated review-queue budgets.
 
 ```bash
 pip install -r requirements.txt -r requirements-dl.txt   # CUDA torch first for GPU, see requirements-dl.txt
+python analysis/run_dl_case_study.py --preflight          # GPU, disk, dataset, weights: exits 1 if the run cannot work
 python analysis/run_dl_case_study.py                      # single run
 python analysis/run_dl_case_study.py --cv-folds 5         # plus 5-fold CV over all 1800 images
 ```
 
-Writes `docs/data/neu-cls-dl/{summary,reliability,review-queue}.json`. The calibration and bootstrap
+If the dataset host is unreachable from your machine, download NEU-CLS manually and put the zip at `analysis/.cache/NEU-CLS.zip`; `--preflight` prints the exact path. Writes `docs/data/neu-cls-dl/{summary,reliability,review-queue}.json`. The calibration and bootstrap
 helpers (`analysis/dl/`) and the holdout-identity guarantee are covered by `tests/test_calibration.py`
 and `tests/test_dl_split.py`; the training loop itself needs a GPU machine to exercise.
