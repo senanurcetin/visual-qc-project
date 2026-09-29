@@ -2,6 +2,6 @@
 branch = False
 
 [report]
-include = main.py, line_sim.py, case_study.py, rag_demo.py
+include = main.py, line_sim.py, case_study.py, rag_demo.py, camera.py, report.py, hmi_page.py
 fail_under = 80
 show_missing = True
