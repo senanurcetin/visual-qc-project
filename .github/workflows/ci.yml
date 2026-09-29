@@ -34,6 +34,7 @@ jobs:
           python -m py_compile analysis/rag/chunking.py analysis/rag/metrics.py analysis/rag/corpus.py
           python -m py_compile analysis/run_neu_case_study.py
           python -m py_compile analysis/generate_visuals.py
+          python -m py_compile analysis/run_dl_case_study.py analysis/dl/calibration.py analysis/dl/stats.py
 
       - name: Generate visualization assets
         run: |

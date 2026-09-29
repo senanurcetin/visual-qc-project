@@ -12,12 +12,15 @@ Her faz bağımsız PR/sürüm olarak teslim edilir. Sayılar README'ye elle yaz
 | Veritabanı | Neon Postgres, **bu projeye ayrı bir Neon projesi** (`visual-qc`). Başka projelerle (ör. VocabMaster) proje, veritabanı, rol ve bağlantı dizesi paylaşılmaz. Yerelde SQLite |
 | Deploy | Vercel yalnızca demo (hafif ONNX inference). Tam sistem Docker ile |
 
-## Faz 1: Sağlamlaştırma
-- `main.py` modüllere bölünür (routes, export, frame)
-- `coverage` ölçümü ve CI eşiği; `ruff` + `mypy`; `pre-commit`; Dependabot
-- README/case-study sayıları JSON'dan üretilir
+## Faz 1: Sağlamlaştırma (büyük ölçüde tamam)
+- [x] `main.py` modüllere bölündü (`hmi_page`, `camera`, `report`)
+- [x] `coverage` ölçümü ve CI eşiği; `ruff`; `pre-commit`; Dependabot. mypy henüz yok
+- [x] README/hiring-summary sayıları `tests/test_docs_consistency.py` ile JSON'a karşı doğrulanır (üretim yerine sapma koruması)
+- [ ] `line_sim.snapshot` maliyeti çalışma süresiyle artıyor (7 günlük hatta ~330 ms/istek); ayrı görev olarak açıldı
 
-## Faz 2: Gerçek model, gerçek görüntü
+## Faz 2: Gerçek model, gerçek görüntü (kod hazır, GPU'da çalıştırılmayı bekliyor)
+
+Hazır: `analysis/run_dl_case_study.py` (ResNet18 / EfficientNet-B0, RF ile aynı holdout, sıcaklık ölçekleme, ECE, bootstrap GA, isteğe bağlı K-fold CV), `analysis/dl/` (test edilmiş NumPy/SciPy yardımcıları). Torch kısmı bulut konteynerinde çalıştırılamadığı için ilk GPU çalıştırması bir doğrulama adımıdır. Kalan: Grad-CAM, ONNX, dashboard'a gerçek görüntü, `/api/classify`.
 - ResNet18 / EfficientNet-B0 fine-tune; aynı 80/20 holdout ve metrik tablosuyla Random Forest ile karşılaştırma
 - Temperature scaling, reliability diagram, kalibre inceleme kuyruğu
 - 5-fold stratified CV ve bootstrap güven aralıkları

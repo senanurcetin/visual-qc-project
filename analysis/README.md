@@ -34,3 +34,20 @@ python analysis/generate_rag_visuals.py
 ```
 
 `rag/metrics.py` and `rag/chunking.py` depend only on NumPy and the standard library so the unit tests run in CI without the model stack. Method and results: [`docs/rag-case-study.md`](../docs/rag-case-study.md).
+
+## CNN baseline (`run_dl_case_study.py`)
+
+Fine-tunes ResNet18 / EfficientNet-B0 on the same 80/20 holdout as the Random Forest, then fits a
+calibration temperature on a validation slice of the training part (never on the test rows) and
+reports accuracy / macro-F1 with bootstrap 95% intervals, ECE before and after calibration, and
+the calibrated review-queue budgets.
+
+```bash
+pip install -r requirements.txt -r requirements-dl.txt   # CUDA torch first for GPU, see requirements-dl.txt
+python analysis/run_dl_case_study.py                      # single run
+python analysis/run_dl_case_study.py --cv-folds 5         # plus 5-fold CV over all 1800 images
+```
+
+Writes `docs/data/neu-cls-dl/{summary,reliability,review-queue}.json`. The calibration and bootstrap
+helpers (`analysis/dl/`) and the holdout-identity guarantee are covered by `tests/test_calibration.py`
+and `tests/test_dl_split.py`; the training loop itself needs a GPU machine to exercise.
