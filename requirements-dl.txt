@@ -2,5 +2,5 @@
 # Install on top of requirements.txt. For GPU training install a CUDA build of torch first, e.g.:
 #   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 torch>=2.5
-torchvision>=0.20
+torchvision>=0.29.0
 scipy
