@@ -1,4 +1,5 @@
-FROM python:3.11-slim
+# Keep the Python version in step with .python-version (what Vercel runs).
+FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
