@@ -1,5 +1,11 @@
-"""Fallback 2D camera feed (OpenCV) for browsers without WebGL."""
+"""Camera feed: frame sources (simulated line, video file) and the MJPEG stream built on them.
+
+The simulated source is also the 2D fallback for browsers without WebGL.
+"""
+import statistics
 import time
+from collections.abc import Iterator
+from typing import Protocol
 
 import cv2
 import numpy as np
@@ -18,7 +24,7 @@ def generate_frame(state):
 
     # Görsel Çizim (OpenCV)
     w, h = 1280, 720
-    frame = np.full((h, w, 3), (20, 25, 30), dtype=np.uint8)
+    frame: np.ndarray = np.full((h, w, 3), (20, 25, 30), dtype=np.uint8)
     cv2.rectangle(frame, (0, h//2 - 130), (w, h//2 + 130), (40, 45, 50), -1)
     prod_x = int(w + 100 - (progress * (w + 400)))
 
@@ -44,10 +50,74 @@ def generate_frame(state):
     return frame
 
 
-def gen(state):
+class FrameSource(Protocol):
+    """Anything that yields BGR frames: the simulator, a video file, later a real camera."""
+
+    def read(self) -> np.ndarray: ...
+
+
+class SimulatedSource:
+    def __init__(self, state):
+        self.state = state
+
+    def read(self) -> np.ndarray:
+        return generate_frame(self.state)
+
+
+class VideoFileSource:
+    """Loops a video file, e.g. a recording of NEU-CLS plates passing the camera."""
+
+    def __init__(self, path: str):
+        self.capture = cv2.VideoCapture(path)
+        if not self.capture.isOpened():
+            raise ValueError(f"cannot open video source: {path}")
+
+    def read(self) -> np.ndarray:
+        ok, frame = self.capture.read()
+        if not ok:  # end of file: start over
+            self.capture.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            ok, frame = self.capture.read()
+            if not ok:
+                raise ValueError("video source produced no frames")
+        return frame
+
+    def __del__(self):
+        capture = getattr(self, "capture", None)
+        if capture is not None:
+            capture.release()
+
+
+def make_source(spec: str | None, state) -> FrameSource:
+    """`FRAME_SOURCE` value -> source. `video:<path>` plays a file; anything else is the simulator."""
+    if spec and spec.startswith("video:"):
+        try:
+            return VideoFileSource(spec.removeprefix("video:"))
+        except ValueError:
+            pass  # fall back rather than break the page
+    return SimulatedSource(state)
+
+
+def gen(source: FrameSource) -> Iterator[bytes]:
     while True:
-        frame = generate_frame(state)
-        (flag, encodedImage) = cv2.imencode('.jpg', frame)
-        if not flag: continue
-        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + encodedImage.tobytes() + b'\r\n')
+        ok, encoded = cv2.imencode('.jpg', source.read())
+        if not ok:
+            continue
+        yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + encoded.tobytes() + b'\r\n'
         time.sleep(0.03)
+
+
+def measure_latency(source: FrameSource, frames: int = 100) -> dict:
+    """Per-frame read + JPEG-encode time in milliseconds, and the sustainable frame rate."""
+    times = []
+    for _ in range(frames):
+        start = time.perf_counter()
+        cv2.imencode('.jpg', source.read())
+        times.append((time.perf_counter() - start) * 1000)
+    ordered = sorted(times)
+    return {
+        "frames": frames,
+        "p50_ms": round(statistics.median(ordered), 3),
+        "p95_ms": round(ordered[min(frames - 1, int(0.95 * frames))], 3),
+        "max_ms": round(ordered[-1], 3),
+        "fps": round(1000 / statistics.mean(times), 1),
+    }

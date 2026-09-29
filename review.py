@@ -23,9 +23,15 @@ def get_store() -> ReviewStore:
     return current_app.extensions["review_store"]
 
 
-def visitor_id(create: bool = False) -> str | None:
+def visitor_id() -> str | None:
+    """This visitor's id, or None if they have never written a decision."""
     vid = session.get("vid")
-    if vid is None and create:
+    return vid if isinstance(vid, str) else None
+
+
+def ensure_visitor_id() -> str:
+    vid = visitor_id()
+    if vid is None:
         vid = session["vid"] = secrets.token_hex(8)
         session.permanent = True
     return vid
@@ -38,7 +44,8 @@ def rejected_units(line_state: dict) -> dict[str, dict]:
 
 @review_bp.route("/api/review-queue")
 def review_queue():
-    decisions = get_store().for_visitor(visitor_id()) if visitor_id() else {}
+    vid = visitor_id()
+    decisions = get_store().for_visitor(vid) if vid else {}
     items = []
     for unit_id, row in reversed(rejected_units(line_state()).items()):
         decision = decisions.get(unit_id)
@@ -54,20 +61,20 @@ def review_queue():
 def submit_review():
     body = request.get_json(silent=True) or {}
     unit_id, label = body.get("unit_id"), body.get("label")
-    unit = rejected_units(line_state()).get(unit_id)
-    if unit is None:
+    if not isinstance(unit_id, str) or (unit := rejected_units(line_state()).get(unit_id)) is None:
         return jsonify({"error": "unit is not a recent rejected unit on this line"}), 404
-    if label not in line_sim.DEFECT_CLASSES:
+    if not isinstance(label, str) or label not in line_sim.DEFECT_CLASSES:
         return jsonify({"error": "label must be one of the defect classes"}), 400
     decision = "confirm" if label == unit["defect"] else "correct"
-    saved = get_store().record(visitor_id(create=True), unit_id, unit["defect"], decision, label)
+    saved = get_store().record(ensure_visitor_id(), unit_id, unit["defect"], decision, label)
     return jsonify({k: saved[k] for k in ("unit_id", "predicted_defect", "decision", "operator_label", "updated_at")})
 
 
 @review_bp.route("/api/review/export.csv")
 def export_corrections():
     """Corrected labels of this visitor: candidates for the next retraining set."""
-    rows = [d for d in (get_store().for_visitor(visitor_id()).values() if visitor_id() else []) if d["decision"] == "correct"]
+    vid = visitor_id()
+    rows = [d for d in (get_store().for_visitor(vid).values() if vid else []) if d["decision"] == "correct"]
     out = io.StringIO()
     writer = csv.writer(out)
     writer.writerow(["unit_id", "predicted_defect", "operator_label", "updated_at"])

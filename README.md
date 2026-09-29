@@ -177,6 +177,31 @@ The operator dashboard renders the simulated inspection line in 3D (Three.js): s
 
 ---
 
+## Operator Workflow, SPC and Persistence
+
+- **Review queue** (HMI panel): every rejected unit can be *confirmed* or *corrected* to the right defect class. Decisions are stored per visitor in Postgres when `DATABASE_URL` is set (Neon in the hosted demo, Postgres in Docker), otherwise in a local SQLite file. Schema changes are versioned migrations (`store.py`, table `schema_migrations`).
+- **Corrections export**: `/api/review/export.csv` returns the visitor's corrected labels. Quality engineers get every operator's corrections from `/api/admin/corrections.csv`, which is disabled unless `REVIEW_ADMIN_TOKEN` is set and then needs `Authorization: Bearer <token>`. These are the retraining candidates.
+- **SPC** (`/spc`): p-chart of the reject rate per batch of 10 units with 3-sigma control limits; out-of-control batches are flagged.
+- **Classify an image** (`POST /api/classify`, multipart field `image`): serves the ONNX model exported by `analysis/run_dl_case_study.py --export-onnx` and returns label, calibrated confidence, entropy, a `needs_review` flag and a ranking. Returns 503 with a reason when no model is installed (as on the hosted demo).
+- **Frame sources** (`camera.py`): the 2D feed reads from a `FrameSource` — the simulator, or a looped video with `FRAME_SOURCE=video:/path/clip.mp4`. `python analysis/bench_frames.py` reports p50/p95 latency and fps (simulated source: ~6 ms p50, ~7.7 ms p95, ~165 fps on the dev container).
+
+---
+
+## CNN Baseline
+
+`analysis/run_dl_case_study.py` fine-tunes ResNet18 / EfficientNet-B0 on the **same 360-row holdout** as the Random Forest (a test pins the identity), fits a calibration temperature on a validation slice, and reports accuracy / macro-F1 with bootstrap 95% intervals, ECE before and after calibration, the calibrated review-queue budgets, optional 5-fold CV, Grad-CAM overlays and the ONNX export. `--smoke-test` runs the whole pipeline on synthetic textures in seconds without the dataset (it runs in CI); a real run needs the NEU-CLS download and, preferably, a GPU. **The real-data numbers are not in this README yet**: they will be added, and the docs-consistency test extended, once that run has been done. See [`analysis/README.md`](analysis/README.md).
+
+---
+
+## Docker
+
+```bash
+cp .env.example .env        # set SECRET_KEY and POSTGRES_PASSWORD
+docker compose up --build   # app on :8080 + Postgres; mount ./models to enable /api/classify
+```
+
+---
+
 ## Stack
 
 | Layer | Technology |
@@ -186,7 +211,9 @@ The operator dashboard renders the simulated inspection line in 3D (Three.js): s
 | Dashboard | Flask, deterministic per-visitor line simulation (signed session cookie), Excel export, Three.js 3D line twin (OpenCV 2D feed as fallback) |
 | Visualization | Matplotlib, Three.js (lazy-loaded), Canvas 2D |
 | Retrieval & RAG | sentence-transformers (BGE), Chroma, UMAP, Qwen2.5 via transformers, NLI cross-encoder |
-| CI | GitHub Actions |
+| Persistence | Postgres (Neon / Docker) or SQLite, psycopg 3, versioned migrations |
+| Serving | ONNX Runtime (`/api/classify`), gunicorn in Docker |
+| CI | GitHub Actions: ruff, mypy, unit tests with a Postgres service and an 80% coverage floor, CPU-torch CNN smoke test, Playwright e2e |
 
 ---
 
@@ -248,8 +275,13 @@ App: `http://127.0.0.1:8080` | Case-study route: `/case-study` | RAG map: `/rag`
 ## Tests
 
 ```bash
-python -m unittest discover -s tests -v
-python -m py_compile main.py case_study.py rag_demo.py analysis/run_neu_case_study.py analysis/run_rag_case_study.py
+pip install -r requirements-dev.txt
+ruff check . && mypy
+coverage run -m unittest discover -s tests && coverage report      # 80% floor on the app modules
+
+# Optional: run the store tests against a real Postgres, and the CNN pipeline tests
+TEST_DATABASE_URL=postgresql://user:pass@localhost:5432/db python -m unittest tests.test_review -v
+pip install torch torchvision onnx onnxscript -r requirements-serve.txt && python -m unittest tests.test_dl_torch -v
 ```
 
 ---
@@ -281,8 +313,9 @@ python -m py_compile main.py case_study.py rag_demo.py analysis/run_neu_case_stu
 
 - HOG + Gabor descriptors are handcrafted — deep learning (ResNet, EfficientNet) would likely improve accuracy further
 - NEU-CLS is a research benchmark — results are not directly transferable to a live production line
-- The Flask dashboard runs a simulated line (rendered as a 3D digital twin), not a real camera stream; defect classes on rejected plates are drawn procedurally, not taken from NEU-CLS images
-- The historian and Excel export are derived from the visitor's simulated line, not persisted to a database
+- The Flask dashboard runs a simulated line (rendered as a 3D digital twin) or a looped video, not a live camera; defect classes on rejected plates are drawn procedurally, not taken from NEU-CLS images
+- The historian and Excel export are derived from the visitor's simulated line; only operator review decisions are persisted, and the hosted demo needs `DATABASE_URL` set to keep them
+- The CNN pipeline is verified on synthetic data only; no real-data CNN result is claimed here yet
 - The RAG knowledge base is encyclopaedic (Wikipedia), not plant SOPs; generated eval questions make retrieval easier than real queries, and NLI faithfulness is not answer correctness
 
 ---

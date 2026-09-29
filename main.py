@@ -6,7 +6,7 @@ import pandas as pd
 from flask import Flask, Response, jsonify, render_template_string, request, send_file, session
 
 import line_sim
-from camera import gen
+from camera import gen, make_source
 from case_study import case_study_bp
 from classify import classify_bp
 from hmi_page import HTML_TEMPLATE
@@ -96,7 +96,7 @@ def index():
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen(line_state()), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen(make_source(os.environ.get('FRAME_SOURCE'), line_state())), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=False)

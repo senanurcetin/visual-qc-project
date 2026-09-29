@@ -12,6 +12,7 @@ import tempfile
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 MIGRATIONS: list[tuple[int, list[str]]] = [
     (1, ["""
@@ -43,6 +44,7 @@ class ReviewStore:
 
     @contextmanager
     def _connect(self):
+        conn: Any
         if self.postgres:
             import psycopg  # imported lazily so the SQLite path needs nothing extra
 

@@ -30,9 +30,9 @@ Hazır: `analysis/run_dl_case_study.py` (ResNet18 / EfficientNet-B0, RF ile ayn�
 
 Çıkış kriteri: karşılaştırma tablosu README'de; CV ve kalibrasyon sonuçları belgelenmiş.
 
-## Faz 3: Kalıcılık ve operatör akışı (ilk dilim tamam)
+## Faz 3: Kalıcılık ve operatör akışı (tamam)
 
-Hazır: `store.py` (Postgres/SQLite, `DATABASE_URL`), `review.py` (`/api/review-queue`, `/api/review`, `/api/review/export.csv`), HMI'de Review Queue paneli, ayrı Neon projesi `visual-qc`. Postgres SQL'i Neon'da doğrulandı; psycopg bağlantı yolu bulut konteynerinden (TCP engelli) çalıştırılamadı. Üretimde etkinleştirmek için Vercel'de `DATABASE_URL` ortam değişkeni gerekir; yoksa her instance kendi geçici SQLite dosyasını kullanır. Kalan: alembic, roller, SPC grafikleri.
+Hazır: `store.py` (Postgres/SQLite, `DATABASE_URL`), `review.py` (`/api/review-queue`, `/api/review`, `/api/review/export.csv`), HMI'de Review Queue paneli, ayrı Neon projesi `visual-qc`. Postgres SQL'i Neon'da doğrulandı; psycopg bağlantı yolu bulut konteynerinden (TCP engelli) çalıştırılamadı. Üretimde etkinleştirmek için Vercel'de `DATABASE_URL` ortam değişkeni gerekir; yoksa her instance kendi geçici SQLite dosyasını kullanır. Sürümlü migrasyonlar (`schema_migrations`, alembic yerine 60 satırlık çözüm: tek tablo için yeterli), token korumalı kalite mühendisi ucu, `/spc` p-grafiği, CI'da Postgres servisi ve psycopg yolunun gerçek Postgres'te doğrulanması tamam.
 - Historian: Neon Postgres (deploy) / SQLite (yerel); şema `alembic` ile
 - Düşük güvenli plakalar için inceleme kuyruğu UI'ı (onayla / düzelt)
 - Düzeltilen etiketlerin yeniden eğitim adayı olarak dışa aktarımı
@@ -45,12 +45,16 @@ Hazır: `store.py` (Postgres/SQLite, `DATABASE_URL`), `review.py` (`/api/review-
 - 30-50 elle yazılmış gerçekçi soruluk ikinci eval seti
 - İnsan etiketli küçük "cevap doğru mu" alt kümesi
 
-## Faz 5: Canlı akışa doğru (opsiyonel)
+## Faz 5: Canlı akışa doğru (temeli tamam)
+
+Hazır: `FrameSource` (simülatör / video döngüsü), `analysis/bench_frames.py` (p50/p95, fps), `Dockerfile` + `docker-compose.yml`. Kalan: ONNX çıkarım gecikmesini aynı ölçüme katmak (gerçek model gerekir).
 - `FrameSource` soyutlaması: simülatör / video dosyası
 - NEU-CLS video döngüsüyle gerçek inference hattı; gecikme (p50/p95) ve verim ölçümü
 - `Dockerfile` + `docker-compose` (app + Postgres)
 
-## Faz 6: Yayın
+## Faz 6: Yayın (kısmen)
+
+Hazır: `CHANGELOG.md`, README güncel. Kalan: sürüm etiketi, mimari diyagram, güncel demo videosu, gerçek NEU-CLS CNN sonuçlarının README'ye eklenmesi.
 - Sürüm etiketleri, `CHANGELOG.md`, README'nin kısaltılması, mimari diyagram, güncel demo videosu
 
 ## Riskler
