@@ -7,7 +7,7 @@ from pathlib import Path
 
 import line_sim
 import main
-from store import MIGRATIONS, ReviewStore
+from store import MIGRATIONS, LimitReached, ReviewStore
 
 
 def start_with_failed_first_unit(client, seconds=40):
@@ -163,6 +163,22 @@ class StoreContract:
         self.assertEqual(later.init_schema(), [])
 
 
+class QuotaContract:
+    """Per-visitor quota, identical on every backend (provided by test_review.StoreContract subclasses)."""
+
+    def test_per_visitor_quota_blocks_new_units_but_not_edits_or_other_visitors(self):
+        store = self.make_store(max_per_visitor=2)
+        me, other = self.v("me"), self.v("other")
+        store.record(me, "U_0001", "crazing", "confirm", "crazing")
+        store.record(me, "U_0002", "crazing", "confirm", "crazing")
+        with self.assertRaises(LimitReached) as ctx:
+            store.record(me, "U_0003", "crazing", "confirm", "crazing")
+        self.assertEqual(ctx.exception.scope, "visitor")
+        store.record(me, "U_0001", "crazing", "correct", "patches")  # editing an existing decision is fine
+        self.assertEqual(store.for_visitor(me)["U_0001"]["operator_label"], "patches")
+        store.record(other, "U_0003", "crazing", "confirm", "crazing")  # quotas are per visitor
+
+
 class SqliteStoreTests(StoreContract, unittest.TestCase):
     def setUp(self):
         super().setUp()
@@ -182,7 +198,7 @@ class SqliteStoreTests(StoreContract, unittest.TestCase):
 
 
 @unittest.skipUnless(os.environ.get("TEST_DATABASE_URL"), "set TEST_DATABASE_URL to run against a real Postgres")
-class PostgresStoreTests(StoreContract, unittest.TestCase):
+class PostgresStoreTests(StoreContract, QuotaContract, unittest.TestCase):
     def make_store(self, **kwargs):
         store = ReviewStore(os.environ["TEST_DATABASE_URL"], **kwargs)
         self.assertTrue(store.postgres)
