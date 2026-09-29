@@ -180,6 +180,7 @@ The operator dashboard renders the simulated inspection line in 3D (Three.js): s
 ## Operator Workflow, SPC and Persistence
 
 - **Review queue** (HMI panel): every rejected unit can be *confirmed* or *corrected* to the right defect class. Decisions are stored per visitor in Postgres when `DATABASE_URL` is set (Neon in the hosted demo, Postgres in Docker), otherwise in a local SQLite file. Schema changes are versioned migrations (`store.py`, table `schema_migrations`).
+- **Abuse limits**: decisions are capped per visitor and per table, expire after a retention period, and the write endpoints are rate limited per client (429 with `Retry-After`). Limits are tunable through `REVIEW_*` / `CLASSIFY_RATE_PER_MIN` (see `.env.example`); the rate limit is per server instance, the row quotas are the hard bound.
 - **Corrections export**: `/api/review/export.csv` returns the visitor's corrected labels. Quality engineers get every operator's corrections from `/api/admin/corrections.csv`, which is disabled unless `REVIEW_ADMIN_TOKEN` is set and then needs `Authorization: Bearer <token>`. These are the retraining candidates.
 - **SPC** (`/spc`): p-chart of the reject rate per batch of 10 units with 3-sigma control limits; out-of-control batches are flagged.
 - **Classify an image** (`POST /api/classify`, multipart field `image`): serves the ONNX model exported by `analysis/run_dl_case_study.py --export-onnx` and returns label, calibrated confidence, entropy, a `needs_review` flag and a ranking. Returns 503 with a reason when no model is installed (as on the hosted demo).
@@ -189,7 +190,11 @@ The operator dashboard renders the simulated inspection line in 3D (Three.js): s
 
 ## CNN Baseline
 
-`analysis/run_dl_case_study.py` fine-tunes ResNet18 / EfficientNet-B0 on the **same 360-row holdout** as the Random Forest (a test pins the identity), fits a calibration temperature on a validation slice, and reports accuracy / macro-F1 with bootstrap 95% intervals, ECE before and after calibration, the calibrated review-queue budgets, optional 5-fold CV, Grad-CAM overlays and the ONNX export. `--smoke-test` runs the whole pipeline on synthetic textures in seconds without the dataset (it runs in CI); a real run needs the NEU-CLS download and, preferably, a GPU. **The real-data numbers are not in this README yet**: they will be added, and the docs-consistency test extended, once that run has been done. See [`analysis/README.md`](analysis/README.md).
+`analysis/run_dl_case_study.py` fine-tunes ResNet18 / EfficientNet-B0 on the **same 360-row holdout** as the Random Forest (a test pins the identity), fits a calibration temperature on a validation slice, and reports accuracy / macro-F1 with bootstrap 95% intervals, ECE before and after calibration, the calibrated review-queue budgets, optional 5-fold CV, Grad-CAM overlays and the ONNX export. `--smoke-test` runs the whole pipeline on synthetic textures in seconds without the dataset (it runs in CI); a real run needs the NEU-CLS download and, preferably, a GPU. See [`analysis/README.md`](analysis/README.md).
+
+<!-- DL-RESULTS:START -->
+**No real-data CNN run has been recorded yet.** After one, `python analysis/update_docs_from_dl.py` fills this block from `docs/data/neu-cls-dl/summary.json`, and the docs-consistency test keeps it in sync.
+<!-- DL-RESULTS:END -->
 
 ---
 
