@@ -161,7 +161,7 @@ def train_model(arch, x_train, y_train, x_val, y_val, num_classes, args, device)
             scaler.step(optimizer)
             scaler.update()
             scheduler.step()
-            total_loss += float(loss) * len(idx)
+            total_loss += loss.item() * len(idx)
         val_acc = accuracy_score(y_val, predict_logits(model, x_val, device, args.batch_size).argmax(1))
         print(f"  epoch {epoch + 1:>2}/{args.epochs}  train_loss={total_loss / len(order):.4f}  val_acc={val_acc:.4f}")
         if val_acc > best_acc:
