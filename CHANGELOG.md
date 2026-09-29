@@ -4,6 +4,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Release tags are
 
 ## [Unreleased]
 
+### Changed
+- Dev tooling: `ruff` 0.9.10 -> 0.16.9 (requirements and pre-commit hook kept in step; the codebase lints clean).
+
 ## [0.2.0] - 2026-09-29
 
 ### Added
