@@ -1,24 +1,28 @@
 """Fine-tune a CNN on NEU-CLS and compare it with the Random Forest on the SAME holdout.
 
-Needs a GPU machine (CPU works but is slow):
+Needs a GPU machine for a real run (CPU works but is slow):
 
     pip install -r requirements-dl.txt
-    python analysis/run_dl_case_study.py                 # single 80/20 run
-    python analysis/run_dl_case_study.py --cv-folds 5    # plus 5-fold cross-validation
+    python analysis/run_dl_case_study.py                       # single 80/20 run
+    python analysis/run_dl_case_study.py --cv-folds 5          # plus 5-fold cross-validation
+    python analysis/run_dl_case_study.py --export-onnx models/ # also write the serving model
+    python analysis/run_dl_case_study.py --smoke-test          # 1-2 min pipeline check, no dataset
 
 The 80/20 split reproduces the one in run_neu_case_study.py (same seed, same stratification), so
 accuracy / macro-F1 / review-queue numbers are directly comparable. A further 10% of the training
 part is held out to fit the calibration temperature and pick the best epoch; the test rows are
 never used for either.
 
-Outputs: docs/data/neu-cls-dl/*.json and analysis/.cache/neu_dl_logits.npz (test logits, for
-Grad-CAM and later analysis).
+Outputs: docs/data/neu-cls-dl/*.json, analysis/.cache/neu_dl_logits.npz (test logits) and, with
+--gradcam-samples N, Grad-CAM overlays under analysis/.cache/gradcam/. --smoke-test trains on
+synthetic images and writes everything to a temporary directory; its numbers mean nothing.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -51,17 +55,34 @@ OUTPUT_DIR = ROOT / "docs" / "data" / "neu-cls-dl"
 BASELINE_FILE = ROOT / "docs" / "data" / "neu-cls-case-study" / "benchmark-comparison.json"
 IMAGE_SIZE = 224
 IMAGENET_MEAN, IMAGENET_STD = (0.485, 0.456, 0.406), (0.229, 0.224, 0.225)
+SMOKE_CLASSES = ["crazing", "inclusion", "patches", "pitted_surface", "rolled-in_scale", "scratches"]
 
 
-def load_images(paths) -> np.ndarray:
-    """Grayscale uint8 array of shape (N, IMAGE_SIZE, IMAGE_SIZE)."""
-    out = np.empty((len(paths), IMAGE_SIZE, IMAGE_SIZE), dtype=np.uint8)
+def load_images(paths, size: int = IMAGE_SIZE) -> np.ndarray:
+    """Grayscale uint8 array of shape (N, size, size)."""
+    out = np.empty((len(paths), size, size), dtype=np.uint8)
     for i, path in enumerate(paths):
         image = cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
         if image is None:
             raise ValueError(f"Failed to read image: {path}")
-        out[i] = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE), interpolation=cv2.INTER_AREA)
+        out[i] = cv2.resize(image, (size, size), interpolation=cv2.INTER_AREA)
     return out
+
+
+def synthetic_dataset(per_class: int, size: int, seed: int = RANDOM_SEED) -> tuple[np.ndarray, np.ndarray]:
+    """Learnable stand-in for NEU-CLS: each class is a differently oriented / spaced stripe texture."""
+    rng = np.random.default_rng(seed)
+    yy, xx = np.mgrid[0:size, 0:size] / size
+    images, labels = [], []
+    for cls in range(len(SMOKE_CLASSES)):
+        angle, freq = cls * np.pi / len(SMOKE_CLASSES), 4 + 3 * cls
+        pattern = np.sin(2 * np.pi * freq * (xx * np.cos(angle) + yy * np.sin(angle)))
+        for _ in range(per_class):
+            phase = rng.uniform(0, 2 * np.pi)
+            img = 0.5 + 0.25 * np.roll(pattern, int(phase * size / 6), axis=1) + rng.normal(0, 0.08, (size, size))
+            images.append(np.clip(img * 255, 0, 255).astype(np.uint8))
+            labels.append(cls)
+    return np.stack(images), np.array(labels)
 
 
 def build_model(arch: str, num_classes: int, pretrained: bool):
@@ -77,6 +98,11 @@ def build_model(arch: str, num_classes: int, pretrained: bool):
     else:
         raise ValueError(f"Unknown architecture: {arch}")
     return model
+
+
+def cam_layer(model, arch: str):
+    """Last convolutional block, the usual Grad-CAM target."""
+    return model.layer4[-1] if arch == "resnet18" else model.features[-1]
 
 
 def to_input(batch_u8, device):
@@ -145,13 +171,77 @@ def train_model(arch, x_train, y_train, x_val, y_val, num_classes, args, device)
     return model, best_acc
 
 
+def export_onnx(model, out_dir: Path, class_names, temperature: float, arch: str, size: int) -> Path:
+    """Serving model: float32 (B,1,size,size) in [0,1] -> logits; normalisation is baked in."""
+    import torch
+    import torch.nn as nn
+
+    class Serving(nn.Module):
+        def __init__(self, inner):
+            super().__init__()
+            self.inner = inner
+            self.register_buffer("mean", torch.tensor(IMAGENET_MEAN).view(1, 3, 1, 1))
+            self.register_buffer("std", torch.tensor(IMAGENET_STD).view(1, 3, 1, 1))
+
+        def forward(self, x):
+            return self.inner((x.repeat(1, 3, 1, 1) - self.mean) / self.std)
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    wrapped = Serving(model.cpu().eval()).eval()
+    path = out_dir / "model.onnx"
+    torch.onnx.export(
+        wrapped, torch.zeros(1, 1, size, size), str(path), input_names=["image"], output_names=["logits"],
+        dynamic_axes={"image": {0: "batch"}, "logits": {0: "batch"}}, opset_version=17, dynamo=False,
+    )
+    (out_dir / "meta.json").write_text(json.dumps({
+        "architecture": arch, "image_size": size, "class_names": list(class_names), "temperature": temperature,
+    }, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def grad_cam(model, arch: str, images_u8: np.ndarray, device) -> tuple[np.ndarray, np.ndarray]:
+    """Grad-CAM heat maps in [0,1] for the predicted class. Returns (maps (N,H,W), predictions (N,))."""
+    import torch.nn.functional as F
+
+    model.eval()
+    store: dict = {}
+    layer = cam_layer(model, arch)
+
+    def forward_hook(_, __, output):
+        store["act"] = output
+        output.register_hook(lambda grad: store.__setitem__("grad", grad))
+
+    handle = layer.register_forward_hook(forward_hook)
+    maps, preds = [], []
+    try:
+        for image in images_u8:
+            model.zero_grad(set_to_none=True)
+            logits = model(to_input(image[None], device))
+            cls = int(logits.argmax(1))
+            logits[0, cls].backward()
+            weights = store["grad"].mean(dim=(2, 3), keepdim=True)
+            cam = F.relu((weights * store["act"]).sum(dim=1, keepdim=True))
+            cam = F.interpolate(cam, size=image.shape, mode="bilinear", align_corners=False)[0, 0]
+            cam = cam - cam.min()
+            maps.append((cam / cam.max().clamp_min(1e-8)).detach().cpu().numpy())
+            preds.append(cls)
+    finally:
+        handle.remove()
+    return np.stack(maps), np.array(preds)
+
+
+def overlay(image_u8: np.ndarray, cam: np.ndarray) -> np.ndarray:
+    heat = cv2.applyColorMap((cam * 255).astype(np.uint8), cv2.COLORMAP_JET)
+    return cv2.addWeighted(cv2.cvtColor(image_u8, cv2.COLOR_GRAY2BGR), 0.55, heat, 0.45, 0)
+
+
 def split_train_val(indices, labels):
     return train_test_split(indices, test_size=0.10, random_state=RANDOM_SEED, stratify=labels[indices])
 
 
-def write_json(name, payload):
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    (OUTPUT_DIR / name).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+def write_json(out_dir: Path, name: str, payload) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / name).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def main() -> None:
@@ -160,8 +250,12 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=15)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--image-size", type=int, default=IMAGE_SIZE)
     parser.add_argument("--no-pretrained", action="store_true", help="random init instead of ImageNet weights")
     parser.add_argument("--cv-folds", type=int, default=0, help="also run K-fold CV over all 1800 images (slow)")
+    parser.add_argument("--export-onnx", type=Path, metavar="DIR", help="write model.onnx + meta.json for /api/classify")
+    parser.add_argument("--gradcam-samples", type=int, default=0, help="save Grad-CAM overlays for N test images")
+    parser.add_argument("--smoke-test", action="store_true", help="tiny synthetic run to check the pipeline; no dataset")
     args = parser.parse_args()
 
     import torch
@@ -169,15 +263,26 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}" + ("" if device.type == "cuda" else "  (no GPU found - this will be slow)"))
 
-    ensure_dataset()
-    paths = list(iter_image_paths())
-    labels_text = np.array([infer_label(p) for p in paths])
-    class_names = sorted(set(labels_text.tolist()))
-    labels = np.array([class_names.index(name) for name in labels_text])
-    images = load_images(paths)
+    if args.smoke_test:
+        args.no_pretrained, args.epochs, args.image_size = True, min(args.epochs, 3), min(args.image_size, 64)
+        images, labels = synthetic_dataset(per_class=40, size=args.image_size)
+        class_names = list(SMOKE_CLASSES)
+        scratch = Path(tempfile.mkdtemp(prefix="neu_dl_smoke_"))
+        out_dir, cache_dir = scratch / "data", scratch / "cache"
+        baseline = {"accuracy": None, "macro_f1": None}
+        print(f"Smoke test on synthetic images; outputs in {scratch}")
+    else:
+        ensure_dataset()
+        paths = list(iter_image_paths())
+        labels_text = np.array([infer_label(p) for p in paths])
+        class_names = sorted(set(labels_text.tolist()))
+        labels = np.array([class_names.index(name) for name in labels_text])
+        images = load_images(paths, args.image_size)
+        out_dir, cache_dir = OUTPUT_DIR, CACHE_DIR
+        baseline = next(m for m in json.loads(BASELINE_FILE.read_text()) if m["model"] == "random_forest")
 
     # Same outer split as run_neu_case_study.py (indices depend only on the labels and the seed).
-    all_idx = np.arange(len(paths))
+    all_idx = np.arange(len(labels))
     train_idx, test_idx = train_test_split(all_idx, test_size=0.20, random_state=RANDOM_SEED, stratify=labels)
     fit_idx, val_idx = split_train_val(train_idx, labels)
 
@@ -201,11 +306,11 @@ def main() -> None:
     acc, f1 = float(accuracy_score(y_test, preds)), macro_f1(y_test, preds)
     acc_ci = bootstrap_ci(y_test, preds, lambda t, p: float((t == p).mean()))
     f1_ci = bootstrap_ci(y_test, preds, macro_f1)
-    baseline = next(m for m in json.loads(BASELINE_FILE.read_text()) if m["model"] == "random_forest")
 
     summary = {
+        "smoke_test": args.smoke_test,
         "architecture": args.arch, "pretrained": not args.no_pretrained, "epochs": args.epochs,
-        "device": device.type, "train_seconds": round(train_seconds, 1), "seed": RANDOM_SEED,
+        "image_size": args.image_size, "device": device.type, "train_seconds": round(train_seconds, 1), "seed": RANDOM_SEED,
         "split": {"fit": len(fit_idx), "val": len(val_idx), "test": len(test_idx)},
         "best_val_accuracy": round(best_val_acc, 4),
         "test": {
@@ -235,18 +340,32 @@ def main() -> None:
             "accuracy_mean": round(float(np.mean(fold_acc)), 4), "accuracy_std": round(float(np.std(fold_acc)), 4),
         }
 
-    write_json("summary.json", summary)
-    write_json("reliability.json", {
-        "before": reliability_bins(raw_p, y_test), "after": reliability_bins(cal_p, y_test),
-    })
-    write_json("review-queue.json", {"review_budgets": build_review_queue(cal_p, preds, y_test)})
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    np.savez(CACHE_DIR / "neu_dl_logits.npz", test_logits=test_logits, test_idx=test_idx, targets=y_test,
+    write_json(out_dir, "summary.json", summary)
+    write_json(out_dir, "reliability.json", {"before": reliability_bins(raw_p, y_test), "after": reliability_bins(cal_p, y_test)})
+    write_json(out_dir, "review-queue.json", {"review_budgets": build_review_queue(cal_p, preds, y_test)})
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    np.savez(cache_dir / "neu_dl_logits.npz", test_logits=test_logits, test_idx=test_idx, targets=y_test,
              temperature=temperature, class_names=np.array(class_names))
-    torch.save(model.state_dict(), CACHE_DIR / f"neu_dl_{args.arch}.pt")
+    torch.save(model.state_dict(), cache_dir / f"neu_dl_{args.arch}.pt")
+
+    if args.gradcam_samples > 0:
+        # Prefer misclassified rows: that is where the heat map explains the most.
+        order = np.argsort(preds == y_test, kind="stable")[: args.gradcam_samples]
+        maps, cam_preds = grad_cam(model.to(device), args.arch, images[test_idx][order], device)
+        cam_dir = cache_dir / "gradcam"
+        cam_dir.mkdir(parents=True, exist_ok=True)
+        for rank, (row, cam, pred) in enumerate(zip(order, maps, cam_preds, strict=True)):
+            name = f"{rank:02d}_true-{class_names[y_test[row]]}_pred-{class_names[pred]}.png"
+            cv2.imwrite(str(cam_dir / name), overlay(images[test_idx][row], cam))
+        print(f"Grad-CAM overlays: {cam_dir}")
+
+    if args.export_onnx or args.smoke_test:
+        target = args.export_onnx or (out_dir.parent / "onnx")
+        print(f"Exported serving model: {export_onnx(model, target, class_names, temperature, args.arch, args.image_size)}")
 
     print(json.dumps(summary, indent=2))
-    print(f"\nRandom Forest on the same holdout: acc={baseline['accuracy']}  macro_f1={baseline['macro_f1']}")
+    if baseline["accuracy"] is not None:
+        print(f"\nRandom Forest on the same holdout: acc={baseline['accuracy']}  macro_f1={baseline['macro_f1']}")
     print(f"{args.arch}: acc={acc:.4f} {tuple(round(v, 4) for v in acc_ci)}  macro_f1={f1:.4f}")
 
 

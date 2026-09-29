@@ -18,7 +18,7 @@ Her faz bağımsız PR/sürüm olarak teslim edilir. Sayılar README'ye elle yaz
 - [x] README/hiring-summary sayıları `tests/test_docs_consistency.py` ile JSON'a karşı doğrulanır (üretim yerine sapma koruması)
 - [x] `line_sim.snapshot` maliyeti çalışma süresiyle artıyordu (7 günlük hatta ~330 ms/istek); OK sayısı blok önbelleğine alındı, ısınmış istek ~0.4 ms
 
-## Faz 2: Gerçek model, gerçek görüntü (kod hazır, GPU'da çalıştırılmayı bekliyor)
+## Faz 2: Gerçek model, gerçek görüntü (boru hattı CPU'da doğrulandı; gerçek eğitim GPU'da)
 
 Hazır: `analysis/run_dl_case_study.py` (ResNet18 / EfficientNet-B0, RF ile aynı holdout, sıcaklık ölçekleme, ECE, bootstrap GA, isteğe bağlı K-fold CV), `analysis/dl/` (test edilmiş NumPy/SciPy yardımcıları). Torch kısmı bulut konteynerinde çalıştırılamadığı için ilk GPU çalıştırması bir doğrulama adımıdır. Kalan: Grad-CAM, ONNX, dashboard'a gerçek görüntü, `/api/classify`.
 - ResNet18 / EfficientNet-B0 fine-tune; aynı 80/20 holdout ve metrik tablosuyla Random Forest ile karşılaştırma

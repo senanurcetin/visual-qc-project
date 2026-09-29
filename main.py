@@ -8,6 +8,7 @@ from flask import Flask, Response, jsonify, render_template_string, request, sen
 import line_sim
 from camera import gen
 from case_study import case_study_bp
+from classify import classify_bp
 from hmi_page import HTML_TEMPLATE
 from line_session import line_state
 from rag_demo import rag_bp
@@ -26,6 +27,7 @@ app.register_blueprint(case_study_bp)
 app.register_blueprint(rag_bp)
 app.register_blueprint(review_bp)
 app.register_blueprint(spc_bp)
+app.register_blueprint(classify_bp)
 
 # --- 2. BACKEND: İŞ MANTIĞI & DURUM YÖNETİMİ ---
 # --- HAT SİMÜLASYONU (DURUMSUZ) ---

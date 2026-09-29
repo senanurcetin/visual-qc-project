@@ -64,6 +64,27 @@ jobs:
       - name: Import app
         run: python -c "import main; print(main.app.name)"
 
+  dl-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies (CPU torch)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt -r requirements-serve.txt
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install onnx onnxscript
+
+      - name: CNN pipeline smoke test (synthetic images, CPU)
+        run: python -m unittest tests.test_dl_torch tests.test_classify -v
+
   e2e:
     runs-on: ubuntu-latest
     steps:
