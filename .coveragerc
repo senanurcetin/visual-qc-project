@@ -1,0 +1,7 @@
+[run]
+branch = False
+
+[report]
+include = main.py, line_sim.py, case_study.py, rag_demo.py
+fail_under = 80
+show_missing = True
