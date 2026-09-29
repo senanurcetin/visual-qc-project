@@ -17,6 +17,8 @@ import cv2
 import numpy as np
 from flask import Blueprint, current_app, jsonify, request
 
+from ratelimit import rate_limited
+
 classify_bp = Blueprint("classify", __name__)
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 REVIEW_ENTROPY_BITS = 1.0  # entropy above this routes the image to human review
@@ -64,6 +66,7 @@ def preprocess(data: bytes, size: int) -> np.ndarray:
 
 
 @classify_bp.route("/api/classify", methods=["POST"])
+@rate_limited("classify", calls=int(os.environ.get("CLASSIFY_RATE_PER_MIN", "20")))
 def classify():
     upload = request.files.get("image")
     if upload is None:
