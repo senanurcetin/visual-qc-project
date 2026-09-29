@@ -10,6 +10,19 @@ jobs:
   quality:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -42,6 +55,8 @@ jobs:
           python analysis/generate_rag_visuals.py
 
       - name: Unit tests with coverage
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
         run: |
           coverage run -m unittest discover -s tests -v
           coverage report

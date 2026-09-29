@@ -1,11 +1,13 @@
+import os
 import tempfile
 import time
 import unittest
+import uuid
 from pathlib import Path
 
 import line_sim
 import main
-from store import ReviewStore
+from store import MIGRATIONS, ReviewStore
 
 
 def start_with_failed_first_unit(client, seconds=40):
@@ -84,21 +86,70 @@ class ReviewApiTests(unittest.TestCase):
         self.assertNotIn("Set-Cookie", self.client.get("/api/review-queue").headers)
 
 
-class ReviewStoreTests(unittest.TestCase):
+class StoreContract:
+    """Behaviour every backend must share. Subclasses provide `make_store()`."""
+
+    def make_store(self, **kwargs) -> ReviewStore:
+        raise NotImplementedError
+
+    def setUp(self):
+        self.uid = uuid.uuid4().hex[:8]  # isolates rows when the database is shared
+
+    def v(self, name):
+        return f"{name}-{self.uid}"
+
     def test_upsert_keeps_one_row_per_visitor_and_unit(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            store = ReviewStore(f"sqlite:///{Path(tmp) / 's.db'}")
-            store.record("v1", "U_0001", "crazing", "confirm", "crazing")
-            store.record("v1", "U_0001", "crazing", "correct", "patches")
-            store.record("v2", "U_0001", "crazing", "confirm", "crazing")
-            self.assertEqual(store.for_visitor("v1")["U_0001"]["operator_label"], "patches")
-            self.assertEqual(len(store.for_visitor("v1")), 1)
-            self.assertEqual(store.for_visitor("v2")["U_0001"]["decision"], "confirm")
-            self.assertEqual(store.for_visitor("nobody"), {})
+        store = self.make_store()
+        store.record(self.v("v1"), "U_0001", "crazing", "confirm", "crazing")
+        store.record(self.v("v1"), "U_0001", "crazing", "correct", "patches")
+        store.record(self.v("v2"), "U_0001", "crazing", "confirm", "crazing")
+        self.assertEqual(store.for_visitor(self.v("v1"))["U_0001"]["operator_label"], "patches")
+        self.assertEqual(len(store.for_visitor(self.v("v1"))), 1)
+        self.assertEqual(store.for_visitor(self.v("v2"))["U_0001"]["decision"], "confirm")
+        self.assertEqual(store.for_visitor(self.v("nobody")), {})
+
+    def test_all_corrections_spans_visitors_and_skips_confirmations(self):
+        store = self.make_store()
+        store.record(self.v("a"), "U_0001", "crazing", "correct", "patches")
+        store.record(self.v("b"), "U_0002", "scratches", "correct", "inclusion")
+        store.record(self.v("c"), "U_0003", "patches", "confirm", "patches")
+        mine = [c for c in store.all_corrections() if c["visitor_id"].endswith(self.uid)]
+        self.assertEqual(sorted(c["visitor_id"][0] for c in mine), ["a", "b"])
+
+    def test_migrations_apply_once_in_order_and_new_ones_are_picked_up(self):
+        store = self.make_store()
+        store.init_schema()  # a fresh database applies everything; a shared one may already have it
+        self.assertEqual(store.init_schema(), [])
+        extra = 1000 + int(self.uid, 16) % 100000
+        later = self.make_store(migrations=[*MIGRATIONS, (extra, ["CREATE INDEX IF NOT EXISTS ix_" + self.uid + " ON review_decisions (unit_id)"])])
+        self.assertEqual(later.init_schema(), [extra])
+        self.assertEqual(later.init_schema(), [])
+
+
+class SqliteStoreTests(StoreContract, unittest.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.tmp = tempfile.TemporaryDirectory()
+        self.path = Path(self.tmp.name) / "s.db"
+        self.addCleanup(self.tmp.cleanup)
+
+    def make_store(self, **kwargs):
+        return ReviewStore(f"sqlite:///{self.path}", **kwargs)
+
+    def test_fresh_database_applies_every_migration(self):
+        self.assertEqual(self.make_store().init_schema(), [v for v, _ in MIGRATIONS])
 
     def test_backend_is_chosen_from_the_url(self):
         self.assertTrue(ReviewStore("postgresql://u:p@host/db").postgres)
         self.assertFalse(ReviewStore("sqlite:///x.db").postgres)
+
+
+@unittest.skipUnless(os.environ.get("TEST_DATABASE_URL"), "set TEST_DATABASE_URL to run against a real Postgres")
+class PostgresStoreTests(StoreContract, unittest.TestCase):
+    def make_store(self, **kwargs):
+        store = ReviewStore(os.environ["TEST_DATABASE_URL"], **kwargs)
+        self.assertTrue(store.postgres)
+        return store
 
 
 if __name__ == "__main__":
