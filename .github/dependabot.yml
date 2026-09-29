@@ -18,6 +18,11 @@ updates:
       # (numpy 2.5 also needs Python >= 3.12). Revisit together with the OpenCV bump.
       - dependency-name: "numpy"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      # requirements-dl.txt / requirements-rag.txt use deliberately loose torch floors (e.g. torch>=2.5):
+      # installers put a CUDA build matching the machine's driver first, and a raised floor would
+      # make pip swap it for the default PyPI build. Bump them by hand when a feature needs it.
+      - dependency-name: "torch"
+      - dependency-name: "torchvision"
   - package-ecosystem: github-actions
     directory: /
     schedule:

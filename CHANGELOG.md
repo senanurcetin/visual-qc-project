@@ -6,6 +6,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Release tags are
 
 ### Changed
 - CI and the Docker image now run on Python 3.12, the version Vercel actually serves (`.python-version`); CI used 3.11 before, so the tests were not exercising the production interpreter. README badge updated.
+- Dependabot no longer touches the `torch` / `torchvision` floors in `requirements-dl.txt` / `requirements-rag.txt`: they are loose on purpose so a machine's CUDA build is not replaced by pip.
 - Dependabot runs monthly with grouped minor/patch updates, and skips `numpy` minor/major releases: `opencv-python-headless` 4.12 requires `numpy<2.3`.
 - Dev tooling: `ruff` 0.9.10 -> 0.16.9 (requirements and pre-commit hook kept in step; the codebase lints clean).
 
