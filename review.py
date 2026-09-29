@@ -11,7 +11,8 @@ from flask import Blueprint, Response, current_app, jsonify, request, session
 
 import line_sim
 from line_session import line_state
-from store import ReviewStore
+from ratelimit import rate_limited
+from store import LimitReached, ReviewStore
 
 review_bp = Blueprint("review", __name__)
 REVIEW_WINDOW = 20  # most recent completed units offered for review
@@ -58,6 +59,7 @@ def review_queue():
 
 
 @review_bp.route("/api/review", methods=["POST"])
+@rate_limited("review", calls=int(os.environ.get("REVIEW_RATE_PER_MIN", "30")))
 def submit_review():
     body = request.get_json(silent=True) or {}
     unit_id, label = body.get("unit_id"), body.get("label")
@@ -66,7 +68,12 @@ def submit_review():
     if not isinstance(label, str) or label not in line_sim.DEFECT_CLASSES:
         return jsonify({"error": "label must be one of the defect classes"}), 400
     decision = "confirm" if label == unit["defect"] else "correct"
-    saved = get_store().record(ensure_visitor_id(), unit_id, unit["defect"], decision, label)
+    try:
+        saved = get_store().record(ensure_visitor_id(), unit_id, unit["defect"], decision, label)
+    except LimitReached as exc:
+        if exc.scope == "visitor":
+            return jsonify({"error": "you have reached the review limit for this demo"}), 429
+        return jsonify({"error": "review storage is full, try again later"}), 503
     return jsonify({k: saved[k] for k in ("unit_id", "predicted_defect", "decision", "operator_label", "updated_at")})
 
 

@@ -4,6 +4,8 @@ import json
 import unittest
 from pathlib import Path
 
+from analysis import update_docs_from_dl
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "docs" / "data" / "neu-cls-case-study"
 
@@ -40,6 +42,31 @@ class DocsMatchArtifactsTests(unittest.TestCase):
             load("confusion-matrix.json")["matrix"][i][i] for i in range(len(load("confusion-matrix.json")["matrix"]))
         )
         self.assertIn(f"{errors / holdout * 100:.1f}% ({errors} / {holdout} holdout samples)", self.hiring)
+
+
+class CnnResultsBlockTests(unittest.TestCase):
+    """The CNN block in README.md may only ever reflect a real (non-smoke) summary.json."""
+
+    def setUp(self):
+        self.readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.summary_file = ROOT / "docs" / "data" / "neu-cls-dl" / "summary.json"
+
+    def test_readme_has_exactly_one_results_block(self):
+        self.assertEqual(self.readme.count(update_docs_from_dl.START), 1)
+        self.assertEqual(self.readme.count(update_docs_from_dl.END), 1)
+
+    def test_committed_results_are_real_and_match_the_readme(self):
+        if not self.summary_file.exists():
+            self.skipTest("no CNN run recorded yet")
+        summary = json.loads(self.summary_file.read_text(encoding="utf-8"))
+        self.assertFalse(summary.get("smoke_test"), "docs/data/neu-cls-dl/summary.json is from a smoke test")
+        rf = next(m for m in load("benchmark-comparison.json") if m["model"] == "random_forest")
+        block = update_docs_from_dl.render_block(summary, rf)
+        self.assertIn(block, self.readme, "README CNN block is stale: run python analysis/update_docs_from_dl.py")
+
+    def test_placeholder_is_only_present_while_no_run_is_committed(self):
+        has_placeholder = "No real-data CNN run has been recorded yet" in self.readme
+        self.assertEqual(has_placeholder, not self.summary_file.exists())
 
 
 if __name__ == "__main__":
