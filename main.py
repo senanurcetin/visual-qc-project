@@ -13,6 +13,7 @@ from line_session import line_state
 from rag_demo import rag_bp
 from report import build_report
 from review import review_bp
+from spc import spc_bp
 
 app = Flask(__name__, static_folder="web/line", static_url_path="/line/static")
 # Session çerezi yalnızca demo hattının kontrol durumunu imzalar; gizli veri taşımaz.
@@ -24,6 +25,7 @@ app.config.update(SESSION_COOKIE_SAMESITE="Lax", SESSION_COOKIE_HTTPONLY=True,
 app.register_blueprint(case_study_bp)
 app.register_blueprint(rag_bp)
 app.register_blueprint(review_bp)
+app.register_blueprint(spc_bp)
 
 # --- 2. BACKEND: İŞ MANTIĞI & DURUM YÖNETİMİ ---
 # --- HAT SİMÜLASYONU (DURUMSUZ) ---

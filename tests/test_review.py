@@ -86,6 +86,43 @@ class ReviewApiTests(unittest.TestCase):
         self.assertNotIn("Set-Cookie", self.client.get("/api/review-queue").headers)
 
 
+class AdminRoleTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        main.app.config["DATABASE_URL"] = f"sqlite:///{Path(self.tmp.name) / 'a.db'}"
+        main.app.extensions.pop("review_store", None)
+        self.client = main.app.test_client()
+        start_with_failed_first_unit(self.client)
+        predicted = next(i for i in self.client.get("/api/review-queue").get_json()["items"] if i["unit_id"] == "U_0000")["predicted_defect"]
+        self.other = next(c for c in line_sim.DEFECT_CLASSES if c != predicted)
+        self.client.post("/api/review", json={"unit_id": "U_0000", "label": self.other})
+
+    def tearDown(self):
+        main.app.config.pop("DATABASE_URL", None)
+        main.app.extensions.pop("review_store", None)
+        os.environ.pop("REVIEW_ADMIN_TOKEN", None)
+        self.tmp.cleanup()
+
+    def test_disabled_without_a_configured_token(self):
+        os.environ.pop("REVIEW_ADMIN_TOKEN", None)
+        self.assertEqual(main.app.test_client().get("/api/admin/corrections.csv").status_code, 404)
+
+    def test_requires_the_bearer_token(self):
+        os.environ["REVIEW_ADMIN_TOKEN"] = "s3cret"
+        anon = main.app.test_client()  # a different visitor than the one who corrected the label
+        self.assertEqual(anon.get("/api/admin/corrections.csv").status_code, 401)
+        self.assertEqual(anon.get("/api/admin/corrections.csv", headers={"Authorization": "Bearer nope"}).status_code, 401)
+
+    def test_returns_every_visitors_corrections_with_the_token(self):
+        os.environ["REVIEW_ADMIN_TOKEN"] = "s3cret"
+        response = main.app.test_client().get("/api/admin/corrections.csv", headers={"Authorization": "Bearer s3cret"})
+        rows = response.get_data(as_text=True).strip().splitlines()
+        self.assertEqual(rows[0], "visitor_id,unit_id,predicted_defect,operator_label,updated_at")
+        self.assertEqual(len(rows), 2)
+        self.assertIn(",U_0000,", rows[1])
+        self.assertIn(self.other, rows[1])
+
+
 class StoreContract:
     """Behaviour every backend must share. Subclasses provide `make_store()`."""
 

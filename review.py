@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import io
+import os
 import secrets
 import time
 
@@ -72,3 +73,23 @@ def export_corrections():
     writer.writerow(["unit_id", "predicted_defect", "operator_label", "updated_at"])
     writer.writerows([[d["unit_id"], d["predicted_defect"], d["operator_label"], d["updated_at"]] for d in rows])
     return Response(out.getvalue(), mimetype="text/csv", headers={"Content-Disposition": "attachment; filename=corrections.csv"})
+
+
+@review_bp.route("/api/admin/corrections.csv")
+def admin_corrections():
+    """Quality-engineer view: corrected labels from every operator, as a retraining candidate set.
+
+    Disabled (404) unless REVIEW_ADMIN_TOKEN is set; then it requires `Authorization: Bearer <token>`.
+    """
+    token = os.environ.get("REVIEW_ADMIN_TOKEN")
+    if not token:
+        return jsonify({"error": "not found"}), 404
+    supplied = request.headers.get("Authorization", "").removeprefix("Bearer ")
+    if not secrets.compare_digest(supplied.encode(), token.encode()):
+        return jsonify({"error": "unauthorized"}), 401
+    out = io.StringIO()
+    writer = csv.writer(out)
+    writer.writerow(["visitor_id", "unit_id", "predicted_defect", "operator_label", "updated_at"])
+    writer.writerows([[d["visitor_id"], d["unit_id"], d["predicted_defect"], d["operator_label"], d["updated_at"]]
+                      for d in get_store().all_corrections()])
+    return Response(out.getvalue(), mimetype="text/csv")

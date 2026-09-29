@@ -32,7 +32,7 @@ HTML_TEMPLATE = """
         .kpi-title { font-size: 0.7rem; color: #9ca3af; text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
         .kpi-val { font-family: 'Roboto Mono', monospace; font-size: 1.4rem; font-weight: 500; }
 
-        .control-bar { flex-shrink: 0; padding: 10px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; background: #111827; border-bottom: 1px solid var(--border); }
+        .control-bar { flex-shrink: 0; padding: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; background: #111827; border-bottom: 1px solid var(--border); }
         .btn { padding: 10px; border: none; border-radius: 4px; color: white; font-weight: 600; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; transition: 0.2s; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         .btn-start { background: #065f46; border-bottom: 3px solid #064e3b; } .btn-start:active { transform: translateY(2px); border-bottom: 0px; }
         .btn-pause { background: #92400e; border-bottom: 3px solid #78350f; } .btn-pause:active { transform: translateY(2px); border-bottom: 0px; }
@@ -86,6 +86,7 @@ HTML_TEMPLATE = """
         <button class="btn btn-sim-fail" onclick="sendCmd('SIMULATE_FAIL')">Simulate Defect</button>
         <a href="/case-study" class="btn btn-case-study">Case Study</a>
         <a href="/rag" class="btn btn-rag">RAG Map</a>
+        <a href="/spc" class="btn btn-case-study">SPC Chart</a>
         <a href="/api/export_report" class="btn btn-export">&#x1F4E5; Export Report</a>
     </div>
     <div class="main-grid">
