@@ -1,7 +1,7 @@
 # Visual QC Project
 
 [![CI](https://github.com/senanurcetin/visual-qc-project/actions/workflows/ci.yml/badge.svg)](https://github.com/senanurcetin/visual-qc-project/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/Python-3.11-blue)
+![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 **Computer vision analytics case study** — steel surface defect classification on the NEU-CLS dataset, combined with an operator-facing Flask QA dashboard. Covers EDA, feature engineering (HOG), model benchmarking, per-class metrics, Pareto error analysis, and confidence-based review queue design.
