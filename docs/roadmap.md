@@ -30,7 +30,9 @@ Hazır: `analysis/run_dl_case_study.py` (ResNet18 / EfficientNet-B0, RF ile ayn�
 
 Çıkış kriteri: karşılaştırma tablosu README'de; CV ve kalibrasyon sonuçları belgelenmiş.
 
-## Faz 3: Kalıcılık ve operatör akışı
+## Faz 3: Kalıcılık ve operatör akışı (ilk dilim tamam)
+
+Hazır: `store.py` (Postgres/SQLite, `DATABASE_URL`), `review.py` (`/api/review-queue`, `/api/review`, `/api/review/export.csv`), HMI'de Review Queue paneli, ayrı Neon projesi `visual-qc`. Postgres SQL'i Neon'da doğrulandı; psycopg bağlantı yolu bulut konteynerinden (TCP engelli) çalıştırılamadı. Üretimde etkinleştirmek için Vercel'de `DATABASE_URL` ortam değişkeni gerekir; yoksa her instance kendi geçici SQLite dosyasını kullanır. Kalan: alembic, roller, SPC grafikleri.
 - Historian: Neon Postgres (deploy) / SQLite (yerel); şema `alembic` ile
 - Düşük güvenli plakalar için inceleme kuyruğu UI'ı (onayla / düzelt)
 - Düzeltilen etiketlerin yeniden eğitim adayı olarak dışa aktarımı

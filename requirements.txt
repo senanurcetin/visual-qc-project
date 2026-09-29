@@ -5,3 +5,4 @@ numpy==2.2.6
 opencv-python-headless==4.12.0.88
 pandas==2.3.3
 XlsxWriter==3.2.9
+psycopg[binary]==3.3.6

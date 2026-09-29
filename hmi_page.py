@@ -60,6 +60,12 @@ HTML_TEMPLATE = """
         .log-table th { position: sticky; top: 0; background: #1e293b; padding: 8px; text-align: left; color: #9ca3af; }
         .log-table td { padding: 6px 8px; border-bottom: 1px solid #334155; }
         .text-ok { color: var(--green); } .text-fail { color: var(--red); font-weight: bold; }
+        .review-sec { border-top: 3px solid var(--purple); max-height: 150px; }
+        .review-list { overflow-y: auto; font-family: 'Roboto Mono', monospace; font-size: 0.75rem; }
+        .review-row { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-bottom: 1px solid #334155; }
+        .review-row .who { flex: 1; } .review-row .done { color: var(--green); }
+        .review-row button, .review-row select { background: #334155; color: var(--text); border: 1px solid var(--border); border-radius: 3px; font: inherit; padding: 2px 6px; cursor: pointer; }
+        .review-empty { padding: 8px; color: #9ca3af; }
         .warn-card { border: 1px solid var(--yellow) !important; color: var(--yellow) !important; }
     </style>
 </head>
@@ -90,6 +96,7 @@ HTML_TEMPLATE = """
         <div class="right-col">
             <div class="panel profit-sec"><div class="section-header">Trend Analysis</div><div class="chart-container"><canvas id="profitChart"></canvas></div></div>
             <div class="panel oee-sec"><div class="section-header">OEE Breakdown</div><div class="chart-container"><canvas id="oeeChart"></canvas></div></div>
+            <div class="panel review-sec"><div class="section-header">Review Queue &middot; <a href="/api/review/export.csv" style="color:#a78bfa">corrections CSV</a></div><div class="review-list" id="review-list"><div class="review-empty">No rejected units yet.</div></div></div>
             <div class="panel log-sec"><div class="section-header">Event Historian</div><div class="log-box"><table class="log-table"><thead><tr><th>Time</th><th>ID</th><th>Result</th></tr></thead><tbody id="log-tbody"></tbody></table></div></div>
         </div>
     </div>
@@ -187,6 +194,35 @@ HTML_TEMPLATE = """
         if (loading) loading.hidden = true;
     };
     setTimeout(() => { if (!window.lineTwinReady) window.showLineFallback(); }, 8000);
+
+
+    // --- Review queue: confirm or correct the predicted defect of rejected units ---
+    function loadReview() {
+        fetch('/api/review-queue').then(r => r.json()).then(q => {
+            const list = document.getElementById('review-list');
+            if (!list) return;
+            if (!q.items.length) { list.innerHTML = '<div class="review-empty">No rejected units yet.</div>'; return; }
+            list.innerHTML = q.items.map(i => {
+                const options = q.classes.map(c => `<option value="${c}">${c.replace(/_/g, ' ')}</option>`).join('');
+                const state = i.decision
+                    ? `<span class="done">${i.decision === 'confirm' ? '&#10003; confirmed' : '&#9998; ' + i.operator_label.replace(/_/g, ' ')}</span>`
+                    : `<button onclick="submitReview('${i.unit_id}','${i.predicted_defect}')">Confirm</button>
+                       <select onchange="if(this.value)submitReview('${i.unit_id}',this.value)"><option value="">Correct&hellip;</option>${options}</select>`;
+                return `<div class="review-row"><span class="who">${i.unit_id} &middot; ${i.predicted_defect.replace(/_/g, ' ')}</span>${state}</div>`;
+            }).join('');
+        }).catch(() => {});
+    }
+
+    function submitReview(unitId, label) {
+        fetch('/api/review', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({unit_id: unitId, label: label})
+        }).then(loadReview);
+    }
+
+    setInterval(loadReview, 4000);
+    loadReview();
 
     setInterval(update, 1000);
     window.onload = initCharts;

@@ -9,8 +9,10 @@ import line_sim
 from camera import gen
 from case_study import case_study_bp
 from hmi_page import HTML_TEMPLATE
+from line_session import line_state
 from rag_demo import rag_bp
 from report import build_report
+from review import review_bp
 
 app = Flask(__name__, static_folder="web/line", static_url_path="/line/static")
 # Session çerezi yalnızca demo hattının kontrol durumunu imzalar; gizli veri taşımaz.
@@ -21,6 +23,7 @@ app.config.update(SESSION_COOKIE_SAMESITE="Lax", SESSION_COOKIE_HTTPONLY=True,
                   SESSION_REFRESH_EACH_REQUEST=False)
 app.register_blueprint(case_study_bp)
 app.register_blueprint(rag_bp)
+app.register_blueprint(review_bp)
 
 # --- 2. BACKEND: İŞ MANTIĞI & DURUM YÖNETİMİ ---
 # --- HAT SİMÜLASYONU (DURUMSUZ) ---
@@ -29,15 +32,6 @@ app.register_blueprint(rag_bp)
 # eşzamanlı istekleri farklı serverless instance'lar karşılasa bile aynı sayaçlar görülür.
 ANIMATION_CYCLE = line_sim.CYCLE_SECONDS
 DEFECT_CLASSES = line_sim.DEFECT_CLASSES
-
-
-def line_state():
-    state = session.get("line")
-    if not line_sim.is_valid(state):
-        state = line_sim.new_state(time.time())
-        session["line"] = state
-        session.permanent = True
-    return state
 
 
 SECURITY_HEADERS = {
