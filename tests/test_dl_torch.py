@@ -20,6 +20,27 @@ ROOT = Path(__file__).resolve().parents[1]
 HAVE_STACK = all(importlib.util.find_spec(m) for m in ("torch", "torchvision", "onnxruntime", "onnx"))
 
 
+def assert_onnx_matches_pytorch(test, scratch, arch):
+    import onnxruntime
+    import torch
+
+    sys.path.insert(0, str(ROOT))
+    from analysis.run_dl_case_study import build_model, synthetic_dataset, to_input
+
+    onnx_dir = scratch / "onnx"
+    meta = json.loads((onnx_dir / "meta.json").read_text())
+    test.assertEqual(meta["architecture"], arch)
+    model = build_model(arch, len(meta["class_names"]), pretrained=False)
+    model.load_state_dict(torch.load(scratch / "cache" / f"neu_dl_{arch}.pt"))
+    model.eval()
+    images, _ = synthetic_dataset(1, meta["image_size"])
+    with torch.no_grad():
+        expected = model(to_input(images, torch.device("cpu"))).numpy()
+    session = onnxruntime.InferenceSession(str(onnx_dir / "model.onnx"), providers=["CPUExecutionProvider"])
+    got = session.run(["logits"], {"image": (images.astype(np.float32) / 255.0)[:, None]})[0]
+    np.testing.assert_allclose(got, expected, atol=1e-4)
+
+
 @unittest.skipUnless(HAVE_STACK, "needs torch, torchvision, onnx and onnxruntime")
 class SmokePipelineTests(unittest.TestCase):
     @classmethod
@@ -50,23 +71,7 @@ class SmokePipelineTests(unittest.TestCase):
         self.assertGreater(summary["test"]["accuracy"], 0.5)  # chance is 1/6
 
     def test_onnx_matches_pytorch(self):
-        import onnxruntime
-        import torch
-
-        sys.path.insert(0, str(ROOT))
-        from analysis.run_dl_case_study import build_model, synthetic_dataset, to_input
-
-        onnx_dir = self.scratch / "onnx"
-        meta = json.loads((onnx_dir / "meta.json").read_text())
-        model = build_model("resnet18", len(meta["class_names"]), pretrained=False)
-        model.load_state_dict(torch.load(self.scratch / "cache" / "neu_dl_resnet18.pt"))
-        model.eval()
-        images, _ = synthetic_dataset(1, meta["image_size"])
-        with torch.no_grad():
-            expected = model(to_input(images, torch.device("cpu"))).numpy()
-        session = onnxruntime.InferenceSession(str(onnx_dir / "model.onnx"), providers=["CPUExecutionProvider"])
-        got = session.run(["logits"], {"image": (images.astype(np.float32) / 255.0)[:, None]})[0]
-        np.testing.assert_allclose(got, expected, atol=1e-4)
+        assert_onnx_matches_pytorch(self, self.scratch, "resnet18")
 
     def test_exported_model_is_served_by_the_api(self):
         import main
@@ -89,6 +94,42 @@ class SmokePipelineTests(unittest.TestCase):
                 os.environ.pop("QC_MODEL_DIR", None)
             else:
                 os.environ["QC_MODEL_DIR"] = old
+
+
+@unittest.skipUnless(HAVE_STACK, "needs torch, torchvision, onnx and onnxruntime")
+class EfficientNetAndCrossValidationTests(unittest.TestCase):
+    """The other architecture and the K-fold path, which the default smoke run does not exercise.
+
+    The tiny 3-epoch run is too short for EfficientNet's BatchNorm statistics to settle (it reaches
+    ~100% on the same data with 15 epochs), so this asserts the pipeline, not accuracy.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        run = subprocess.run(
+            [sys.executable, str(ROOT / "analysis" / "run_dl_case_study.py"), "--smoke-test", "--arch", "efficientnet_b0",
+             "--cv-folds", "2", "--gradcam-samples", "2"],
+            capture_output=True, text=True, timeout=900, cwd=ROOT,
+        )
+        cls.run_result = run
+        found = re.search(r"outputs in (\S+)", run.stdout)
+        cls.scratch = Path(found.group(1)) if found else None
+
+    def test_pipeline_runs_end_to_end(self):
+        self.assertEqual(self.run_result.returncode, 0, self.run_result.stderr[-2000:])
+        summary = json.loads((self.scratch / "data" / "summary.json").read_text())
+        self.assertEqual(summary["architecture"], "efficientnet_b0")
+        self.assertEqual(len(list((self.scratch / "cache" / "gradcam").glob("*.png"))), 2)
+
+    def test_cross_validation_summary(self):
+        cv = json.loads((self.scratch / "data" / "summary.json").read_text())["cross_validation"]
+        self.assertEqual(cv["folds"], 2)
+        self.assertEqual(len(cv["accuracy_per_fold"]), 2)
+        self.assertAlmostEqual(cv["accuracy_mean"], sum(cv["accuracy_per_fold"]) / 2, places=3)
+        self.assertTrue(all(0.0 <= a <= 1.0 for a in cv["accuracy_per_fold"]))
+
+    def test_onnx_matches_pytorch(self):
+        assert_onnx_matches_pytorch(self, self.scratch, "efficientnet_b0")
 
 
 if __name__ == "__main__":

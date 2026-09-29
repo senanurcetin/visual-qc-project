@@ -5,6 +5,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Versions are not
 ## [Unreleased]
 
 ### Added
+- `analysis/update_docs_from_dl.py`: writes the real-data CNN table (with bootstrap intervals, ECE and a Random-Forest-vs-CNN verdict) into the README's marked block; refuses smoke-test summaries. `tests/test_docs_consistency.py` fails if the block drifts from `docs/data/neu-cls-dl/summary.json`.
+- `run_dl_case_study.py --preflight`: checks GPU, disk, dataset layout / reachability, pretrained weights and output paths before a long run; exits 1 when the run cannot work.
+- Abuse limits on the public write endpoints: per-visitor and total row quotas with retention pruning for review decisions (429 / 503), and per-client rate limits on `/api/review` and `/api/classify` (`Retry-After`). Client identity ignores spoofable forwarding headers.
 - Operator review queue in the HMI: confirm or correct the predicted defect of rejected units; decisions persist per visitor (Postgres via `DATABASE_URL`, SQLite fallback) with versioned migrations.
 - `/api/admin/corrections.csv` (quality-engineer export, `REVIEW_ADMIN_TOKEN` bearer token) and `/api/review/export.csv`.
 - `/spc`: p-chart of the reject rate per batch with 3-sigma control limits.
