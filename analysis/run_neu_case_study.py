@@ -288,7 +288,7 @@ def build_cost_weighted_metrics(
 
     per_class.sort(key=lambda r: r["combined_cost"], reverse=True)
     total_cost = total_fn_cost + total_fp_cost
-    n_test = len(y_test)
+    len(y_test)
     naive_cost = sum(
         DEFECT_FN_COSTS.get(cls, 200) * int((y_test == cls).sum())
         for cls in class_names
@@ -442,7 +442,7 @@ def main() -> None:
 
     misclassified_rows = []
     for image_path, target, predicted, score, ent in zip(
-        test_paths, y_test, final_predictions, confidence, entropy
+        test_paths, y_test, final_predictions, confidence, entropy, strict=False
     ):
         if predicted != target:
             misclassified_rows.append(
@@ -631,7 +631,7 @@ def main() -> None:
     print(f"  SPC: p̄={spc_data['p_bar']}  UCL={spc_data['ucl']}  LCL={spc_data['lcl']}")
     print(f"  Cost savings vs naive: {cost_metrics['cost_savings_share']*100:.1f}%")
     print(f"  Pareto 80% classes: {pareto['eighty_percent_classes']}")
-    print(f"  New artifacts: spc-data.json, cost-matrix.json, pareto.json, adaptive-thresholds.json")
+    print("  New artifacts: spc-data.json, cost-matrix.json, pareto.json, adaptive-thresholds.json")
 
 
 if __name__ == "__main__":

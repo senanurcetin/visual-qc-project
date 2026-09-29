@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -61,7 +62,7 @@ for k, (label, prompt, color) in enumerate(variants):
     vals = [ge["closed_book_by_generator"][g]["sentence_support_rate"] if prompt is None
             else ge["by_config"][f"{g}/{prompt}"]["sentence_support_rate"] for g in gens]
     bars = ax.bar(x + (k - 1) * w, vals, w, label=label, color=color, alpha=0.85)
-    for g, b in zip(gens, bars):
+    for g, b in zip(gens, bars, strict=False):
         chosen = prompt is not None and f"{g}/{prompt}" == ge["selected_config"]
         ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.015, f"{b.get_height():.0%}" + (" *" if chosen else ""),
                 ha="center", fontsize=9, fontweight="bold" if chosen else "normal")

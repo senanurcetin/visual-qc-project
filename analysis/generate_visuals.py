@@ -1,11 +1,11 @@
 """Generate all visualization assets for visual-qc-project from JSON artifacts."""
-import json, os
+import json
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -92,7 +92,7 @@ cum_p = [d["cumulative_share"]*100 for d in p_items]
 fig, ax1 = plt.subplots(figsize=(8,5), facecolor=PAL["bg"]); ax1.set_facecolor(PAL["bg"])
 ax2 = ax1.twinx()
 bars = ax1.bar(cls_p, err_p, color=PAL["danger"], alpha=0.8)
-for bar, v in zip(bars, err_p):
+for bar, v in zip(bars, err_p, strict=False):
     ax1.text(bar.get_x()+bar.get_width()/2, v+0.1, str(v), ha="center", va="bottom", fontsize=9, fontweight="bold")
 ax2.plot(cls_p, cum_p, "o-", color=PAL["primary"], linewidth=2, markersize=6, label="Cumulative %")
 ax2.axhline(80, color=PAL["neutral"], linestyle="--", linewidth=1, label="80% line")

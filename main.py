@@ -1,13 +1,14 @@
+import io
 import os
+import time
+from datetime import datetime, timedelta
+
 import cv2
 import numpy as np
-import time
-import io
-from flask import Flask, Response, render_template_string, jsonify, request, send_file, session
-from datetime import timedelta
-import line_sim
-from datetime import datetime
 import pandas as pd  # Excel raporlama ve veri manipülasyonu için
+from flask import Flask, Response, jsonify, render_template_string, request, send_file, session
+
+import line_sim
 from case_study import case_study_bp
 from rag_demo import rag_bp
 
@@ -41,18 +42,18 @@ HTML_TEMPLATE = """
     </script>
     <script type="module" src="/line/static/line3d.js"></script>
     <style>
-        :root { 
-            --bg: #111827; --card: #1f293b; --border: #374151; --text: #f3f4f6; 
+        :root {
+            --bg: #111827; --card: #1f293b; --border: #374151; --text: #f3f4f6;
             --green: #10b981; --yellow: #f59e0b; --red: #ef4444; --blue: #3b82f6; --purple: #8b5cf6; --teal: #14b8a6;
         }
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--bg); color: var(--text); }
         body { font-family: 'Inter', sans-serif; display: flex; flex-direction: column; }
-        
+
         .header { flex-shrink: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 12px; background: #030712; border-bottom: 1px solid var(--border); }
         .kpi-card { background: var(--card); border: 1px solid var(--border); padding: 8px 12px; border-radius: 4px; }
         .kpi-title { font-size: 0.7rem; color: #9ca3af; text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
         .kpi-val { font-family: 'Roboto Mono', monospace; font-size: 1.4rem; font-weight: 500; }
-        
+
         .control-bar { flex-shrink: 0; padding: 10px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; background: #111827; border-bottom: 1px solid var(--border); }
         .btn { padding: 10px; border: none; border-radius: 4px; color: white; font-weight: 600; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; transition: 0.2s; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         .btn-start { background: #065f46; border-bottom: 3px solid #064e3b; } .btn-start:active { transform: translateY(2px); border-bottom: 0px; }
@@ -123,13 +124,13 @@ HTML_TEMPLATE = """
         try {
             if (typeof Chart === 'undefined') { console.error("Chart.js missing"); return; }
             const chartConfig = (type, color) => ({
-                type: type, 
+                type: type,
                 data: { labels: [], datasets: [{ data: [], borderColor: color, backgroundColor: color + '22', fill: true, tension: 0.3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3af', font: {size: 10} } } } }
             });
             profitChart = new Chart('profitChart', chartConfig('line', '#3b82f6'));
             oeeChart = new Chart('oeeChart', {
-                type: 'bar', 
+                type: 'bar',
                 data: { labels: ['AVA', 'PER', 'QLY'], datasets: [{ data: [0,0,0], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'] }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { x: { max: 1, ticks: { color: '#94a3af', callback: v => (v*100)+'%' } }, y: { ticks: { color: '#f3f4f6' } } } }
             });
@@ -148,10 +149,10 @@ HTML_TEMPLATE = """
                 const statusEl = document.getElementById('status_val');
                 if(statusEl) {
                     statusEl.textContent = data.system_mode;
-                    statusEl.style.color = data.system_mode === 'RUNNING' ? 'var(--green)' : 
+                    statusEl.style.color = data.system_mode === 'RUNNING' ? 'var(--green)' :
                                          (data.system_mode === 'ESTOP' ? 'var(--red)' : 'var(--yellow)');
                 }
-                
+
                 // KPI Güncellemeleri
                 document.getElementById('val_profit').textContent = `$${data.net_profit.toFixed(2)}`;
                 document.getElementById('val_total').textContent = data.total_units;
@@ -162,16 +163,16 @@ HTML_TEMPLATE = """
                 document.getElementById('val_oee').textContent = oeeVal + '%';
                 const oeeCard = document.getElementById('oee_card');
                 if (oeeCard) oeeCard.className = oeeVal < 65 ? 'kpi-card warn-card' : 'kpi-card';
-                
+
                 // Log Tablosu Güncelleme
                 const tbody = document.getElementById('log-tbody');
                 if(tbody && data.recent_logs) {
                     tbody.innerHTML = data.recent_logs.map(log => `<tr><td>${log.time}</td><td>${log.id}</td><td class="${log.status=='OK'?'text-ok':'text-fail'}">${log.status}${log.defect ? ' · ' + log.defect.replace(/_/g, ' ') : ''}</td></tr>`).join('');
                 }
-                
+
                 // Grafik Güncellemeleri
                 if (profitChart && data.system_mode === 'RUNNING') {
-                    profitChart.data.labels.push(''); 
+                    profitChart.data.labels.push('');
                     profitChart.data.datasets[0].data.push(data.net_profit);
                     if (profitChart.data.labels.length > 30) { profitChart.data.labels.shift(); profitChart.data.datasets[0].data.shift(); }
                     profitChart.update('none');
@@ -184,19 +185,19 @@ HTML_TEMPLATE = """
             .catch(err => {
                 console.error("Data Fetch Error:", err);
                 const statusEl = document.getElementById('status_val');
-                if(statusEl && statusEl.textContent !== "SERVER ERR") { 
-                    statusEl.textContent = "SERVER ERR"; 
-                    statusEl.style.color = "var(--red)"; 
+                if(statusEl && statusEl.textContent !== "SERVER ERR") {
+                    statusEl.textContent = "SERVER ERR";
+                    statusEl.style.color = "var(--red)";
                 }
             });
     }
 
-    function sendCmd(cmd) { 
-        fetch('/api/control', { 
-            method: 'POST', 
-            headers: {'Content-Type': 'application/json'}, 
-            body: JSON.stringify({command: cmd}) 
-        }).then(() => setTimeout(update, 50)); 
+    function sendCmd(cmd) {
+        fetch('/api/control', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({command: cmd})
+        }).then(() => setTimeout(update, 50));
     }
 
     // 3D hat ikizi yüklenemezse (WebGL yok / CDN erişilemiyor) eski 2D kamera akışına düş.
@@ -276,7 +277,7 @@ def generate_frame(state):
     frame = np.full((h, w, 3), (20, 25, 30), dtype=np.uint8)
     cv2.rectangle(frame, (0, h//2 - 130), (w, h//2 + 130), (40, 45, 50), -1)
     prod_x = int(w + 100 - (progress * (w + 400)))
-    
+
     if -200 < prod_x < w:
         if current_mode == 'RUNNING' and current_status != "PENDING":
             is_ok = current_status == "OK"
@@ -320,33 +321,33 @@ def export_report():
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter', datetime_format='yyyy-mm-dd hh:mm:ss') as writer:
             workbook = writer.book
-            
+
             # --- 1. SEKMESİ: DASHBOARD (Özet ve Grafikler) ---
             dash_sheet = workbook.add_worksheet('Dashboard')
-            
+
             # Formatlar (Kurumsal Tasarım)
             title_fmt = workbook.add_format({'bold': True, 'font_size': 20, 'align': 'center', 'valign': 'vcenter', 'fg_color': '#1E293B', 'font_color': 'white'})
             kpi_header_fmt = workbook.add_format({'bold': True, 'font_size': 11, 'align': 'center', 'bg_color': '#E2E8F0', 'border': 1})
             kpi_val_fmt = workbook.add_format({'font_size': 16, 'align': 'center', 'border': 1, 'bold': True})
-            
+
             dash_sheet.merge_range('B2:F3', 'ÜRETİM PERFORMANS RAPORU', title_fmt)
-            
+
             # KPI Hesaplamaları
             total_units = len(df)
             ok_units = len(df[df['status'] == 'OK'])
             yield_rate = (ok_units / total_units * 100) if total_units > 0 else 0
             avg_oee = df['oee_score'].mean() * 100
-            
+
             # KPI Yazdırma
             dash_sheet.write('B5', 'Toplam Üretim', kpi_header_fmt)
             dash_sheet.write('B6', total_units, kpi_val_fmt)
-            
+
             dash_sheet.write('C5', 'Sağlam (OK)', kpi_header_fmt)
             dash_sheet.write('C6', ok_units, kpi_val_fmt)
-            
+
             dash_sheet.write('D5', 'Başarı Oranı (%)', kpi_header_fmt)
             dash_sheet.write('D6', f"{yield_rate:.1f}%", kpi_val_fmt)
-            
+
             dash_sheet.write('E5', 'Ort. OEE (%)', kpi_header_fmt)
             dash_sheet.write('E6', f"{avg_oee:.1f}%", kpi_val_fmt)
 
@@ -354,7 +355,7 @@ def export_report():
             status_counts = df['status'].value_counts()
             dash_sheet.write_column('AA1', status_counts.index) # Gizli Veri Alanı
             dash_sheet.write_column('AB1', status_counts.values)
-            
+
             pie_chart = workbook.add_chart({'type': 'pie'})
             pie_chart.add_series({
                 'name': 'Kalite Dağılımı',
@@ -368,12 +369,12 @@ def export_report():
             # --- 2. SEKMESİ: DETAYLI LOGLAR ---
             df.to_excel(writer, sheet_name='Detaylı Loglar', index=False)
             log_sheet = writer.sheets['Detaylı Loglar']
-            
+
             # Tablo Tasarımı
             header_fmt = workbook.add_format({'bold': True, 'fg_color': '#1E293B', 'font_color': 'white', 'border': 1})
             ok_fmt = workbook.add_format({'bg_color': '#C6EFCE', 'font_color': '#006100'}) # Açık Yeşil
             fail_fmt = workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006'}) # Açık Kırmızı
-            
+
             # Başlıkları boya
             for col_num, value in enumerate(df.columns.values):
                 log_sheet.write(0, col_num, value, header_fmt)
@@ -385,7 +386,7 @@ def export_report():
 
         output.seek(0)
         filename = f"Uretim_Raporu_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
-        
+
         return send_file(
             output,
             as_attachment=True,

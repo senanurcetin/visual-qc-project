@@ -5,3 +5,4 @@ __pycache__/
 .idx/
 .vscode/
 analysis/.cache/
+.coverage

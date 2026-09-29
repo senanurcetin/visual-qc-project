@@ -53,7 +53,7 @@ class BrowserSmokeTests(unittest.TestCase):
 
     def test_rag_loads_three_only_on_scroll_and_switches_questions(self):
         page = self.open("/rag", viewport={"width": 1280, "height": 420})  # map well below the fold
-        loaded = "performance.getEntriesByType('resource').some(e => /three\.module/.test(e.name))"
+        loaded = r"performance.getEntriesByType('resource').some(e => /three\.module/.test(e.name))"
         self.assertGreater(page.evaluate("document.getElementById('map-frame').getBoundingClientRect().top - innerHeight"), 200)
         self.assertFalse(page.evaluate(loaded))
         page.locator("#map-section").scroll_into_view_if_needed()

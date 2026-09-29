@@ -1,0 +1,16 @@
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = ["E501", "E701", "E702", "E741"]
+
+[tool.coverage.run]
+branch = false
+
+[tool.coverage.report]
+include = ["main.py", "line_sim.py", "case_study.py", "rag_demo.py"]
+fail_under = 80
+show_missing = true
