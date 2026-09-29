@@ -12,9 +12,9 @@ Her faz bağımsız PR/sürüm olarak teslim edilir. Sayılar README'ye elle yaz
 | Veritabanı | Neon Postgres, **bu projeye ayrı bir Neon projesi** (`visual-qc`). Başka projelerle (ör. VocabMaster) proje, veritabanı, rol ve bağlantı dizesi paylaşılmaz. Yerelde SQLite |
 | Deploy | Vercel yalnızca demo (hafif ONNX inference). Tam sistem Docker ile |
 
-## Faz 1: Sağlamlaştırma (büyük ölçüde tamam)
+## Faz 1: Sağlamlaştırma (tamam)
 - [x] `main.py` modüllere bölündü (`hmi_page`, `camera`, `report`)
-- [x] `coverage` ölçümü ve CI eşiği; `ruff`; `pre-commit`; Dependabot. mypy henüz yok
+- [x] `coverage` ölçümü ve CI eşiği; `ruff`; `pre-commit`; Dependabot; mypy
 - [x] README/hiring-summary sayıları `tests/test_docs_consistency.py` ile JSON'a karşı doğrulanır (üretim yerine sapma koruması)
 - [x] `line_sim.snapshot` maliyeti çalışma süresiyle artıyordu (7 günlük hatta ~330 ms/istek); OK sayısı blok önbelleğine alındı, ısınmış istek ~0.4 ms
 
@@ -39,7 +39,9 @@ Hazır: `store.py` (Postgres/SQLite, `DATABASE_URL`), `review.py` (`/api/review-
 - Operatör / kalite mühendisi rolleri
 - Vardiya bazlı SPC grafikleri; Excel rapor bu veriden
 
-## Faz 4: RAG'i kusur akışına bağlama
+## Faz 4: RAG'i kusur akışına bağlama (GPU/model gerektirmeyen kısmı tamam)
+
+Hazır: inceleme kuyruğunda kusur sınıfına göre bilgi tabanı pasajları (`/api/defect-knowledge`, TF-IDF; model gerektirmez). Kalan, elle ve model erişimi gerektiren işler: 30-50 gerçekçi soruluk ikinci eval seti, insan etiketli "cevap doğru mu" alt kümesi, açık lisanslı SOP benzeri kaynaklarla bilgi tabanı genişletme. Bilinen sınır: KB'deki *Crazing* makalesi polimerlerle ilgili, çelik yüzey çatlağı değil.
 - Sınıflandırıcı çıktısından RAG'e: kusurun nedenleri ve düzeltici eylemler
 - Açık lisanslı kaynaklarla bilgi tabanı genişletme (lisans kaydıyla)
 - 30-50 elle yazılmış gerçekçi soruluk ikinci eval seti
@@ -52,9 +54,9 @@ Hazır: `FrameSource` (simülatör / video döngüsü), `analysis/bench_frames.p
 - NEU-CLS video döngüsüyle gerçek inference hattı; gecikme (p50/p95) ve verim ölçümü
 - `Dockerfile` + `docker-compose` (app + Postgres)
 
-## Faz 6: Yayın (kısmen)
+## Faz 6: Yayın (kod tarafı tamam)
 
-Hazır: `CHANGELOG.md`, README güncel. Kalan: sürüm etiketi, mimari diyagram, güncel demo videosu, gerçek NEU-CLS CNN sonuçlarının README'ye eklenmesi.
+Hazır: `CHANGELOG.md`, README güncel. Mimari diyagram (Mermaid) ve `0.2.0` sürüm notu hazır. Kalan, koddan bağımsız: sürüm etiketi ve güncel demo videosu (elle), gerçek NEU-CLS CNN sonuçları (GPU çalıştırması sonrası `analysis/update_docs_from_dl.py`).
 - Sürüm etiketleri, `CHANGELOG.md`, README'nin kısaltılması, mimari diyagram, güncel demo videosu
 
 ## Riskler

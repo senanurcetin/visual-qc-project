@@ -10,6 +10,7 @@ from camera import gen, make_source
 from case_study import case_study_bp
 from classify import classify_bp
 from hmi_page import HTML_TEMPLATE
+from knowledge import knowledge_bp
 from line_session import line_state
 from rag_demo import rag_bp
 from report import build_report
@@ -28,6 +29,7 @@ app.register_blueprint(rag_bp)
 app.register_blueprint(review_bp)
 app.register_blueprint(spc_bp)
 app.register_blueprint(classify_bp)
+app.register_blueprint(knowledge_bp)
 
 # --- 2. BACKEND: İŞ MANTIĞI & DURUM YÖNETİMİ ---
 # --- HAT SİMÜLASYONU (DURUMSUZ) ---
