@@ -1,8 +1,8 @@
 # Analysis scripts, chart generation and tests (CI installs this file).
 -r requirements.txt
-scikit-learn==1.8.0
+scikit-learn==1.9.1
 matplotlib==3.11.2
 ruff==0.16.9
-coverage==7.6.10
+coverage==7.16.1
 mypy==2.3.1
 pandas-stubs
