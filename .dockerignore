@@ -1,9 +1,10 @@
+.git
+.github
 .venv
 __pycache__/
 *.py[cod]
-*.db
-.idx/
-.vscode/
+tests/
 analysis/.cache/
+docs/assets/
 .coverage
-models/
+.env

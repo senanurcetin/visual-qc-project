@@ -18,12 +18,12 @@ def hit_at_k(ranked: Sequence[Sequence], gold: Sequence, k: int) -> float:
     """Share of queries whose gold item appears in the top-k ranked results."""
     if not gold:
         return 0.0
-    return float(np.mean([g in list(r)[:k] for r, g in zip(ranked, gold)]))
+    return float(np.mean([g in list(r)[:k] for r, g in zip(ranked, gold, strict=False)]))
 
 
 def mean_reciprocal_rank(ranked: Sequence[Sequence], gold: Sequence, k: int = 10) -> float:
     scores = []
-    for r, g in zip(ranked, gold):
+    for r, g in zip(ranked, gold, strict=False):
         top = list(r)[:k]
         scores.append(1.0 / (top.index(g) + 1) if g in top else 0.0)
     return float(np.mean(scores)) if scores else 0.0

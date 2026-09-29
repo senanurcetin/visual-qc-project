@@ -226,7 +226,7 @@ def build_eval_set(chunks: list[dict], generator: Generator) -> list[dict]:
     sampled = [c for group in by_article.values() for c in rng.sample(group, min(QUESTIONS_PER_ARTICLE, len(group)))]
     raw = generator.generate([question_prompt(c) for c in sampled], max_new_tokens=60)
     items = []
-    for c, q in zip(sampled, raw):
+    for c, q in zip(sampled, raw, strict=False):
         q = q.strip().strip('"').splitlines()[0].strip() if q.strip() else ""
         if valid_question(q):
             items.append({"question": q, "gold_chunk": c["id"], "gold_article": c["article"],
@@ -282,8 +282,8 @@ def score_rankings(ranked_idx: np.ndarray, chunks: list[dict], eval_items: list[
     gold_arts = [e["gold_article"] for e in eval_items]
     curated_rows = ranked_idx[n:]
     curated_hit5 = np.mean([
-        any(chunks[i]["article"] in c["gold_articles"] for i in row[:5]) for row, c in zip(curated_rows, curated)])
-    curated_hit1 = np.mean([chunks[row[0]]["article"] in c["gold_articles"] for row, c in zip(curated_rows, curated)])
+        any(chunks[i]["article"] in c["gold_articles"] for i in row[:5]) for row, c in zip(curated_rows, curated, strict=False)])
+    curated_hit1 = np.mean([chunks[row[0]]["article"] in c["gold_articles"] for row, c in zip(curated_rows, curated, strict=False)])
     return {
         "hit_at_1": r4(M.hit_at_k(ids, gold_ids, 1)),
         "hit_at_4": r4(M.hit_at_k(ids, gold_ids, TOP_K)),
@@ -319,7 +319,7 @@ def build_chroma(chunks: list[dict], vectors: np.ndarray, model_key: str):
 
 def chroma_search(collection, query_vecs: np.ndarray, k: int) -> list[list[tuple[str, float]]]:
     res = collection.query(query_embeddings=query_vecs.tolist(), n_results=k, include=["distances"])
-    return [[(i, 1.0 - d) for i, d in zip(ids, dists)] for ids, dists in zip(res["ids"], res["distances"])]
+    return [[(i, 1.0 - d) for i, d in zip(ids, dists, strict=False)] for ids, dists in zip(res["ids"], res["distances"], strict=False)]
 
 
 # ── 5–6. Answers and faithfulness ─────────────────────────────────────────────
@@ -379,7 +379,7 @@ class FaithfulnessScorer:
             "sentences": [{"text": s, "entailment": r4(p), "supported": bool(p >= ENTAILMENT_THRESHOLD),
                            "best_passage": windows[best_window[i]][0] + 1,
                            "evidence": windows[best_window[i]][1] if p >= ENTAILMENT_THRESHOLD else None}
-                          for i, (s, p) in enumerate(zip(sentences, best))],
+                          for i, (s, p) in enumerate(zip(sentences, best, strict=False))],
         }
 
 
@@ -453,7 +453,7 @@ def main() -> None:
     hits = chroma_search(collection, qvecs, EVAL_K)
     brute = rank_dense(vectors, qvecs, TOP_K)
     chroma_agreement = np.mean([
-        [cid for cid, _ in h[:TOP_K]] == [chunks[i]["id"] for i in b] for h, b in zip(hits, brute)])
+        [cid for cid, _ in h[:TOP_K]] == [chunks[i]["id"] for i in b] for h, b in zip(hits, brute, strict=False)])
     log(f"  Chroma top-{TOP_K} identical to exact search for {chroma_agreement:.1%} of queries")
     by_id = {c["id"]: c for c in chunks}
     index_of = {c["id"]: i for i, c in enumerate(chunks)}
@@ -467,7 +467,7 @@ def main() -> None:
         gen = generator if gkey == QUESTION_GENERATOR else load_generator(gkey)
         for version in RAG_PROMPTS:
             answers_by_config[f"{gkey}/{version}"] = gen.generate(
-                [rag_prompt(q, p, version) for q, p in zip(all_questions, retrieved)], max_new_tokens=220)
+                [rag_prompt(q, p, version) for q, p in zip(all_questions, retrieved, strict=False)], max_new_tokens=220)
         closed_by_generator[gkey] = gen.generate([closed_book_prompt(q) for q in all_questions], max_new_tokens=220)
         gen.close()
     del generator
@@ -475,9 +475,9 @@ def main() -> None:
     log("6/7 faithfulness")
     scorer = FaithfulnessScorer()
     passages = [[p["text"] for p in ps] for ps in retrieved]
-    scores_by_config = {cfg: [scorer.score(a, ps) for a, ps in zip(answers, passages)]
+    scores_by_config = {cfg: [scorer.score(a, ps) for a, ps in zip(answers, passages, strict=False)]
                         for cfg, answers in answers_by_config.items()}
-    closed_scores_by_generator = {g: [scorer.score(a, ps) for a, ps in zip(answers, passages)]
+    closed_scores_by_generator = {g: [scorer.score(a, ps) for a, ps in zip(answers, passages, strict=False)]
                                   for g, answers in closed_by_generator.items()}
     config_summaries = {cfg: summarize_faithfulness(sc) for cfg, sc in scores_by_config.items()}
     closed_summaries = {g: summarize_faithfulness(sc) for g, sc in closed_scores_by_generator.items()}
@@ -508,8 +508,8 @@ def main() -> None:
         },
     }
     true_top = [[index_of[cid] for cid, _ in h[:TOP_K]] for h in hits]
-    overlap3 = [M.neighbor_overlap(t, M.nearest_indices(coords3, q, TOP_K)) for t, q in zip(true_top, q3)]
-    overlap2 = [M.neighbor_overlap(t, M.nearest_indices(coords2, q, TOP_K)) for t, q in zip(true_top, q2)]
+    overlap3 = [M.neighbor_overlap(t, M.nearest_indices(coords3, q, TOP_K)) for t, q in zip(true_top, q3, strict=False)]
+    overlap2 = [M.neighbor_overlap(t, M.nearest_indices(coords2, q, TOP_K)) for t, q in zip(true_top, q2, strict=False)]
     fidelity["query_neighbor_overlap"] = {
         "k": TOP_K,
         "mean_overlap_3d": r4(np.mean(overlap3)), "mean_overlap_2d": r4(np.mean(overlap2)),
@@ -535,7 +535,7 @@ def main() -> None:
         "topics": topics, "articles": article_names,
         "fields": ["x", "y", "z", "x2", "y2", "topic", "article"],
         "points": [[r4(a[0]), r4(a[1]), r4(a[2]), r4(b[0]), r4(b[1]), topics.index(c["topic"]),
-                    article_names.index(c["article"])] for a, b, c in zip(n3, n2, chunks)],
+                    article_names.index(c["article"])] for a, b, c in zip(n3, n2, chunks, strict=False)],
         "ids": [c["id"] for c in chunks],
         "sections": [c["section"] for c in chunks],
         "previews": [c["text"][:220].rsplit(" ", 1)[0] + "…" if len(c["text"]) > 220 else c["text"] for c in chunks],
@@ -587,9 +587,9 @@ def main() -> None:
         "rag_curated_only": summarize_faithfulness(rag_scores[n:]),
         "gold_in_context_vs_faithfulness": {
             "gold_retrieved": summarize_faithfulness(
-                [s for s, h, e in zip(rag_scores[:n], hits[:n], eval_items) if e["gold_chunk"] in [x for x, _ in h[:TOP_K]]]),
+                [s for s, h, e in zip(rag_scores[:n], hits[:n], eval_items, strict=False) if e["gold_chunk"] in [x for x, _ in h[:TOP_K]]]),
             "gold_missed": summarize_faithfulness(
-                [s for s, h, e in zip(rag_scores[:n], hits[:n], eval_items) if e["gold_chunk"] not in [x for x, _ in h[:TOP_K]]]),
+                [s for s, h, e in zip(rag_scores[:n], hits[:n], eval_items, strict=False) if e["gold_chunk"] not in [x for x, _ in h[:TOP_K]]]),
         },
     }
     for block in ("rag_generated_only", "rag_curated_only"):

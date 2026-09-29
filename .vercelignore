@@ -6,3 +6,4 @@ src/
 .github/
 *.db
 .claude/
+models/
