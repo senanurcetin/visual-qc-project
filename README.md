@@ -59,6 +59,20 @@ Steel surface inspection needs more than a classifier. A useful system must rout
 
 Random forest on HOG + Gabor + grid features selected for highest accuracy and balanced per-class performance.
 
+### Deep-learning comparison (October 2026)
+
+| Model | Split | Accuracy | Macro F1 |
+|---|---|---|---|
+| Random Forest on HOG + Gabor + grid (above) | random 80/20, seed 42 | 0.939 | 0.939 |
+| ResNet-18, ImageNet-pretrained, fine-tuned ([cnn/train_cnn.py](cnn/train_cnn.py)) | random 80/20, seed 42 | **1.000** (360/360) | 1.000 |
+| same ResNet-18 | blocked: images 241-300 of each class held out | **1.000** (360/360) | 1.000 |
+
+The blocked split guards against near-duplicate neighbouring crops of the same strip; the score did not
+move. A perfect score here means NEU-CLS is saturated as a benchmark, not that the model is ready for a
+production line, so the confidence-based review queue below still applies. The model is on Hugging Face as
+[senanurcetin/neu-steel-defect-resnet18](https://huggingface.co/senanurcetin/neu-steel-defect-resnet18)
+(ONNX) with an [in-browser demo](https://huggingface.co/spaces/senanurcetin/neu-steel-defect-demo).
+
 ---
 
 ## Per-Class Metrics
