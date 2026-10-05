@@ -73,6 +73,27 @@ production line, so the confidence-based review queue below still applies. The m
 [senanurcetin/neu-steel-defect-resnet18](https://huggingface.co/senanurcetin/neu-steel-defect-resnet18)
 (ONNX) with an [in-browser demo](https://huggingface.co/spaces/senanurcetin/neu-steel-defect-demo).
 
+**Where the 100% ends.** In the Kaggle notebook
+[NEU Steel Defects: 100% Accuracy and Where It Ends](https://www.kaggle.com/code/senanuretin/neu-steel-defects-100-accuracy-and-where-it-ends),
+a ResNet-18 trained the same way is tested on the same 360 images, each degraded at test time only:
+
+| test-time condition | accuracy |
+|---|---|
+| clean | 1.000 |
+| darker lighting (x0.5) | 1.000 |
+| low contrast (x0.5) | 0.947 |
+| brighter lighting (x1.6) | 0.828 |
+| sensor noise, sd 0.05 | 0.808 |
+| JPEG quality 15 | 0.767 |
+| half resolution | 0.642 |
+| slight blur (radius 1.5) | 0.556 |
+| quarter resolution | 0.514 |
+| sensor noise, sd 0.12 | 0.386 |
+| strong blur (radius 3) | 0.375 |
+
+Focus, resolution and sensor noise are the conditions to control on the line (or to add to training as
+augmentation); the clean-image score does not show them.
+
 ---
 
 ## Per-Class Metrics
