@@ -232,7 +232,7 @@ The operator dashboard renders the simulated inspection line in 3D (Three.js): s
 `analysis/run_dl_case_study.py` fine-tunes ResNet18 / EfficientNet-B0 on the **same 360-row holdout** as the Random Forest (a test pins the identity), fits a calibration temperature on a validation slice, and reports accuracy / macro-F1 with bootstrap 95% intervals, ECE before and after calibration, the calibrated review-queue budgets, optional 5-fold CV, Grad-CAM overlays and the ONNX export. `--smoke-test` runs the whole pipeline on synthetic textures in seconds without the dataset (it runs in CI); a real run needs the NEU-CLS download and, preferably, a GPU. See [`analysis/README.md`](analysis/README.md).
 
 <!-- DL-RESULTS:START -->
-**No real-data CNN run has been recorded yet.** After one, `python analysis/update_docs_from_dl.py` fills this block from `docs/data/neu-cls-dl/summary.json`, and the docs-consistency test keeps it in sync.
+**No real-data CNN run has been recorded yet** for this calibrated pipeline. The separate fine-tuned ResNet-18 baseline ([`cnn/train_cnn.py`](cnn/train_cnn.py)) has been run on NEU-CLS: see [Deep-learning comparison](#deep-learning-comparison-october-2026) above. After a real run of this pipeline, `python analysis/update_docs_from_dl.py` fills this block from `docs/data/neu-cls-dl/summary.json`, and the docs-consistency test keeps it in sync.
 <!-- DL-RESULTS:END -->
 
 ---
@@ -356,7 +356,7 @@ pip install torch torchvision onnx onnxscript -r requirements-serve.txt && pytho
 - NEU-CLS is a research benchmark — results are not directly transferable to a live production line
 - The Flask dashboard runs a simulated line (rendered as a 3D digital twin) or a looped video, not a live camera; defect classes on rejected plates are drawn procedurally, not taken from NEU-CLS images
 - The historian and Excel export are derived from the visitor's simulated line; only operator review decisions are persisted, and the hosted demo needs `DATABASE_URL` set to keep them
-- The CNN pipeline is verified on synthetic data only; no real-data CNN result is claimed here yet
+- The calibrated CNN pipeline (`analysis/run_dl_case_study.py`) is verified on synthetic data only; the separate fine-tuned ResNet-18 baseline does have a real-data result (1.000 on the random and the blocked split), which reads as a saturated benchmark, not production readiness
 - The RAG knowledge base is encyclopaedic (Wikipedia), not plant SOPs; generated eval questions make retrieval easier than real queries, and NLI faithfulness is not answer correctness
 
 ---

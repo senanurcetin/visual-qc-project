@@ -35,7 +35,7 @@ Computer vision analytics case study: steel surface defect classification on NEU
 | **LLM evaluation** | Sentence-level NLI faithfulness with a no-retrieval control; generator and prompt chosen by the metric |
 | **Honest visualisation** | 3D embedding map whose highlights come from the real search, with the projection's distortion quantified on the page |
 | **Production engineering** | Postgres persistence with versioned migrations (tested on SQLite and a real Postgres in CI), per-visitor quotas, retention and rate limits on public write endpoints, token-protected export |
-| **Model calibration and uncertainty** | Temperature scaling, ECE, bootstrap confidence intervals, identical-holdout comparison enforced by a test; a CNN pipeline verified end to end on synthetic data (no real-data CNN result is claimed) |
+| **Model calibration and uncertainty** | Temperature scaling, ECE, bootstrap confidence intervals, identical-holdout comparison enforced by a test; a calibrated CNN pipeline verified end to end on synthetic data, plus a fine-tuned ResNet-18 baseline that scores 1.000 on real NEU-CLS (random and blocked splits), read as a saturated benchmark |
 | **Serving** | ONNX export with parity check (2e-6), `/api/classify` on ONNX Runtime, Docker + Postgres compose stack |
 | **Performance** | Found and fixed a per-poll cost that grew with uptime (~330 ms → ~0.4 ms), with brute-force equivalence tests |
 | **CI** | GitHub Actions: ruff, mypy, 80% coverage floor, Postgres service, CPU-torch pipeline smoke test, Playwright e2e; Dependabot with a guard against a breaking OpenCV major |
