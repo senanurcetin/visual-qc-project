@@ -57,7 +57,7 @@ def fit(tr_p, tr_y, te_p, te_y, device, epochs=12):
     opt = torch.optim.AdamW(m.parameters(), lr=3e-4, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, epochs)
     dl = torch.utils.data.DataLoader(DS(tr_p, tr_y, True), batch_size=32, shuffle=True, num_workers=0)
-    for ep in range(epochs):
+    for _ep in range(epochs):
         m.train()
         for x, y in dl:
             x, y = x.to(device), y.to(device)
