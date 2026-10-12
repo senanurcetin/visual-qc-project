@@ -1,76 +1,168 @@
-"""Excel production report (pandas + XlsxWriter), built in memory."""
+"""Workbook report of a simulated Visual QC production-line session.
+
+This is NOT measured factory telemetry, and the embedded chart is based solely
+on the visitor's deterministic simulation history.
+"""
+from __future__ import annotations
+
 import io
 
 import pandas as pd
 
 
 def build_report(df: pd.DataFrame) -> io.BytesIO:
-    """Return an .xlsx workbook (Dashboard + log sheets) for the given unit history."""
+    """Build a source-linked dashboard and a detailed, editable session log."""
+    expected = ("timestamp", "unit_id", "status", "defect", "oee_score")
+    missing = [name for name in expected if name not in df.columns]
+    if missing:
+        raise ValueError("Missing report columns: " + ", ".join(missing))
+    if df.empty:
+        raise ValueError("No completed simulated units to report")
+    if not df["status"].isin(["OK", "FAIL"]).all():
+        raise ValueError("Unexpected simulated inspection status")
+    scores = pd.to_numeric(df["oee_score"], errors="coerce")
+    if scores.isna().any() or not scores.between(0, 1).all():
+        raise ValueError("OEE scores must be finite proportions between 0 and 1")
+
+    history = df.loc[:, expected].copy()
+    history["oee_score"] = scores
+    total = len(history)
+    accepted = int(history["status"].eq("OK").sum())
+    rejected = total - accepted
+    last = total + 1
     output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='xlsxwriter', datetime_format='yyyy-mm-dd hh:mm:ss') as writer:
-        workbook = writer.book
-
-        # --- 1. SEKMESİ: DASHBOARD (Özet ve Grafikler) ---
-        dash_sheet = workbook.add_worksheet('Dashboard')
-
-        # Formatlar (Kurumsal Tasarım)
-        title_fmt = workbook.add_format({'bold': True, 'font_size': 20, 'align': 'center', 'valign': 'vcenter', 'fg_color': '#1E293B', 'font_color': 'white'})
-        kpi_header_fmt = workbook.add_format({'bold': True, 'font_size': 11, 'align': 'center', 'bg_color': '#E2E8F0', 'border': 1})
-        kpi_val_fmt = workbook.add_format({'font_size': 16, 'align': 'center', 'border': 1, 'bold': True})
-
-        dash_sheet.merge_range('B2:F3', 'ÜRETİM PERFORMANS RAPORU', title_fmt)
-
-        # KPI Hesaplamaları
-        total_units = len(df)
-        ok_units = len(df[df['status'] == 'OK'])
-        yield_rate = (ok_units / total_units * 100) if total_units > 0 else 0
-        avg_oee = df['oee_score'].mean() * 100
-
-        # KPI Yazdırma
-        dash_sheet.write('B5', 'Toplam Üretim', kpi_header_fmt)
-        dash_sheet.write('B6', total_units, kpi_val_fmt)
-
-        dash_sheet.write('C5', 'Sağlam (OK)', kpi_header_fmt)
-        dash_sheet.write('C6', ok_units, kpi_val_fmt)
-
-        dash_sheet.write('D5', 'Başarı Oranı (%)', kpi_header_fmt)
-        dash_sheet.write('D6', f"{yield_rate:.1f}%", kpi_val_fmt)
-
-        dash_sheet.write('E5', 'Ort. OEE (%)', kpi_header_fmt)
-        dash_sheet.write('E6', f"{avg_oee:.1f}%", kpi_val_fmt)
-
-        # Pasta Grafiği (OK vs NOK)
-        status_counts = df['status'].value_counts()
-        dash_sheet.write_column('AA1', status_counts.index) # Gizli Veri Alanı
-        dash_sheet.write_column('AB1', status_counts.values)
-
-        pie_chart = workbook.add_chart({'type': 'pie'})
-        pie_chart.add_series({
-            'name': 'Kalite Dağılımı',
-            'categories': ['Dashboard', 0, 26, len(status_counts)-1, 26], # AA1:AAn
-            'values':     ['Dashboard', 0, 27, len(status_counts)-1, 27], # AB1:ABn
-            'points': [{'fill': {'color': '#10B981'}}, {'fill': {'color': '#EF4444'}}],
+    with pd.ExcelWriter(
+        output, engine="xlsxwriter", datetime_format="yyyy-mm-dd hh:mm:ss"
+    ) as writer:
+        book = writer.book
+        navy, blue, lavender = "#071829", "#4EA8FF", "#8F9BFF"
+        title = book.add_format({
+            "bold": True, "font_size": 18, "font_color": "#FFFFFF",
+            "bg_color": navy, "valign": "vcenter"
         })
-        pie_chart.set_title({'name': 'OK vs FAIL Oranı'})
-        dash_sheet.insert_chart('B9', pie_chart)
+        note = book.add_format({
+            "bold": True, "font_color": "#122942",
+            "bg_color": "#F6B95F", "text_wrap": True, "valign": "vcenter"
+        })
+        label = book.add_format({
+            "bold": True, "font_color": "#415672", "bg_color": "#EAF2FA",
+            "border": 1, "border_color": "#DCE7F2", "align": "center"
+        })
+        integer = book.add_format({
+            "bold": True, "font_size": 16, "font_color": "#122942",
+            "border": 1, "align": "center", "num_format": "#,##0"
+        })
+        percent = book.add_format({
+            "bold": True, "font_size": 16, "font_color": "#122942",
+            "border": 1, "align": "center", "num_format": "0.0%"
+        })
+        caption = book.add_format({
+            "font_color": "#415672", "font_size": 10, "text_wrap": True
+        })
+        head = book.add_format({
+            "bold": True, "bg_color": navy, "font_color": "#FFFFFF",
+            "border": 1, "border_color": "#DCE7F2"
+        })
+        sheet = book.add_worksheet("Dashboard")
+        sheet.hide_gridlines(2)
+        sheet.set_tab_color(blue)
+        sheet.set_landscape()
+        sheet.fit_to_pages(1, 1)
+        sheet.set_column("A:A", 3)
+        sheet.set_column("B:H", 19)
+        sheet.set_column("AA:AB", 15, None, {"hidden": True})
+        sheet.set_row(1, 34)
+        sheet.merge_range("B2:H3", "VISUAL QC  /  QUALITY ENGINEERING", title)
+        sheet.set_row(4, 32)
+        sheet.merge_range(
+            "B5:H5",
+            "SIMULATED DEMO / NOT REAL PLANT DATA — generated by the visitor's "
+            "inspection-line session, not by physical factory equipment.",
+            note,
+        )
+        for cell, name in [
+            ("B7", "TOTAL UNITS"), ("C7", "ACCEPTED"), ("D7", "REJECTED"),
+            ("E7", "YIELD"), ("F7", "MEAN OEE"),
+        ]:
+            sheet.write(cell, name, label)
+        sheet.set_row(7, 33)
 
-        # --- 2. SEKMESİ: DETAYLI LOGLAR ---
-        df.to_excel(writer, sheet_name='Detaylı Loglar', index=False)
-        log_sheet = writer.sheets['Detaylı Loglar']
+        # Real Excel formulas reference the exported unit history. A cached
+        # number ensures the document opens with valid values before recalc.
+        sheet.write_formula(
+            "B8", f"=COUNTA('Production Log'!B2:B{last})", integer, total
+        )
+        sheet.write_formula(
+            "C8", f'=COUNTIF(\'Production Log\'!C2:C{last},"OK")',
+            integer, accepted
+        )
+        sheet.write_formula("D8", "=B8-C8", integer, rejected)
+        sheet.write_formula("E8", "=IFERROR(C8/B8,0)", percent, accepted / total)
+        sheet.write_formula(
+            "F8", f"=AVERAGE('Production Log'!E2:E{last})",
+            percent, float(scores.mean())
+        )
 
-        # Tablo Tasarımı
-        header_fmt = workbook.add_format({'bold': True, 'fg_color': '#1E293B', 'font_color': 'white', 'border': 1})
-        ok_fmt = workbook.add_format({'bg_color': '#C6EFCE', 'font_color': '#006100'}) # Açık Yeşil
-        fail_fmt = workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006'}) # Açık Kırmızı
+        # Stable ordering prevents a defect-heavy session from swapping colors.
+        sheet.write("AA1", "status")
+        sheet.write("AB1", "units")
+        sheet.write("AA2", "OK")
+        sheet.write_formula("AB2", "=C8", None, accepted)
+        sheet.write("AA3", "FAIL")
+        sheet.write_formula("AB3", "=D8", None, rejected)
+        chart = book.add_chart({"type": "doughnut"})
+        chart.add_series({
+            "name": "Simulation outcome",
+            "categories": "='Dashboard'!$AA$2:$AA$3",
+            "values": "='Dashboard'!$AB$2:$AB$3",
+            "points": [
+                {"fill": {"color": blue}},
+                {"fill": {"color": lavender}},
+            ],
+            "data_labels": {"percentage": True},
+        })
+        chart.set_hole_size(58)
+        chart.set_title({"name": "Accepted versus rejected · simulated"})
+        chart.set_legend({"position": "right"})
+        chart.set_size({"width": 680, "height": 300})
+        sheet.insert_chart("B11", chart)
+        sheet.merge_range(
+            "B27:H28",
+            "Source: simulated line-session unit history. OEE is the mean "
+            "of recorded per-unit oee_score values, not a calibrated "
+            "plant-wide equipment effectiveness measurement.",
+            caption,
+        )
 
-        # Başlıkları boya
-        for col_num, value in enumerate(df.columns.values):
-            log_sheet.write(0, col_num, value, header_fmt)
-            log_sheet.set_column(col_num, col_num, 20) # Sütun genişliği
-
-        # Koşullu Biçimlendirme (Yeşil/Kırmızı)
-        log_sheet.conditional_format(f'C2:C{len(df)+1}', {'type': 'cell', 'criteria': '==', 'value': '"OK"', 'format': ok_fmt})
-        log_sheet.conditional_format(f'C2:C{len(df)+1}', {'type': 'cell', 'criteria': '!=', 'value': '"OK"', 'format': fail_fmt})
+        history.to_excel(writer, sheet_name="Production Log", index=False)
+        log = writer.sheets["Production Log"]
+        log.hide_gridlines(2)
+        log.freeze_panes(1, 0)
+        log.autofilter(0, 0, total, len(expected) - 1)
+        log.set_tab_color(lavender)
+        log.set_column("A:A", 22)
+        log.set_column("B:B", 23)
+        log.set_column("C:C", 12)
+        log.set_column("D:D", 22)
+        log.set_column(
+            "E:E", 18, book.add_format({"num_format": "0.0%"})
+        )
+        for col, name in enumerate(expected):
+            log.write(0, col, name, head)
+        ok_fmt = book.add_format({
+            "bg_color": "#E6F2FF", "font_color": "#204F91"
+        })
+        fail_fmt = book.add_format({
+            "bg_color": "#FFF0F2", "font_color": "#B42342"
+        })
+        for value, fmt in (("OK", ok_fmt), ("FAIL", fail_fmt)):
+            log.conditional_format(
+                f"C2:C{last}",
+                {
+                    "type": "text", "criteria": "containing",
+                    "value": value, "format": fmt
+                },
+            )
 
     output.seek(0)
     return output
