@@ -122,6 +122,9 @@ def build_report(df: pd.DataFrame) -> io.BytesIO:
             "data_labels": {"percentage": True},
         })
         chart.set_hole_size(58)
+        # Source columns AA:AB are deliberately hidden for presentation;
+        # XlsxWriter charts ignore hidden cells unless this is explicit.
+        chart.show_hidden_data()
         chart.set_title({"name": "Accepted versus rejected · simulated"})
         chart.set_legend({"position": "right"})
         chart.set_size({"width": 680, "height": 300})
