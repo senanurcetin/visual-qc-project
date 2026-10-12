@@ -172,6 +172,10 @@ class DashboardRouteTests(unittest.TestCase):
             "Demo Net Profit",
             "Simulated Net Profit Trend",
             "OEE Factors · Simulated Line",
+            "Availability', 'Performance', 'Quality",
+            'id="telemetry-status"',
+            "Last API response:",
+            "Data unavailable — check the demo connection",
             "profitChart.data.datasets[0].data.push(data.net_profit)",
             "oeeChart.data.datasets[0].data = [data.availability, data.performance, data.quality]",
             'href="/api/export_report"',
@@ -188,6 +192,7 @@ class DashboardRouteTests(unittest.TestCase):
         self.assertIn("--purple: #8f9bff", css)
         self.assertIn(".data-provenance", css)
         self.assertIn("@media (max-width: 780px)", css)
+        self.assertIn(".data-provenance #telemetry-status", css)
 
     def test_twin_assets_are_served(self):
         for asset in ("line3d.js", "line3d.css"):
