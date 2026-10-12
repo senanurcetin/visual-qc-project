@@ -22,6 +22,18 @@ def build_report(df: pd.DataFrame) -> io.BytesIO:
         raise ValueError("No completed simulated units to report")
     if not df["status"].isin(["OK", "FAIL"]).all():
         raise ValueError("Unexpected simulated inspection status")
+    # Dashboard!B8 uses COUNTA on this column; missing IDs would make
+    # the live Excel formula disagree with its cached total. Duplicate IDs
+    # would also misrepresent the count of distinct simulated units.
+    unit_ids = df["unit_id"]
+    if (
+        unit_ids.isna().any()
+        or not unit_ids.map(
+            lambda value: isinstance(value, str) and bool(value.strip())
+        ).all()
+        or unit_ids.astype(str).str.strip().duplicated().any()
+    ):
+        raise ValueError("Simulated unit IDs must be non-empty and unique")
     scores = pd.to_numeric(df["oee_score"], errors="coerce")
     if scores.isna().any() or not scores.between(0, 1).all():
         raise ValueError("OEE scores must be finite proportions between 0 and 1")
@@ -40,7 +52,12 @@ def build_report(df: pd.DataFrame) -> io.BytesIO:
     last = total + 1
     output = io.BytesIO()
     with pd.ExcelWriter(
-        output, engine="xlsxwriter", datetime_format="yyyy-mm-dd hh:mm:ss"
+        output, engine="xlsxwriter", datetime_format="yyyy-mm-dd hh:mm:ss",
+        # IDs are strings from a simulated history, not spreadsheet code.
+        # Disable formula/URL coercion when writing the editable unit log.
+        engine_kwargs={
+            "options": {"strings_to_formulas": False, "strings_to_urls": False}
+        },
     ) as writer:
         book = writer.book
         navy, blue, lavender = "#071829", "#4EA8FF", "#8F9BFF"
