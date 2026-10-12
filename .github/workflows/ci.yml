@@ -1,13 +1,13 @@
 name: CI
 
+# CI runs on CircleCI; GitHub Actions minutes are exhausted.
+# Keep manual emergency verification only when explicitly enabled.
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   quality:
+    if: vars.ENABLE_GITHUB_ACTIONS_CI == 'true'
     runs-on: ubuntu-latest
 
     services:
