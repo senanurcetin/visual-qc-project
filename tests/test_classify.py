@@ -98,5 +98,31 @@ class ClassifyEndpointTests(unittest.TestCase):
         self.assertLess(self.post(png_bytes()).get_json()["confidence"], sharp)
 
 
+    def test_nonfinite_model_logits_fail_closed_instead_of_reporting_a_label(self):
+        for invalid in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(logit=invalid):
+                self.install([invalid, 0, 0, 0, 0, 0])
+                response = self.post(png_bytes())
+                self.assertEqual(response.status_code, 503)
+                self.assertEqual(response.get_json(), {
+                    "error": "classifier unavailable", "reason": "invalid model output",
+                })
+
+    def test_invalid_calibration_temperature_fails_closed(self):
+        for temperature in (0.0, -1.0, float("nan"), float("inf")):
+            with self.subTest(temperature=temperature):
+                self.install([0, 0, 0, 0, 5, 0], temperature=temperature)
+                response = self.post(png_bytes())
+                self.assertEqual(response.status_code, 503)
+                self.assertEqual(response.get_json()["reason"], "invalid model output")
+
+    def test_mismatched_class_count_fails_closed(self):
+        self.install([0, 0, 0, 0, 5, 0])
+        main.app.extensions["classifier"]["meta"]["class_names"] = ["crazing"]
+        response = self.post(png_bytes())
+        self.assertEqual(response.status_code, 503)
+        self.assertNotIn("confidence", response.get_json())
+
+
 if __name__ == "__main__":
     unittest.main()
