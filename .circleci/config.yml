@@ -1,0 +1,71 @@
+version: 2.1
+
+# Equivalent to the offline quality job in .github/workflows/ci.yml.
+# The database service is disposable PostgreSQL initialized only for tests;
+# never supply a production database URL or real credentials.
+jobs:
+  python-postgres-quality:
+    docker:
+      - image: cimg/python:3.12
+        environment:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      - image: postgres:16
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+    resource_class: medium
+    working_directory: ~/project
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - visual-qc-pip-v1-{{ checksum "requirements-dev.txt" }}
+            - visual-qc-pip-v1-
+      - run:
+          name: Install locked Python test dependencies
+          command: python -m pip install -r requirements-dev.txt
+          no_output_timeout: 15m
+      - save_cache:
+          key: visual-qc-pip-v1-{{ checksum "requirements-dev.txt" }}
+          paths:
+            - ~/.cache/pip
+      - run:
+          name: Ruff and mypy
+          command: |
+            ruff check .
+            mypy
+      - run:
+          name: Compile Python sources
+          command: python -m compileall -q main.py case_study.py rag_demo.py analysis tests
+      - run:
+          name: Generate visual and RAG charts
+          command: |
+            python analysis/generate_visuals.py
+            python analysis/generate_rag_visuals.py
+      - run:
+          name: Wait for disposable PostgreSQL
+          command: |
+            for attempt in $(seq 1 30); do
+              if python -c "import psycopg; psycopg.connect('postgresql://postgres:postgres@localhost:5432/postgres').close()"; then
+                echo "Test-only PostgreSQL is ready"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "PostgreSQL did not become ready" >&2
+            exit 1
+      - run:
+          name: Unit and integration tests with coverage
+          command: |
+            coverage run -m unittest discover -s tests -v
+            coverage report
+          no_output_timeout: 15m
+      - run:
+          name: Flask import contract
+          command: python -c "import main; print(main.app.name)"
+
+workflows:
+  verify:
+    jobs:
+      - python-postgres-quality
