@@ -213,3 +213,19 @@ body {
   body { overflow: visible !important; height: auto !important; }
   .data-provenance { border: 1px solid #365779; }
 }
+
+/* Client-observed API freshness: this is *not* a sensor event timestamp. */
+.data-provenance #telemetry-status {
+  margin-left: auto;
+  color: #a9cff5;
+  font-size: .74rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (max-width: 780px) {
+  .data-provenance #telemetry-status {
+    margin-left: 0;
+    white-space: normal;
+  }
+}

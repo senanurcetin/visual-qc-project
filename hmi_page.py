@@ -105,6 +105,7 @@ HTML_TEMPLATE = """
     <div class="data-provenance" role="note" aria-label="Dashboard data provenance">
       <strong>SIMULATED PRODUCTION DATA</strong>
       <span>Line counts, OEE and profit are calculated from the visitor's simulated run. The review queue uses simulated defect events; evaluated NEU-CLS model results are documented separately in the <a href="/case-study">model case study</a>.</span>
+      <span id="telemetry-status" role="note" aria-live="off" aria-label="Simulated demo API update status">Awaiting first API response</span>
     </div>
     <div class="main-grid">
         <div class="panel video-box" id="line-twin">
@@ -134,7 +135,7 @@ HTML_TEMPLATE = """
             profitChart = new Chart('profitChart', chartConfig('line', '#4ea8ff'));
             oeeChart = new Chart('oeeChart', {
                 type: 'bar',
-                data: { labels: ['AVA', 'PER', 'QLY'], datasets: [{ data: [0,0,0], backgroundColor: ['#4ea8ff', '#8f9bff', '#f6b95f'] }] },
+                data: { labels: ['Availability', 'Performance', 'Quality'], datasets: [{ data: [0,0,0], backgroundColor: ['#4ea8ff', '#8f9bff', '#f6b95f'] }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { x: { max: 1, ticks: { color: '#94a3af', callback: v => (v*100)+'%' } }, y: { ticks: { color: '#f3f4f6' } } } }
             });
         } catch (e) { console.warn("Chart Init Error", e); }
@@ -148,6 +149,11 @@ HTML_TEMPLATE = """
                 return r.json();
             })
             .then(data => {
+                // Browser receipt time is not physical machine event time.
+                const telemetry = document.getElementById('telemetry-status');
+                if (telemetry) {
+                    telemetry.textContent = 'Last API response: ' + new Date().toLocaleTimeString();
+                }
                 // Durum Göstergesi
                 const statusEl = document.getElementById('status_val');
                 if(statusEl) {
@@ -187,6 +193,10 @@ HTML_TEMPLATE = """
             })
             .catch(err => {
                 console.error("Data Fetch Error:", err);
+                const telemetry = document.getElementById('telemetry-status');
+                if (telemetry) {
+                    telemetry.textContent = 'Data unavailable — check the demo connection';
+                }
                 const statusEl = document.getElementById('status_val');
                 if(statusEl && statusEl.textContent !== "SERVER ERR") {
                     statusEl.textContent = "SERVER ERR";
