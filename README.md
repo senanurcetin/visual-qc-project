@@ -28,6 +28,7 @@ The Flask HMI serves **[Download session report (XLSX)](https://visual-qc-projec
 
 - **Dashboard sheet:** total units, accepted/rejected counts, yield and mean OEE, each calculated by a genuine Excel formula linked to the detailed log. Cached results are included for static viewers.
 - **Production Log:** timestamp, simulated unit identifier, status, defect and per-unit OEE, with filters and conditional formatting.
+- **Defect Analysis:** six simulator defect classes, source-linked `COUNTIFS` counts, percentages and a real bar chart; invalid rejection labels fail export instead of producing a misleading category total.
 - **Chart:** accepted versus rejected distribution, with stable NEXUS blue/lavender series labels even when failures outnumber passes.
 - **Evidence scope:** the yellow header states **SIMULATED DEMO / NOT REAL PLANT DATA**. These measurements describe a visitor's deterministic factory-line simulation, **not** an actual plant or independently benchmarked NEU-CLS classifier performance.
 - **Empty session:** export returns 404 until simulated units are completed; it does not invent historical plant records.
