@@ -105,7 +105,7 @@ HTML_TEMPLATE = """
     <div class="data-provenance" role="note" aria-label="Dashboard data provenance">
       <strong>SIMULATED PRODUCTION DATA</strong>
       <span>Line counts, OEE and profit are calculated from the visitor's simulated run. The review queue uses simulated defect events; evaluated NEU-CLS model results are documented separately in the <a href="/case-study">model case study</a>.</span>
-      <span id="telemetry-status" role="status" aria-live="polite">Awaiting first API response</span>
+      <span id="telemetry-status" role="note" aria-live="off" aria-label="Simulated demo API update status">Awaiting first API response</span>
     </div>
     <div class="main-grid">
         <div class="panel video-box" id="line-twin">
