@@ -9,6 +9,8 @@ import io
 
 import pandas as pd
 
+from line_sim import DEFECT_CLASSES
+
 
 def build_report(df: pd.DataFrame) -> io.BytesIO:
     """Build a source-linked dashboard and a detailed, editable session log."""
@@ -23,6 +25,12 @@ def build_report(df: pd.DataFrame) -> io.BytesIO:
     scores = pd.to_numeric(df["oee_score"], errors="coerce")
     if scores.isna().any() or not scores.between(0, 1).all():
         raise ValueError("OEE scores must be finite proportions between 0 and 1")
+
+    # A failed simulated unit must have a known synthetic defect label.
+    # This prevents category counts silently disagreeing with rejected KPI.
+    failed_defects = df.loc[df["status"].eq("FAIL"), "defect"]
+    if not failed_defects.isin(DEFECT_CLASSES).all():
+        raise ValueError("Rejected units must carry a known simulator defect class")
 
     history = df.loc[:, expected].copy()
     history["oee_score"] = scores
@@ -166,6 +174,70 @@ def build_report(df: pd.DataFrame) -> io.BytesIO:
                     "value": value, "format": fmt
                 },
             )
+
+        defects = book.add_worksheet("Defect Analysis")
+        defects.hide_gridlines(2)
+        defects.set_tab_color("#F6B95F")
+        defects.set_column("A:A", 24)
+        defects.set_column("B:C", 19)
+        defects.set_column("D:M", 12)
+        defects.merge_range(
+            "A1:M2", "VISUAL QC  /  DEFECT DISTRIBUTION", title
+        )
+        defects.set_row(3, 32)
+        defects.merge_range(
+            "A4:M4",
+            "SIMULATED DEMO / NOT REAL PLANT DATA — "
+            "defect classes come from the simulated production line",
+            note,
+        )
+        for cell, name in [
+            ("A6", "Defect class"),
+            ("B6", "Rejected units"),
+            ("C6", "% of rejected"),
+        ]:
+            defects.write(cell, name, head)
+
+        share_fmt = book.add_format({"num_format": "0.0%", "font_color": "#122942"})
+        for index, defect in enumerate(DEFECT_CLASSES, start=7):
+            defects.write(f"A{index}", defect)
+            observed = int(
+                ((history["status"] == "FAIL") & (history["defect"] == defect)).sum()
+            )
+            defects.write_formula(
+                f"B{index}",
+                f'=COUNTIFS(\'Production Log\'!$C$2:$C${last},"FAIL",'
+                f'\'Production Log\'!$D$2:$D${last},A{index})',
+                integer, observed,
+            )
+            defects.write_formula(
+                f"C{index}", f'=IFERROR(B{index}/\'Dashboard\'!$D$8,0)',
+                share_fmt, observed / rejected if rejected else 0,
+            )
+        total_row = 7 + len(DEFECT_CLASSES)
+        defects.write(f"A{total_row}", "TOTAL REJECTED", head)
+        defects.write_formula(
+            f"B{total_row}",
+            f"=SUM(B7:B{total_row - 1})",
+            integer, rejected,
+        )
+        defects.write_formula(
+            f"C{total_row}",
+            f"=IFERROR(B{total_row}/'Dashboard'!$D$8,0)",
+            share_fmt, 1 if rejected else 0,
+        )
+        defect_chart = book.add_chart({"type": "bar"})
+        defect_chart.add_series({
+            "name": "Simulated rejected units",
+            "categories": f"='Defect Analysis'!$A$7:$A${total_row - 1}",
+            "values": f"='Defect Analysis'!$B$7:$B${total_row - 1}",
+            "fill": {"color": blue},
+            "border": {"none": True},
+        })
+        defect_chart.set_title({"name": "Rejected units by simulated defect class"})
+        defect_chart.set_legend({"none": True})
+        defect_chart.set_size({"width": 780, "height": 340})
+        defects.insert_chart("E6", defect_chart)
 
     output.seek(0)
     return output
