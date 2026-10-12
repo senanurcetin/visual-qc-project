@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+<title id="title">Visual QC — computer vision quality assurance</title>
+<desc id="desc">Concept diagram of a steel surface inspection workflow: camera, classifier, human review, and documented evidence. Not a real-time camera capture or measured production result.</desc>
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#08151F"/><stop offset="1" stop-color="#162D3B"/></linearGradient><linearGradient id="metal" x2="1" y2=".5"><stop stop-color="#B2C2C8"/><stop offset=".5" stop-color="#5D7482"/><stop offset="1" stop-color="#B6C8CD"/></linearGradient><pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#98B2C6" stroke-opacity=".08"/></pattern></defs>
+<rect width="1200" height="630" fill="url(#bg)"/><rect width="1200" height="630" fill="url(#grid)"/>
+<rect x="58" y="51" width="243" height="34" rx="17" fill="#183F49" stroke="#368E8A"/><text x="179" y="74" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="700" letter-spacing="1.6" fill="#8DEBD8">INDUSTRIAL COMPUTER VISION</text>
+<text x="58" y="178" font-family="Arial,sans-serif" font-size="78" font-weight="700" fill="#FFFFFF">Visual QC</text>
+<text x="58" y="245" font-family="Arial,sans-serif" font-size="40" font-weight="700" fill="#95E4DC">Steel Defect Intelligence</text>
+<text x="58" y="306" font-family="Arial,sans-serif" font-size="21" fill="#BDD3DB">Image classification, confidence-aware review,</text>
+<text x="58" y="337" font-family="Arial,sans-serif" font-size="21" fill="#BDD3DB">quality analytics and document-grounded RAG.</text>
+<g font-family="Arial,sans-serif" font-weight="700" font-size="16" fill="#D7F4EE"><rect x="58" y="395" width="135" height="46" rx="13" fill="#1C404E" stroke="#3D7280"/><text x="125" y="423" text-anchor="middle">CLASSIFY</text><path d="M205 418H242" stroke="#70CABB" stroke-width="2" stroke-dasharray="5 5"/><rect x="253" y="395" width="135" height="46" rx="13" fill="#1C404E" stroke="#3D7280"/><text x="320" y="423" text-anchor="middle">REVIEW</text><path d="M400 418H436" stroke="#70CABB" stroke-width="2" stroke-dasharray="5 5"/><rect x="448" y="395" width="145" height="46" rx="13" fill="#1C404E" stroke="#3D7280"/><text x="520" y="423" text-anchor="middle">EXPLAIN</text></g>
+<text x="58" y="558" font-family="Arial,sans-serif" font-size="13" letter-spacing="1.3" fill="#9AB9C5">ILLUSTRATED WORKFLOW  /  NOT A PRODUCTION-LINE SCREENSHOT</text>
+<g transform="translate(740 100)">
+<rect width="389" height="421" rx="24" fill="#0E2431" stroke="#335A68" stroke-width="2"/>
+<rect x="31" y="34" width="327" height="261" rx="14" fill="#142B38" stroke="#527A83"/>
+<path d="M57 71H332L309 250H80Z" fill="url(#metal)" opacity=".95"/>
+<path d="M148 110l37 14-17 27 28 21-37 21" fill="none" stroke="#F16D72" stroke-width="7" stroke-linecap="round" opacity=".85"/>
+<path d="M237 164l15-16 18 18-16 14-15-8" fill="none" stroke="#F16D72" stroke-width="5" stroke-linejoin="round"/>
+<rect x="118" y="90" width="110" height="130" rx="4" fill="none" stroke="#84F0D9" stroke-width="3" stroke-dasharray="10 5"/>
+<path d="M116 101H104V87M226 103H238V88M116 209H104V223M226 209H238V223" stroke="#84F0D9" stroke-width="4" fill="none"/>
+<rect x="31" y="317" width="327" height="72" rx="12" fill="#193D49" stroke="#2E7881"/><circle cx="65" cy="352" r="14" fill="#EF8B7B"/><text x="94" y="343" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#E4F8F4">Anomaly flagged</text><text x="94" y="368" font-family="Arial,sans-serif" font-size="14" fill="#9FC8C9">Route to operator review</text>
+</g>
+</svg>
