@@ -141,6 +141,20 @@ class DashboardRouteTests(unittest.TestCase):
         response = self.client.get("/api/export_report")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[:2], b"PK")
+        import io
+        import zipfile
+
+        with zipfile.ZipFile(io.BytesIO(response.data)) as workbook:
+            self.assertIsNone(workbook.testzip())
+            self.assertIn("xl/worksheets/sheet1.xml", workbook.namelist())
+            self.assertIn("xl/worksheets/sheet2.xml", workbook.namelist())
+            self.assertIn("xl/worksheets/sheet3.xml", workbook.namelist())
+            self.assertIn("xl/charts/chart1.xml", workbook.namelist())
+            self.assertIn("xl/charts/chart2.xml", workbook.namelist())
+            self.assertIn(
+                b"NOT REAL PLANT DATA",
+                workbook.read("xl/sharedStrings.xml"),
+            )
 
     def test_index_mounts_the_3d_twin_with_fallback(self):
         html = self.client.get("/").data
