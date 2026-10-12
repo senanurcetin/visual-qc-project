@@ -77,6 +77,26 @@ class WorkbookReportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "known simulator defect"):
             build_report(wrong)
 
+    def test_report_requires_nonempty_unique_unit_ids(self):
+        for value in (None, "", "   ", "UNIT-1"):
+            with self.subTest(value=value):
+                invalid = sample()
+                invalid.loc[0, "unit_id"] = value
+                with self.assertRaisesRegex(ValueError, "non-empty and unique"):
+                    build_report(invalid)
+
+    def test_excel_does_not_interpret_unit_ids_as_formulas_or_links(self):
+        suspicious = sample()
+        suspicious.loc[0, "unit_id"] = "=2+2"
+        suspicious.loc[1, "unit_id"] = "https://example.org/not-a-link"
+        with zipfile.ZipFile(build_report(suspicious)) as package:
+            log = ET.fromstring(package.read("xl/worksheets/sheet2.xml"))
+            self.assertFalse(list(log.iter(XML + "f")))
+            self.assertFalse(list(log.iter(XML + "hyperlink")))
+            shared = package.read("xl/sharedStrings.xml").decode("utf-8")
+            self.assertIn("=2+2", shared)
+            self.assertIn("https://example.org/not-a-link", shared)
+
     def test_malformed_status_rejected(self):
         wrong = sample()
         wrong.loc[0, "status"] = "UNKNOWN"
