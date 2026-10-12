@@ -148,6 +148,33 @@ class DashboardRouteTests(unittest.TestCase):
         self.assertIn(b'id="twin-fallback"', html)
         self.assertIn(b"/line/static/line3d.js", html)
 
+    def test_nexus_hmi_keeps_live_bindings_and_provenance_visible(self):
+        page = self.client.get("/")
+        self.assertEqual(page.status_code, 200)
+        html = page.get_data(as_text=True)
+        for expected in (
+            "SIMULATED PRODUCTION DATA",
+            "Demo OEE · Simulated",
+            "Demo Net Profit",
+            "Simulated Net Profit Trend",
+            "OEE Factors · Simulated Line",
+            "profitChart.data.datasets[0].data.push(data.net_profit)",
+            "oeeChart.data.datasets[0].data = [data.availability, data.performance, data.quality]",
+            'href="/api/export_report"',
+            'href="/case-study"',
+        ):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, html)
+
+    def test_nexus_hmi_stylesheet_is_served(self):
+        response = self.client.get("/line/static/line3d.css")
+        self.assertEqual(response.status_code, 200)
+        css = response.get_data(as_text=True)
+        self.assertIn("--blue: #4ea8ff", css)
+        self.assertIn("--purple: #8f9bff", css)
+        self.assertIn(".data-provenance", css)
+        self.assertIn("@media (max-width: 780px)", css)
+
     def test_twin_assets_are_served(self):
         for asset in ("line3d.js", "line3d.css"):
             response = self.client.get(f"/line/static/{asset}")
