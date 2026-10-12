@@ -26,9 +26,19 @@ REVIEW_ENTROPY_BITS = 1.0  # entropy above this routes the image to human review
 
 def softmax(logits: np.ndarray, temperature: float = 1.0) -> np.ndarray:
     # Deliberately not imported from analysis/: that directory is excluded from the Vercel bundle.
-    z = np.asarray(logits, dtype=np.float64) / temperature
+    if not math.isfinite(temperature) or temperature <= 0:
+        raise ValueError("invalid classifier calibration temperature")
+    z = np.asarray(logits, dtype=np.float64)
+    if z.ndim != 2 or not z.shape[0] or not z.shape[1] or not np.isfinite(z).all():
+        raise ValueError("invalid classifier logits")
+    z = z / temperature
+    if not np.isfinite(z).all():
+        raise ValueError("invalid classifier logits")
     e = np.exp(z - z.max(axis=1, keepdims=True))
-    return e / e.sum(axis=1, keepdims=True)
+    probs = e / e.sum(axis=1, keepdims=True)
+    if not np.isfinite(probs).all():
+        raise ValueError("invalid classifier probabilities")
+    return probs
 
 
 class ModelUnavailable(RuntimeError):
@@ -83,9 +93,18 @@ def classify():
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
 
-    logits = model["session"].run(["logits"], {"image": batch})[0]
-    probs = softmax(logits, float(model["meta"].get("temperature", 1.0)))[0]
-    names = model["meta"]["class_names"]
+    try:
+        logits = model["session"].run(["logits"], {"image": batch})[0]
+        probs = softmax(logits, float(model["meta"].get("temperature", 1.0)))[0]
+        names = model["meta"]["class_names"]
+        if (not isinstance(names, list) or len(names) != len(probs)
+                or any(not isinstance(name, str) or not name for name in names)):
+            raise ValueError("invalid classifier label metadata")
+    except (ValueError, TypeError, IndexError, KeyError):
+        # Do not emit a fabricated confidence score for corrupt model metadata
+        # or nonfinite inference output. Never expose raw logits in the response.
+        return jsonify({"error": "classifier unavailable", "reason": "invalid model output"}), 503
+
     entropy = float(-(probs * np.log2(np.clip(probs, 1e-12, 1.0))).sum())
     order = np.argsort(probs)[::-1]
     return jsonify({
