@@ -4,7 +4,7 @@
 
 > Editorial workflow diagram, not a captured model decision. For actual application evidence and measured performance, see the [live dashboard](https://visual-qc-project-pearl.vercel.app) and the original screenshots and evaluation charts below.
 
-[![CI](https://github.com/senanurcetin/visual-qc-project/actions/workflows/ci.yml/badge.svg)](https://github.com/senanurcetin/visual-qc-project/actions/workflows/ci.yml)
+**Quality checks:** [CircleCI — Python/PostgreSQL validation](https://circleci.com/gh/senanurcetin/visual-qc-project/5) · GitHub Actions are not the current automatic CI provider.
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
@@ -19,6 +19,20 @@ Portfolio entry: [senanur-cetin.vercel.app/projects/visual-qc-project](https://s
 Short video: [`docs/assets/visual-qc-dashboard.webm`](docs/assets/visual-qc-dashboard.webm)
 
 ![Visual QC dashboard](docs/assets/visual-qc-dashboard.png)
+
+---
+
+## Functional XLSX report — source-backed, not a mockup
+
+The Flask HMI serves **[Download session report (XLSX)](https://visual-qc-project-pearl.vercel.app/api/export_report)** after the visitor completes at least one simulated production unit. The real report generator is [`report.py`](report.py); [automated workbook checks](tests/test_report_workbook.py) inspect its formulas, chart source and embedded provenance statement.
+
+- **Dashboard sheet:** total units, accepted/rejected counts, yield and mean OEE, each calculated by a genuine Excel formula linked to the detailed log. Cached results are included for static viewers.
+- **Production Log:** timestamp, simulated unit identifier, status, defect and per-unit OEE, with filters and conditional formatting.
+- **Chart:** accepted versus rejected distribution, with stable NEXUS blue/lavender series labels even when failures outnumber passes.
+- **Evidence scope:** the yellow header states **SIMULATED DEMO / NOT REAL PLANT DATA**. These measurements describe a visitor's deterministic factory-line simulation, **not** an actual plant or independently benchmarked NEU-CLS classifier performance.
+- **Empty session:** export returns 404 until simulated units are completed; it does not invent historical plant records.
+
+**Release note:** source changes and tests must pass CircleCI, and the updated Vercel deployment must be confirmed before claiming this revised workbook is available in the public demo. Existing README screenshot/video assets predate this workbook design and are not presented as new captures.
 
 ---
 
