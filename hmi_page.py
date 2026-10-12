@@ -73,6 +73,14 @@ HTML_TEMPLATE = """
     </style>
 </head>
 <body>
+    <header class="hmi-masthead" aria-label="VisionQC quality control dashboard">
+        <div class="hmi-brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div class="hmi-brand-copy">
+            <strong>Visual QC <em>Control Center</em></strong>
+            <small>Computer vision · Steel surface inspection · Digital twin</small>
+        </div>
+        <div class="hmi-brand-meta"><span class="hmi-mode-pill">SIMULATED PRODUCTION LINE</span><span class="hmi-keyboard-hint">Operations / Quality Engineering</span></div>
+    </header>
     <div class="header">
         <div class="kpi-card" id="oee_card"><div class="kpi-title">OEE Performance</div><div class="kpi-val" id="val_oee">0.0%</div></div>
         <div class="kpi-card"><div class="kpi-title">Status</div><div id="status_val" class="kpi-val" style="color:var(--red)">INIT</div></div>
