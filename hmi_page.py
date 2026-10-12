@@ -8,7 +8,9 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VisionQC - Pro HMI v34.2</title>
+    <title>Visual QC | NEXUS Industrial Inspection Dashboard</title>
+    <meta name="theme-color" content="#071829">
+    <meta name="description" content="Interactive industrial quality-inspection HMI using simulated production-line data and genuine model-evaluation case studies.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/line/static/line3d.css">
@@ -21,8 +23,8 @@ HTML_TEMPLATE = """
     <script type="module" src="/line/static/line3d.js"></script>
     <style>
         :root {
-            --bg: #111827; --card: #1f293b; --border: #374151; --text: #f3f4f6;
-            --green: #10b981; --yellow: #f59e0b; --red: #ef4444; --blue: #3b82f6; --purple: #8b5cf6; --teal: #14b8a6;
+            --bg: #071829; --card: #10263d; --border: #294767; --text: #eff5ff;
+            --green: #43c99d; --yellow: #f6b95f; --red: #f37a88; --blue: #4ea8ff; --purple: #8f9bff; --teal: #487fd8;
         }
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: var(--bg); color: var(--text); }
         body { font-family: 'Inter', sans-serif; display: flex; flex-direction: column; }
@@ -82,9 +84,9 @@ HTML_TEMPLATE = """
         <div class="hmi-brand-meta"><span class="hmi-mode-pill">SIMULATED PRODUCTION LINE</span><span class="hmi-keyboard-hint">Operations / Quality Engineering</span></div>
     </header>
     <div class="header">
-        <div class="kpi-card" id="oee_card"><div class="kpi-title">OEE Performance</div><div class="kpi-val" id="val_oee">0.0%</div></div>
+        <div class="kpi-card" id="oee_card"><div class="kpi-title">Demo OEE · Simulated</div><div class="kpi-val" id="val_oee">0.0%</div></div>
         <div class="kpi-card"><div class="kpi-title">Status</div><div id="status_val" class="kpi-val" style="color:var(--red)">INIT</div></div>
-        <div class="kpi-card"><div class="kpi-title">Net Profit</div><div class="kpi-val" id="val_profit">$0.00</div></div>
+        <div class="kpi-card"><div class="kpi-title">Demo Net Profit</div><div class="kpi-val" id="val_profit">$0.00</div></div>
         <div class="kpi-card"><div class="kpi-title">Total Output</div><div class="kpi-val" id="val_total">0</div></div>
         <div class="kpi-card"><div class="kpi-title">Yield OK</div><div class="kpi-val" style="color:var(--green)" id="val_ok">0</div></div>
         <div class="kpi-card"><div class="kpi-title">Yield NOK</div><div class="kpi-val" style="color:var(--red)" id="val_nok">0</div></div>
@@ -100,14 +102,18 @@ HTML_TEMPLATE = """
         <a href="/spc" class="btn btn-case-study">SPC Chart</a>
         <a href="/api/export_report" class="btn btn-export">&#x1F4E5; Export Report</a>
     </div>
+    <div class="data-provenance" role="note" aria-label="Dashboard data provenance">
+      <strong>SIMULATED PRODUCTION DATA</strong>
+      <span>Line counts, OEE and profit are calculated from the visitor's simulated run. The review queue uses simulated defect events; evaluated NEU-CLS model results are documented separately in the <a href="/case-study">model case study</a>.</span>
+    </div>
     <div class="main-grid">
         <div class="panel video-box" id="line-twin">
             <div class="twin-loading" id="twin-loading">Loading 3D line…</div>
             <img id="twin-fallback" alt="Simulated 2D inspection camera feed" hidden>
         </div>
         <div class="right-col">
-            <div class="panel profit-sec"><div class="section-header">Trend Analysis</div><div class="chart-container"><canvas id="profitChart"></canvas></div></div>
-            <div class="panel oee-sec"><div class="section-header">OEE Breakdown</div><div class="chart-container"><canvas id="oeeChart"></canvas></div></div>
+            <div class="panel profit-sec"><div class="section-header">Simulated Net Profit Trend</div><div class="chart-container"><canvas id="profitChart" role="img" aria-label="Simulated session profit trend in US dollars"></canvas></div></div>
+            <div class="panel oee-sec"><div class="section-header">OEE Factors · Simulated Line</div><div class="chart-container"><canvas id="oeeChart" role="img" aria-label="Simulated availability, performance and quality factors as percentages"></canvas></div></div>
             <div class="panel review-sec"><div class="section-header">Review Queue &middot; <a href="/api/review/export.csv" style="color:#a78bfa">corrections CSV</a></div><div class="review-list" id="review-list"><div class="review-empty">No rejected units yet.</div></div></div>
             <div class="panel log-sec"><div class="section-header">Event Historian</div><div class="log-box"><table class="log-table"><thead><tr><th>Time</th><th>ID</th><th>Result</th></tr></thead><tbody id="log-tbody"></tbody></table></div></div>
         </div>
@@ -125,10 +131,10 @@ HTML_TEMPLATE = """
                 data: { labels: [], datasets: [{ data: [], borderColor: color, backgroundColor: color + '22', fill: true, tension: 0.3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3af', font: {size: 10} } } } }
             });
-            profitChart = new Chart('profitChart', chartConfig('line', '#3b82f6'));
+            profitChart = new Chart('profitChart', chartConfig('line', '#4ea8ff'));
             oeeChart = new Chart('oeeChart', {
                 type: 'bar',
-                data: { labels: ['AVA', 'PER', 'QLY'], datasets: [{ data: [0,0,0], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'] }] },
+                data: { labels: ['AVA', 'PER', 'QLY'], datasets: [{ data: [0,0,0], backgroundColor: ['#4ea8ff', '#8f9bff', '#f6b95f'] }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { x: { max: 1, ticks: { color: '#94a3af', callback: v => (v*100)+'%' } }, y: { ticks: { color: '#f3f4f6' } } } }
             });
         } catch (e) { console.warn("Chart Init Error", e); }

@@ -151,3 +151,65 @@ body {
  .log-sec { min-height: 185px; }
 }
 @media (prefers-reduced-motion: reduce) { .btn { transition: none !important; } }
+
+/* NEXUS dashboard tokens, October 2026.
+   Changes the actual HTML/CSS of the simulation HMI, not portfolio artwork.
+   Meaningful statuses retain their own green/amber/red semantics. */
+:root {
+  --bg: #071829 !important;
+  --card: #10263d !important;
+  --border: #294767 !important;
+  --text: #eff5ff !important;
+  --blue: #4ea8ff !important;
+  --purple: #8f9bff !important;
+  --teal: #487fd8 !important;
+}
+body {
+  background:
+    radial-gradient(70% 55% at 8% -4%, rgba(78,168,255,.14), transparent 77%),
+    radial-gradient(55% 42% at 92% 2%, rgba(143,155,255,.12), transparent 75%),
+    #071829 !important;
+  color: #eff5ff !important;
+}
+.hmi-masthead {
+  background: linear-gradient(110deg,#071829,#102942 62%,#142c4b) !important;
+  border-bottom-color: #294767 !important;
+}
+.hmi-brand-mark { background: #15365a !important; border-color: #507da8 !important; }
+.hmi-brand-mark span { border-color: #8f9bff !important; }
+.hmi-brand-copy strong { color: #f5f9ff !important; }
+.hmi-brand-copy em { color: #8f9bff !important; }
+.hmi-brand-copy small,.hmi-keyboard-hint { color: #bfd0e7 !important; }
+.hmi-mode-pill { background: #163a5f !important; border-color: #4e86bc !important; color: #e4f0ff !important; }
+.header,.control-bar { background: #0b2037 !important; border-bottom-color: #294767 !important; }
+.kpi-card { background: linear-gradient(155deg,#142d4b,#0e233b) !important; border-color: #365779 !important; }
+.kpi-card::after { background: linear-gradient(90deg,#4ea8ff,#8f9bff) !important; }
+.kpi-title { color: #bdd0e9 !important; }
+.kpi-val { color: #f4f8ff !important; }
+.btn-reset,.btn-case-study { background: #265c9b !important; }
+.btn-rag { background: #5856ab !important; }
+.btn-export { background: #3567af !important; }
+.panel,.right-col { border-color: #365779 !important; }
+.right-col { background: #0d253e !important; }
+.section-header { background: #19395c !important; color: #e5effe !important; }
+.log-table th { background: #163858 !important; color: #d1e3fb !important; }
+.log-table td { border-bottom-color: #294767 !important; }
+#line-twin { border-color: #365779 !important; }
+.btn:focus-visible { outline: 3px solid #8f9bff !important; outline-offset: 3px; }
+.data-provenance {
+  flex-shrink: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 13px;
+  padding: 9px 20px; background: #0b2037; border-bottom: 1px solid #294767;
+  font-size: .72rem; line-height: 1.5; color: #c2d3ec;
+}
+.data-provenance strong { color: #f6b95f; letter-spacing: .09em; white-space: nowrap; }
+.data-provenance a { color: #8bc5ff; font-weight: 700; }
+.data-provenance a:focus-visible { outline: 2px solid #8f9bff; outline-offset: 2px; }
+@media (max-width: 780px) {
+  .data-provenance { padding: 10px 12px; gap: 4px; align-items: flex-start; flex-direction: column; }
+  .hmi-masthead { padding: 10px 12px; }
+}
+@media print {
+  .control-bar { display: none !important; }
+  body { overflow: visible !important; height: auto !important; }
+  .data-provenance { border: 1px solid #365779; }
+}
