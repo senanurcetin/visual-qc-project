@@ -1,5 +1,9 @@
 # Visual QC Project
 
+![Visual QC quality inspection workflow illustration](docs/assets/visual-qc-overview.svg)
+
+> Editorial workflow diagram, not a captured model decision. For actual application evidence and measured performance, see the [live dashboard](https://visual-qc-project-pearl.vercel.app) and the original screenshots and evaluation charts below.
+
 [![CI](https://github.com/senanurcetin/visual-qc-project/actions/workflows/ci.yml/badge.svg)](https://github.com/senanurcetin/visual-qc-project/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
