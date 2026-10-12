@@ -39,6 +39,10 @@ class WorkbookReportTests(unittest.TestCase):
             charts = package.read("xl/charts/chart1.xml").decode("utf-8")
             self.assertIn("4EA8FF", charts)
             self.assertIn("8F9BFF", charts)
+            # The underlying chart data lives in hidden AA:AB. XlsxWriter
+            # defaults to plotVisOnly=1, which suppresses those data points.
+            # With show_hidden_data(), plotVisOnly must be absent/false.
+            self.assertNotIn("plotVisOnly", charts)
 
     def test_all_rejected_still_uses_stable_status_order(self):
         with zipfile.ZipFile(build_report(sample(("FAIL", "FAIL")))) as package:
