@@ -150,6 +150,13 @@ body {
   .chart-container { min-height: 155px; }
   .log-sec { min-height: 200px; }
 }
+/* Short desktop windows scroll instead of compressing the 3D view and charts. */
+@media (max-height: 840px) and (min-width: 781px) {
+  html, body { height:auto!important; min-height:100%!important; overflow-y:auto!important; }
+  body { display:block!important; }
+  .main-grid { min-height:540px; }
+  #line-twin { min-height:480px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .control-bar .btn { transition: none !important; }
 }
