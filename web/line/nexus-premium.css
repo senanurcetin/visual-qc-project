@@ -82,6 +82,7 @@ body {
 #status_val { color: #b5c2ff !important; }
 #status_val[style*="--red"] { color: #f37a88 !important; }
 #status_val[style*="--green"] { color: #43c99d !important; }
+#status_val[style*="--yellow"] { color: #f6b95f !important; }
 .control-bar {
   background: #0b2037 !important;
   border-bottom: 1px solid #294767 !important;
