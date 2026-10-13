@@ -355,8 +355,7 @@ After starting `python main.py` and installing Playwright/Chromium locally:
 ```bash
 python -m pip install playwright
 python -m playwright install chromium
-E2E_BASE_URL=http://127.0.0.1:8080 E2E_SCREENSHOT_DIR=artifacts/hmi-browser \\
-  python -m unittest discover -s tests/e2e -p 'test_smoke.py' -v
+E2E_BASE_URL=http://127.0.0.1:8080 E2E_SCREENSHOT_DIR=artifacts/hmi-browser python -m unittest discover -s tests/e2e -p 'test_smoke.py' -v
 ```
 
 The optional capture files are `visual-qc-desktop-1440.png` (line running after a simulated rejection) and `visual-qc-mobile-375.png` (reachable twin, charts and historian). This procedure does not enable or trigger hosted CI. No screenshot or full browser-test success is claimed until an actual run is performed and the captures are inspected. Confirm Vercel preview and production revisions separately before merging this draft or changing published imagery.
