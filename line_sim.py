@@ -83,7 +83,9 @@ def completed_units(t: float) -> int:
 def apply_command(state: dict, command: str | None, now: float) -> dict:
     state = {**state, "forced": list(state["forced"])}
     t = sim_time(state, now)
-    if command == "START" and state["mode"] != "RUNNING":
+    # The simulated emergency-stop latch must be cleared with RESET.
+    # START after ESTOP is explicitly ignored; this is not physical safety logic.
+    if command == "START" and state["mode"] not in {"RUNNING", "ESTOP"}:
         state.update(mode="RUNNING", acc=t, started=now)
     elif command == "PAUSE" and state["mode"] == "RUNNING":
         state.update(mode="PAUSED", acc=t, started=None)

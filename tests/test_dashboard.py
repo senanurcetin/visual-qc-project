@@ -45,6 +45,17 @@ class LineSimulationTests(unittest.TestCase):
         self.assertEqual(line_sim.sim_time(self.state, now + 999), 7.0)
         self.assertEqual(line_sim.snapshot(self.state, now + 999)["system_mode"], "ESTOP")
 
+    def test_simulated_estop_requires_reset_before_restart(self):
+        state = line_sim.apply_command(self.state, "START", 1000.0)
+        stopped = line_sim.apply_command(state, "ESTOP", 1005.0)
+        self.assertEqual(stopped["mode"], "ESTOP")
+        self.assertEqual(line_sim.apply_command(stopped, "START", 1010.0), stopped)
+        self.assertEqual(line_sim.snapshot(stopped, 1020.0)["system_mode"], "ESTOP")
+        reset = line_sim.apply_command(stopped, "RESET", 1020.0)
+        self.assertEqual(reset["mode"], "PAUSED")
+        started = line_sim.apply_command(reset, "START", 1021.0)
+        self.assertEqual(started["mode"], "RUNNING")
+
     def test_reset_starts_a_fresh_line(self):
         now = self.run_for(9.0)
         self.state = line_sim.apply_command(self.state, "RESET", now)
@@ -142,6 +153,22 @@ class DashboardRouteTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200, payload)
             self.assertEqual(response.get_json()["status"], "ignored", payload)
             self.assertFalse(response.get_json()["applied"], payload)
+
+    def test_hmi_estop_latch_is_reflected_in_command_response(self):
+        self.client.post("/api/control", json={"command": "START"})
+        stop = self.client.post("/api/control", json={"command": "ESTOP"}).get_json()
+        self.assertTrue(stop["applied"])
+        self.assertEqual(stop["mode"], "ESTOP")
+        blocked = self.client.post("/api/control", json={"command": "START"}).get_json()
+        self.assertFalse(blocked["applied"])
+        self.assertEqual(blocked["status"], "ignored")
+        self.assertEqual(blocked["mode"], "ESTOP")
+        reset = self.client.post("/api/control", json={"command": "RESET"}).get_json()
+        self.assertTrue(reset["applied"])
+        self.assertEqual(reset["mode"], "PAUSED")
+        restarted = self.client.post("/api/control", json={"command": "START"}).get_json()
+        self.assertTrue(restarted["applied"])
+        self.assertEqual(restarted["mode"], "RUNNING")
 
     def test_hmi_command_acknowledgements_match_applied_state(self):
         start = self.client.post("/api/control", json={"command": "START"}).get_json()
