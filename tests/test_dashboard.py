@@ -277,6 +277,7 @@ class DashboardRouteTests(unittest.TestCase):
         self.assertIn("lastCommandId", html)
         self.assertIn("result.status === 'ok' && result.applied === true", html)
         self.assertIn("NOT APPLIED · CURRENT MODE:", html)
+        self.assertIn("EMERGENCY STOP LATCHED · RESET REQUIRED", html)
         for id in ("val_oee", "val_profit", "val_total", "val_ok", "val_nok"):
             self.assertIn(f'id="{id}" data-loading="true">—</div>', html)
         self.assertIn("removeAttribute('data-loading')", html)

@@ -269,6 +269,8 @@ HTML_TEMPLATE = """
             const result = await response.json();
             if (result.status === 'ok' && result.applied === true) {
                 setStatus('accepted', cmd + ' APPLIED TO SIMULATED LINE');
+            } else if (result.mode === 'ESTOP' && cmd === 'START') {
+                setStatus('ignored', 'EMERGENCY STOP LATCHED · RESET REQUIRED');
             } else {
                 setStatus('ignored', cmd + ' NOT APPLIED · CURRENT MODE: ' + String(result.mode || 'UNKNOWN'));
             }
