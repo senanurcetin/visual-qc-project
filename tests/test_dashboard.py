@@ -205,6 +205,11 @@ class DashboardRouteTests(unittest.TestCase):
         self.assertIn('#status_val[data-state="ESTOP"]', css)
         self.assertIn('.kpi-card:nth-child(5) .kpi-val', css)
         self.assertIn('statusEl.dataset.state = data.system_mode', html)
+        self.assertIn("dashboardPollInFlight = true", html)
+        self.assertIn("dashboardPollInFlight = false", html)
+        self.assertIn("cache: 'no-store'", html)
+        self.assertIn("esc(log.time)", html)
+        self.assertIn("esc(log.id)", html)
 
     def test_nexus_hmi_stylesheet_is_served(self):
         response = self.client.get("/line/static/line3d.css")

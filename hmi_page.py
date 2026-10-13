@@ -163,8 +163,12 @@ HTML_TEMPLATE = """
     }
 
     // --- AJAX Veri Çekme (1000ms Loop) ---
+    // Do not render an older API response after a newer polling interval.
+    let dashboardPollInFlight = false;
     function update() {
-        fetch('/api/data')
+        if (dashboardPollInFlight) return;
+        dashboardPollInFlight = true;
+        return fetch('/api/data', { cache: 'no-store' })
             .then(r => {
                 if (!r.ok) return r.text().then(text => { throw new Error(text) });
                 return r.json();
@@ -198,7 +202,7 @@ HTML_TEMPLATE = """
                 // Log Tablosu Güncelleme
                 const tbody = document.getElementById('log-tbody');
                 if(tbody && data.recent_logs) {
-                    tbody.innerHTML = data.recent_logs.map(log => `<tr><td>${log.time}</td><td>${log.id}</td><td class="${log.status=='OK'?'text-ok':'text-fail'}">${log.status}${log.defect ? ' · ' + log.defect.replace(/_/g, ' ') : ''}</td></tr>`).join('');
+                    tbody.innerHTML = data.recent_logs.map(log => `<tr><td>${esc(log.time)}</td><td>${esc(log.id)}</td><td class="${log.status==='OK'?'text-ok':'text-fail'}">${esc(log.status)}${log.defect ? ' · ' + esc(log.defect).replace(/_/g, ' ') : ''}</td></tr>`).join('');
                 }
 
                 // Grafik Güncellemeleri
@@ -225,6 +229,8 @@ HTML_TEMPLATE = """
                     statusEl.dataset.state = "SERVER_ERR";
                     statusEl.style.color = "var(--red)";
                 }
+            }).finally(() => {
+                dashboardPollInFlight = false;
             });
     }
 
