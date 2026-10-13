@@ -118,10 +118,10 @@ HTML_TEMPLATE = """
             <img id="twin-fallback" alt="Simulated 2D inspection camera feed" hidden>
         </div>
         <div class="right-col">
-            <div class="panel profit-sec"><div class="section-header">Simulated Net Profit Trend</div><div class="chart-container"><canvas id="profitChart" role="img" aria-label="Simulated session profit trend in US dollars"></canvas></div></div>
+            <div class="panel profit-sec"><div class="section-header">Simulated Net Profit Trend</div><div class="chart-container"><canvas id="profitChart" role="img" aria-label="Simulated session profit trend in US dollars"></canvas><div class="nexus-chart-empty" id="profit-chart-empty" role="status">Waiting for the first simulated profit reading</div></div></div>
             <div class="panel oee-sec"><div class="section-header">OEE Factors · Simulated Line</div><div class="chart-container"><canvas id="oeeChart" role="img" aria-label="Simulated availability, performance and quality factors as percentages"></canvas></div></div>
             <div class="panel review-sec"><div class="section-header">Review Queue &middot; <a href="/api/review/export.csv" style="color:#a78bfa">corrections CSV</a></div><div class="review-list" id="review-list"><div class="review-empty">No rejected units yet.</div></div></div>
-            <div class="panel log-sec"><div class="section-header">Event Historian</div><div class="log-box"><table class="log-table"><thead><tr><th>Time</th><th>ID</th><th>Result</th></tr></thead><tbody id="log-tbody"></tbody></table></div></div>
+            <div class="panel log-sec"><div class="section-header">Event Historian</div><div class="log-box"><table class="log-table"><thead><tr><th>Time</th><th>ID</th><th>Result</th></tr></thead><tbody id="log-tbody"><tr class="nexus-log-empty"><td colspan="3">Awaiting simulated production events</td></tr></tbody></table></div></div>
         </div>
     </div>
 <script>
@@ -202,7 +202,9 @@ HTML_TEMPLATE = """
                 // Log Tablosu Güncelleme
                 const tbody = document.getElementById('log-tbody');
                 if(tbody && data.recent_logs) {
-                    tbody.innerHTML = data.recent_logs.map(log => `<tr><td>${esc(log.time)}</td><td>${esc(log.id)}</td><td class="${log.status==='OK'?'text-ok':'text-fail'}">${esc(log.status)}${log.defect ? ' · ' + esc(log.defect).replace(/_/g, ' ') : ''}</td></tr>`).join('');
+                    tbody.innerHTML = data.recent_logs.length
+                        ? data.recent_logs.map(log => `<tr><td>${esc(log.time)}</td><td>${esc(log.id)}</td><td class="${log.status==='OK'?'text-ok':'text-fail'}">${esc(log.status)}${log.defect ? ' · ' + esc(log.defect).replace(/_/g, ' ') : ''}</td></tr>`).join('')
+                        : '<tr class="nexus-log-empty"><td colspan="3">Awaiting simulated production events</td></tr>';
                 }
 
                 // Grafik Güncellemeleri
@@ -211,6 +213,8 @@ HTML_TEMPLATE = """
                     profitChart.data.datasets[0].data.push(data.net_profit);
                     if (profitChart.data.labels.length > 30) { profitChart.data.labels.shift(); profitChart.data.datasets[0].data.shift(); }
                     profitChart.update('none');
+                    const profitEmpty = document.getElementById('profit-chart-empty');
+                    if (profitEmpty) profitEmpty.hidden = true;
                 }
                 if (oeeChart) {
                     oeeChart.data.datasets[0].data = [data.availability, data.performance, data.quality];

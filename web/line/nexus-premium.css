@@ -189,3 +189,22 @@ body {
   .kpi-card:hover { border-color:#5183b5!important;box-shadow:0 16px 35px rgba(0,9,25,.3); }
 }
 @media (prefers-reduced-motion: reduce) { .kpi-card { transition:none; } }
+
+/* Empty panels are content states, not broken or missing graphs. */
+.nexus-chart-empty {
+  position:absolute; inset:0; display:flex; align-items:center;
+  justify-content:center; text-align:center; padding:16px;
+  background:linear-gradient(140deg,rgba(12,37,62,.91),rgba(7,23,41,.9));
+  border:1px dashed rgba(119,169,224,.35);
+  border-radius:10px; color:#b7d2eb; font-size:.74rem;
+  font-weight:650; line-height:1.55; pointer-events:none;
+}
+.nexus-chart-empty[hidden] { display:none!important; }
+.nexus-log-empty td {
+  color:#a8c1db; text-align:center;
+  font-family:Inter,sans-serif; font-size:.72rem;
+  padding:19px 10px!important;
+}
+@media (max-width:780px) {
+  .nexus-chart-empty { font-size:.69rem; }
+}

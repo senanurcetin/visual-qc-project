@@ -210,6 +210,10 @@ class DashboardRouteTests(unittest.TestCase):
         self.assertIn("cache: 'no-store'", html)
         self.assertIn("esc(log.time)", html)
         self.assertIn("esc(log.id)", html)
+        self.assertIn('id="profit-chart-empty"', html)
+        self.assertIn("Waiting for the first simulated profit reading", html)
+        self.assertIn("Awaiting simulated production events", html)
+        self.assertIn("profitEmpty.hidden = true", html)
 
     def test_nexus_hmi_stylesheet_is_served(self):
         response = self.client.get("/line/static/line3d.css")
