@@ -136,6 +136,13 @@ class DashboardRouteTests(unittest.TestCase):
         self.assertEqual(response.get_json()["status"], "ignored")
         self.assertFalse(response.get_json()["applied"])
 
+    def test_control_rejects_unexpected_json_shapes_without_crashing(self):
+        for payload in ([], ["START"], {"command": []}, {"command": {}}, {"command": 42}):
+            response = self.client.post("/api/control", json=payload)
+            self.assertEqual(response.status_code, 200, payload)
+            self.assertEqual(response.get_json()["status"], "ignored", payload)
+            self.assertFalse(response.get_json()["applied"], payload)
+
     def test_hmi_command_acknowledgements_match_applied_state(self):
         start = self.client.post("/api/control", json={"command": "START"}).get_json()
         self.assertEqual(start["status"], "ok")
