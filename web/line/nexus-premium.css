@@ -233,3 +233,7 @@ body {
 @media(max-width:780px) {
   .nexus-command-status { padding:9px 12px;min-height:37px;font-size:.6rem;line-height:1.45; }
 }
+
+/* A valid request can be an explicit no-op: no green acceptance claim. */
+.nexus-command-status[data-state="ignored"] { color:#f9cf89; }
+.nexus-command-status[data-state="ignored"] .nexus-command-dot { background:#f6b95f; }

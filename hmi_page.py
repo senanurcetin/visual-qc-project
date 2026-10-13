@@ -266,7 +266,12 @@ HTML_TEMPLATE = """
                 body: JSON.stringify({command: cmd})
             });
             if (!response.ok) throw new Error('Control HTTP ' + response.status);
-            setStatus('accepted', cmd + ' ACCEPTED BY DEMO API');
+            const result = await response.json();
+            if (result.status === 'ok' && result.applied === true) {
+                setStatus('accepted', cmd + ' APPLIED TO SIMULATED LINE');
+            } else {
+                setStatus('ignored', cmd + ' NOT APPLIED · CURRENT MODE: ' + String(result.mode || 'UNKNOWN'));
+            }
             setTimeout(update, 50);
         } catch (error) {
             console.error('Simulated command failed:', error);

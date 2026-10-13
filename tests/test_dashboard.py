@@ -131,7 +131,30 @@ class DashboardRouteTests(unittest.TestCase):
             self.assertIn(header, headers)
 
     def test_control_without_json_body_is_ignored(self):
-        self.assertEqual(self.client.post("/api/control", data="x").status_code, 200)
+        response = self.client.post("/api/control", data="x")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["status"], "ignored")
+        self.assertFalse(response.get_json()["applied"])
+
+    def test_hmi_command_acknowledgements_match_applied_state(self):
+        start = self.client.post("/api/control", json={"command": "START"}).get_json()
+        self.assertEqual(start["status"], "ok")
+        self.assertTrue(start["applied"])
+        self.assertEqual(start["mode"], "RUNNING")
+
+        repeated = self.client.post("/api/control", json={"command": "START"}).get_json()
+        self.assertEqual(repeated["status"], "ignored")
+        self.assertFalse(repeated["applied"])
+        self.assertEqual(repeated["mode"], "RUNNING")
+
+        unsupported = self.client.post("/api/control", json={"command": "UNKNOWN"}).get_json()
+        self.assertEqual(unsupported["status"], "ignored")
+        self.assertFalse(unsupported["applied"])
+        self.assertEqual(unsupported["mode"], "RUNNING")
+
+        pause = self.client.post("/api/control", json={"command": "PAUSE"}).get_json()
+        self.assertTrue(pause["applied"])
+        self.assertEqual(pause["mode"], "PAUSED")
 
     def test_export_report_is_an_excel_file(self):
         self.assertEqual(self.client.get("/api/export_report").status_code, 404)  # nothing produced yet
@@ -218,6 +241,8 @@ class DashboardRouteTests(unittest.TestCase):
         self.assertIn("if (!response.ok) throw new Error('Control HTTP '", html)
         self.assertIn("NOT ACCEPTED · CHECK DEMO CONNECTION", html)
         self.assertIn("lastCommandId", html)
+        self.assertIn("result.status === 'ok' && result.applied === true", html)
+        self.assertIn("NOT APPLIED · CURRENT MODE:", html)
         for id in ("val_oee", "val_profit", "val_total", "val_ok", "val_nok"):
             self.assertIn(f'id="{id}" data-loading="true">—</div>', html)
         self.assertIn("removeAttribute('data-loading')", html)
