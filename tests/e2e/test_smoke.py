@@ -42,6 +42,15 @@ class BrowserSmokeTests(unittest.TestCase):
         page.wait_for_function("document.querySelector('#log-tbody .text-fail') !== null", timeout=15000)
         self.assertIn("·", page.locator("#log-tbody .text-fail").first.inner_text())  # defect class shown
         self.assertGreaterEqual(int(self.kpi(page, "val_total")), 1)
+        # Capture the real running HMI with an observed simulated rejection.
+        target = os.environ.get("E2E_SCREENSHOT_DIR")
+        if target:
+            Path(target).mkdir(parents=True, exist_ok=True)
+            page.screenshot(
+                path=str(Path(target) / "visual-qc-desktop-1440.png"),
+                full_page=True,
+                animations="disabled",
+            )
         page.get_by_role("button", name="Pause System").click()
         page.wait_for_function("document.getElementById('status_val').textContent === 'PAUSED'", timeout=5000)
         page.get_by_role("button", name="Emergency Stop").click()
