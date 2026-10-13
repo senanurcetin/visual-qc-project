@@ -45,6 +45,17 @@ class LineSimulationTests(unittest.TestCase):
         self.assertEqual(line_sim.sim_time(self.state, now + 999), 7.0)
         self.assertEqual(line_sim.snapshot(self.state, now + 999)["system_mode"], "ESTOP")
 
+    def test_simulated_estop_requires_reset_before_restart(self):
+        state = line_sim.apply_command(self.state, "START", 1000.0)
+        stopped = line_sim.apply_command(state, "ESTOP", 1005.0)
+        self.assertEqual(stopped["mode"], "ESTOP")
+        self.assertEqual(line_sim.apply_command(stopped, "START", 1010.0), stopped)
+        self.assertEqual(line_sim.snapshot(stopped, 1020.0)["system_mode"], "ESTOP")
+        reset = line_sim.apply_command(stopped, "RESET", 1020.0)
+        self.assertEqual(reset["mode"], "PAUSED")
+        started = line_sim.apply_command(reset, "START", 1021.0)
+        self.assertEqual(started["mode"], "RUNNING")
+
     def test_reset_starts_a_fresh_line(self):
         now = self.run_for(9.0)
         self.state = line_sim.apply_command(self.state, "RESET", now)
@@ -131,7 +142,53 @@ class DashboardRouteTests(unittest.TestCase):
             self.assertIn(header, headers)
 
     def test_control_without_json_body_is_ignored(self):
-        self.assertEqual(self.client.post("/api/control", data="x").status_code, 200)
+        response = self.client.post("/api/control", data="x")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["status"], "ignored")
+        self.assertFalse(response.get_json()["applied"])
+
+    def test_control_rejects_unexpected_json_shapes_without_crashing(self):
+        for payload in ([], ["START"], {"command": []}, {"command": {}}, {"command": 42}):
+            response = self.client.post("/api/control", json=payload)
+            self.assertEqual(response.status_code, 200, payload)
+            self.assertEqual(response.get_json()["status"], "ignored", payload)
+            self.assertFalse(response.get_json()["applied"], payload)
+
+    def test_hmi_estop_latch_is_reflected_in_command_response(self):
+        self.client.post("/api/control", json={"command": "START"})
+        stop = self.client.post("/api/control", json={"command": "ESTOP"}).get_json()
+        self.assertTrue(stop["applied"])
+        self.assertEqual(stop["mode"], "ESTOP")
+        blocked = self.client.post("/api/control", json={"command": "START"}).get_json()
+        self.assertFalse(blocked["applied"])
+        self.assertEqual(blocked["status"], "ignored")
+        self.assertEqual(blocked["mode"], "ESTOP")
+        reset = self.client.post("/api/control", json={"command": "RESET"}).get_json()
+        self.assertTrue(reset["applied"])
+        self.assertEqual(reset["mode"], "PAUSED")
+        restarted = self.client.post("/api/control", json={"command": "START"}).get_json()
+        self.assertTrue(restarted["applied"])
+        self.assertEqual(restarted["mode"], "RUNNING")
+
+    def test_hmi_command_acknowledgements_match_applied_state(self):
+        start = self.client.post("/api/control", json={"command": "START"}).get_json()
+        self.assertEqual(start["status"], "ok")
+        self.assertTrue(start["applied"])
+        self.assertEqual(start["mode"], "RUNNING")
+
+        repeated = self.client.post("/api/control", json={"command": "START"}).get_json()
+        self.assertEqual(repeated["status"], "ignored")
+        self.assertFalse(repeated["applied"])
+        self.assertEqual(repeated["mode"], "RUNNING")
+
+        unsupported = self.client.post("/api/control", json={"command": "UNKNOWN"}).get_json()
+        self.assertEqual(unsupported["status"], "ignored")
+        self.assertFalse(unsupported["applied"])
+        self.assertEqual(unsupported["mode"], "RUNNING")
+
+        pause = self.client.post("/api/control", json={"command": "PAUSE"}).get_json()
+        self.assertTrue(pause["applied"])
+        self.assertEqual(pause["mode"], "PAUSED")
 
     def test_export_report_is_an_excel_file(self):
         self.assertEqual(self.client.get("/api/export_report").status_code, 404)  # nothing produced yet
@@ -183,6 +240,47 @@ class DashboardRouteTests(unittest.TestCase):
         ):
             with self.subTest(expected=expected):
                 self.assertIn(expected, html)
+
+    def test_nexus_portfolio_quality_design_is_served_by_the_real_hmi(self):
+        html = self.client.get("/").get_data(as_text=True)
+        self.assertIn("NEXUS / QUALITY INTELLIGENCE", html)
+        self.assertIn('href="/line/static/nexus-premium.css"', html)
+        self.assertIn("PRODUCTION QUALITY KPIs", html)
+        self.assertIn("DIGITAL TWIN", html)
+        self.assertIn("SIMULATED PRODUCTION LINE", html)
+        response = self.client.get("/line/static/nexus-premium.css")
+        self.assertEqual(response.status_code, 200)
+        css = response.get_data(as_text=True)
+        for color in ("#071829", "#4ea8ff", "#8f9bff"):
+            self.assertIn(color, css)
+        self.assertIn("@media (max-width: 780px)", css)
+        self.assertIn("overflow-y: auto !important;", css)
+        self.assertIn("body { display: block !important; }", css)
+        self.assertIn("overflow-x: hidden !important;", css)
+        self.assertIn("prefers-reduced-motion", css)
+        self.assertIn('#status_val[data-state="RUNNING"]', css)
+        self.assertIn('#status_val[data-state="ESTOP"]', css)
+        self.assertIn('.kpi-card:nth-child(5) .kpi-val', css)
+        self.assertIn('statusEl.dataset.state = data.system_mode', html)
+        self.assertIn("dashboardPollInFlight = true", html)
+        self.assertIn("dashboardPollInFlight = false", html)
+        self.assertIn("cache: 'no-store'", html)
+        self.assertIn("esc(log.time)", html)
+        self.assertIn("esc(log.id)", html)
+        self.assertIn('id="profit-chart-empty"', html)
+        self.assertIn("Waiting for the first simulated profit reading", html)
+        self.assertIn("Awaiting simulated production events", html)
+        self.assertIn("profitEmpty.hidden = true", html)
+        self.assertIn('id="nexus-command-status"', html)
+        self.assertIn("if (!response.ok) throw new Error('Control HTTP '", html)
+        self.assertIn("NOT ACCEPTED · CHECK DEMO CONNECTION", html)
+        self.assertIn("lastCommandId", html)
+        self.assertIn("result.status === 'ok' && result.applied === true", html)
+        self.assertIn("NOT APPLIED · CURRENT MODE:", html)
+        self.assertIn("EMERGENCY STOP LATCHED · RESET REQUIRED", html)
+        for id in ("val_oee", "val_profit", "val_total", "val_ok", "val_nok"):
+            self.assertIn(f'id="{id}" data-loading="true">—</div>', html)
+        self.assertIn("removeAttribute('data-loading')", html)
 
     def test_nexus_hmi_stylesheet_is_served(self):
         response = self.client.get("/line/static/line3d.css")

@@ -73,24 +73,28 @@ HTML_TEMPLATE = """
         .kb-box a { color: #a78bfa; } .kb-box .kb-item { margin-bottom: 6px; } .kb-box .kb-note { color: #94a3b8; font-style: italic; }
         .warn-card { border: 1px solid var(--yellow) !important; color: var(--yellow) !important; }
     </style>
+    <link rel="stylesheet" href="/line/static/nexus-premium.css">
 </head>
 <body>
     <header class="hmi-masthead" aria-label="VisionQC quality control dashboard">
         <div class="hmi-brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
         <div class="hmi-brand-copy">
+            <span class="nexus-vq-wordmark">NEXUS / QUALITY INTELLIGENCE</span>
             <strong>Visual QC <em>Control Center</em></strong>
             <small>Computer vision · Steel surface inspection · Digital twin</small>
         </div>
-        <div class="hmi-brand-meta"><span class="hmi-mode-pill">SIMULATED PRODUCTION LINE</span><span class="hmi-keyboard-hint">Operations / Quality Engineering</span></div>
+        <div class="hmi-brand-meta"><span class="hmi-mode-pill">SIMULATED PRODUCTION LINE</span><span class="nexus-vq-meta">VISION INSPECTION / OPERATIONS</span><span class="hmi-keyboard-hint">Operations / Quality Engineering</span></div>
     </header>
+    <div class="nexus-vq-label">01 / PRODUCTION QUALITY KPIs</div>
     <div class="header">
-        <div class="kpi-card" id="oee_card"><div class="kpi-title">Demo OEE · Simulated</div><div class="kpi-val" id="val_oee">0.0%</div></div>
-        <div class="kpi-card"><div class="kpi-title">Status</div><div id="status_val" class="kpi-val" style="color:var(--red)">INIT</div></div>
-        <div class="kpi-card"><div class="kpi-title">Demo Net Profit</div><div class="kpi-val" id="val_profit">$0.00</div></div>
-        <div class="kpi-card"><div class="kpi-title">Total Output</div><div class="kpi-val" id="val_total">0</div></div>
-        <div class="kpi-card"><div class="kpi-title">Yield OK</div><div class="kpi-val" style="color:var(--green)" id="val_ok">0</div></div>
-        <div class="kpi-card"><div class="kpi-title">Yield NOK</div><div class="kpi-val" style="color:var(--red)" id="val_nok">0</div></div>
+        <div class="kpi-card" id="oee_card"><div class="kpi-title">Demo OEE · Simulated</div><div class="kpi-val" id="val_oee" data-loading="true">—</div></div>
+        <div class="kpi-card"><div class="kpi-title">Status</div><div id="status_val" class="kpi-val" data-state="INIT" style="color:var(--purple)">INIT</div></div>
+        <div class="kpi-card"><div class="kpi-title">Demo Net Profit</div><div class="kpi-val" id="val_profit" data-loading="true">—</div></div>
+        <div class="kpi-card"><div class="kpi-title">Total Output</div><div class="kpi-val" id="val_total" data-loading="true">—</div></div>
+        <div class="kpi-card"><div class="kpi-title">Yield OK</div><div class="kpi-val" style="color:var(--green)" id="val_ok" data-loading="true">—</div></div>
+        <div class="kpi-card"><div class="kpi-title">Yield NOK</div><div class="kpi-val" style="color:var(--red)" id="val_nok" data-loading="true">—</div></div>
     </div>
+    <div class="nexus-vq-label nexus-vq-controls-title">02 / LINE OPERATIONS &amp; REPORTING</div>
     <div class="control-bar">
         <button class="btn btn-start" onclick="sendCmd('START')">Start Cycle</button>
         <button class="btn btn-pause" onclick="sendCmd('PAUSE')">Pause System</button>
@@ -102,21 +106,25 @@ HTML_TEMPLATE = """
         <a href="/spc" class="btn btn-case-study">SPC Chart</a>
         <a href="/api/export_report" class="btn btn-export">&#x1F4E5; Export Report</a>
     </div>
+    <div class="nexus-command-status" id="nexus-command-status" data-state="ready" role="status" aria-live="polite">
+      <span class="nexus-command-dot" aria-hidden="true"></span><span id="nexus-command-label">SIMULATED LINE CONTROLS READY</span>
+    </div>
     <div class="data-provenance" role="note" aria-label="Dashboard data provenance">
       <strong>SIMULATED PRODUCTION DATA</strong>
       <span>Line counts, OEE and profit are calculated from the visitor's simulated run. The review queue uses simulated defect events; evaluated NEU-CLS model results are documented separately in the <a href="/case-study">model case study</a>.</span>
       <span id="telemetry-status" role="note" aria-live="off" aria-label="Simulated demo API update status">Awaiting first API response</span>
     </div>
+    <div class="nexus-vq-label nexus-vq-workspace-title">03 / DIGITAL TWIN &amp; QUALITY TELEMETRY</div>
     <div class="main-grid">
         <div class="panel video-box" id="line-twin">
             <div class="twin-loading" id="twin-loading">Loading 3D line…</div>
             <img id="twin-fallback" alt="Simulated 2D inspection camera feed" hidden>
         </div>
         <div class="right-col">
-            <div class="panel profit-sec"><div class="section-header">Simulated Net Profit Trend</div><div class="chart-container"><canvas id="profitChart" role="img" aria-label="Simulated session profit trend in US dollars"></canvas></div></div>
+            <div class="panel profit-sec"><div class="section-header">Simulated Net Profit Trend</div><div class="chart-container"><canvas id="profitChart" role="img" aria-label="Simulated session profit trend in US dollars"></canvas><div class="nexus-chart-empty" id="profit-chart-empty" role="status">Waiting for the first simulated profit reading</div></div></div>
             <div class="panel oee-sec"><div class="section-header">OEE Factors · Simulated Line</div><div class="chart-container"><canvas id="oeeChart" role="img" aria-label="Simulated availability, performance and quality factors as percentages"></canvas></div></div>
             <div class="panel review-sec"><div class="section-header">Review Queue &middot; <a href="/api/review/export.csv" style="color:#a78bfa">corrections CSV</a></div><div class="review-list" id="review-list"><div class="review-empty">No rejected units yet.</div></div></div>
-            <div class="panel log-sec"><div class="section-header">Event Historian</div><div class="log-box"><table class="log-table"><thead><tr><th>Time</th><th>ID</th><th>Result</th></tr></thead><tbody id="log-tbody"></tbody></table></div></div>
+            <div class="panel log-sec"><div class="section-header">Event Historian</div><div class="log-box"><table class="log-table"><thead><tr><th>Time</th><th>ID</th><th>Result</th></tr></thead><tbody id="log-tbody"><tr class="nexus-log-empty"><td colspan="3">Awaiting simulated production events</td></tr></tbody></table></div></div>
         </div>
     </div>
 <script>
@@ -129,21 +137,41 @@ HTML_TEMPLATE = """
             if (typeof Chart === 'undefined') { console.error("Chart.js missing"); return; }
             const chartConfig = (type, color) => ({
                 type: type,
-                data: { labels: [], datasets: [{ data: [], borderColor: color, backgroundColor: color + '22', fill: true, tension: 0.3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3af', font: {size: 10} } } } }
+                data: { labels: [], datasets: [{ data: [], borderColor: color, borderWidth: 2.5,
+                    pointRadius: 0, pointHoverRadius: 4, pointHitRadius: 15,
+                    backgroundColor: color + '22', fill: true, tension: 0.3 }] },
+                options: { responsive: true, maintainAspectRatio: false, animation: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { display: false },
+                        tooltip: { backgroundColor: '#081b31', titleColor: '#f2f8ff',
+                            bodyColor: '#c2d9f1', borderColor: '#38638d', borderWidth: 1, padding: 10 } },
+                    scales: { x: { display: false },
+                        y: { grid: { color: 'rgba(142,185,229,.16)' },
+                             ticks: { color: '#bed0e8', font: {size: 10}, maxTicksLimit: 5 } } } }
             });
             profitChart = new Chart('profitChart', chartConfig('line', '#4ea8ff'));
             oeeChart = new Chart('oeeChart', {
                 type: 'bar',
                 data: { labels: ['Availability', 'Performance', 'Quality'], datasets: [{ data: [0,0,0], backgroundColor: ['#4ea8ff', '#8f9bff', '#f6b95f'] }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { x: { max: 1, ticks: { color: '#94a3af', callback: v => (v*100)+'%' } }, y: { ticks: { color: '#f3f4f6' } } } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    animation: false, plugins: { legend: {display: false},
+                        tooltip: { backgroundColor: '#081b31', titleColor: '#f2f8ff',
+                            bodyColor: '#c2d9f1', borderColor: '#38638d', borderWidth: 1, padding: 10,
+                            callbacks: { label: context => (Number(context.parsed.x) * 100).toFixed(1) + '%' } } },
+                    scales: { x: { min: 0, max: 1, grid: { color: 'rgba(142,185,229,.14)' },
+                             ticks: { color: '#bed0e8', callback: v => (v*100)+'%' } },
+                              y: { grid: { display: false }, ticks: { color: '#e6f1ff' } } } }
             });
         } catch (e) { console.warn("Chart Init Error", e); }
     }
 
     // --- AJAX Veri Çekme (1000ms Loop) ---
+    // Do not render an older API response after a newer polling interval.
+    let dashboardPollInFlight = false;
     function update() {
-        fetch('/api/data')
+        if (dashboardPollInFlight) return;
+        dashboardPollInFlight = true;
+        return fetch('/api/data', { cache: 'no-store' })
             .then(r => {
                 if (!r.ok) return r.text().then(text => { throw new Error(text) });
                 return r.json();
@@ -158,6 +186,7 @@ HTML_TEMPLATE = """
                 const statusEl = document.getElementById('status_val');
                 if(statusEl) {
                     statusEl.textContent = data.system_mode;
+                    statusEl.dataset.state = data.system_mode;
                     statusEl.style.color = data.system_mode === 'RUNNING' ? 'var(--green)' :
                                          (data.system_mode === 'ESTOP' ? 'var(--red)' : 'var(--yellow)');
                 }
@@ -167,6 +196,10 @@ HTML_TEMPLATE = """
                 document.getElementById('val_total').textContent = data.total_units;
                 document.getElementById('val_ok').textContent = data.ok_units;
                 document.getElementById('val_nok').textContent = data.nok_units;
+                // A real zero is displayed only after the first actual demo API response.
+                ['val_oee', 'val_profit', 'val_total', 'val_ok', 'val_nok'].forEach(id => {
+                    document.getElementById(id).removeAttribute('data-loading');
+                });
 
                 const oeeVal = (data.oee * 100).toFixed(1);
                 document.getElementById('val_oee').textContent = oeeVal + '%';
@@ -176,7 +209,9 @@ HTML_TEMPLATE = """
                 // Log Tablosu Güncelleme
                 const tbody = document.getElementById('log-tbody');
                 if(tbody && data.recent_logs) {
-                    tbody.innerHTML = data.recent_logs.map(log => `<tr><td>${log.time}</td><td>${log.id}</td><td class="${log.status=='OK'?'text-ok':'text-fail'}">${log.status}${log.defect ? ' · ' + log.defect.replace(/_/g, ' ') : ''}</td></tr>`).join('');
+                    tbody.innerHTML = data.recent_logs.length
+                        ? data.recent_logs.map(log => `<tr><td>${esc(log.time)}</td><td>${esc(log.id)}</td><td class="${log.status==='OK'?'text-ok':'text-fail'}">${esc(log.status)}${log.defect ? ' · ' + esc(log.defect).replace(/_/g, ' ') : ''}</td></tr>`).join('')
+                        : '<tr class="nexus-log-empty"><td colspan="3">Awaiting simulated production events</td></tr>';
                 }
 
                 // Grafik Güncellemeleri
@@ -185,6 +220,8 @@ HTML_TEMPLATE = """
                     profitChart.data.datasets[0].data.push(data.net_profit);
                     if (profitChart.data.labels.length > 30) { profitChart.data.labels.shift(); profitChart.data.datasets[0].data.shift(); }
                     profitChart.update('none');
+                    const profitEmpty = document.getElementById('profit-chart-empty');
+                    if (profitEmpty) profitEmpty.hidden = true;
                 }
                 if (oeeChart) {
                     oeeChart.data.datasets[0].data = [data.availability, data.performance, data.quality];
@@ -200,17 +237,48 @@ HTML_TEMPLATE = """
                 const statusEl = document.getElementById('status_val');
                 if(statusEl && statusEl.textContent !== "SERVER ERR") {
                     statusEl.textContent = "SERVER ERR";
+                    statusEl.dataset.state = "SERVER_ERR";
                     statusEl.style.color = "var(--red)";
                 }
+            }).finally(() => {
+                dashboardPollInFlight = false;
             });
     }
 
-    function sendCmd(cmd) {
-        fetch('/api/control', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({command: cmd})
-        }).then(() => setTimeout(update, 50));
+    // Commands control a simulation. A request in flight is not confirmation
+    // that a command was actually accepted by the backend.
+    let lastCommandId = 0;
+    async function sendCmd(cmd) {
+        const requestId = ++lastCommandId;
+        const indicator = document.getElementById('nexus-command-status');
+        const label = document.getElementById('nexus-command-label');
+        const setStatus = (state, text) => {
+            if (requestId !== lastCommandId) return;
+            if (indicator) indicator.dataset.state = state;
+            if (label) label.textContent = text;
+        };
+        setStatus('pending', 'SENDING ' + cmd + ' · SIMULATED LINE');
+        try {
+            const response = await fetch('/api/control', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                cache: 'no-store',
+                body: JSON.stringify({command: cmd})
+            });
+            if (!response.ok) throw new Error('Control HTTP ' + response.status);
+            const result = await response.json();
+            if (result.status === 'ok' && result.applied === true) {
+                setStatus('accepted', cmd + ' APPLIED TO SIMULATED LINE');
+            } else if (result.mode === 'ESTOP' && cmd === 'START') {
+                setStatus('ignored', 'EMERGENCY STOP LATCHED · RESET REQUIRED');
+            } else {
+                setStatus('ignored', cmd + ' NOT APPLIED · CURRENT MODE: ' + String(result.mode || 'UNKNOWN'));
+            }
+            setTimeout(update, 50);
+        } catch (error) {
+            console.error('Simulated command failed:', error);
+            setStatus('error', cmd + ' NOT ACCEPTED · CHECK DEMO CONNECTION');
+        }
     }
 
     // 3D hat ikizi yüklenemezse (WebGL yok / CDN erişilemiyor) eski 2D kamera akışına düş.

@@ -59,9 +59,20 @@ def add_security_headers(response):
 @app.route('/api/control', methods=['POST'])
 def control():
     """HMI butonlarından gelen komutları işler (yalnızca bu ziyaretçinin hattını etkiler)."""
-    command = (request.get_json(silent=True) or {}).get('command')
-    session["line"] = line_sim.apply_command(line_state(), command, time.time())
-    return jsonify({"status": "ok"})
+    payload = request.get_json(silent=True)
+    command = payload.get("command") if isinstance(payload, dict) else None
+    allowed = {"START", "PAUSE", "RESET", "ESTOP", "SIMULATE_FAIL"}
+    if not isinstance(command, str) or command not in allowed:
+        # Retain HTTP 200 for the historical no-body integration contract,
+        # but never imply that an unknown command changed the simulation.
+        return jsonify({"status": "ignored", "applied": False, "mode": line_state()["mode"]})
+
+    previous = line_state()
+    updated = line_sim.apply_command(previous, command, time.time())
+    applied = updated != previous
+    if applied:
+        session["line"] = updated
+    return jsonify({"status": "ok" if applied else "ignored", "applied": applied, "mode": updated["mode"]})
 
 
 @app.route('/api/data')

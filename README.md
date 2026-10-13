@@ -346,6 +346,22 @@ pip install torch torchvision onnx onnxscript -r requirements-serve.txt && pytho
 
 ---
 
+### CI-free HMI browser acceptance
+
+The opt-in [real-browser smoke suite](tests/e2e/test_smoke.py) exercises actual simulated line commands, the latched emergency stop, the 3D twin, analytics charts, the event historian, Excel export and the 375px mobile layout. It can save **real Chromium screenshots**, not illustrations, from a locally running Flask server.
+
+After starting `python main.py` and installing Playwright/Chromium locally:
+
+```bash
+python -m pip install playwright
+python -m playwright install chromium
+E2E_BASE_URL=http://127.0.0.1:8080 E2E_SCREENSHOT_DIR=artifacts/hmi-browser python -m unittest discover -s tests/e2e -p 'test_smoke.py' -v
+```
+
+The optional capture files are `visual-qc-desktop-1440.png` (line running after a simulated rejection) and `visual-qc-mobile-375.png` (reachable twin, charts and historian). This procedure does not enable or trigger hosted CI. No screenshot or full browser-test success is claimed until an actual run is performed and the captures are inspected. Confirm Vercel preview and production revisions separately before merging this draft or changing published imagery.
+
+---
+
 ## Proof Surfaces
 
 | Document | Contents |
