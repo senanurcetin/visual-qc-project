@@ -87,12 +87,12 @@ HTML_TEMPLATE = """
     </header>
     <div class="nexus-vq-label">01 / PRODUCTION QUALITY KPIs</div>
     <div class="header">
-        <div class="kpi-card" id="oee_card"><div class="kpi-title">Demo OEE · Simulated</div><div class="kpi-val" id="val_oee">0.0%</div></div>
+        <div class="kpi-card" id="oee_card"><div class="kpi-title">Demo OEE · Simulated</div><div class="kpi-val" id="val_oee" data-loading="true">—</div></div>
         <div class="kpi-card"><div class="kpi-title">Status</div><div id="status_val" class="kpi-val" data-state="INIT" style="color:var(--purple)">INIT</div></div>
-        <div class="kpi-card"><div class="kpi-title">Demo Net Profit</div><div class="kpi-val" id="val_profit">$0.00</div></div>
-        <div class="kpi-card"><div class="kpi-title">Total Output</div><div class="kpi-val" id="val_total">0</div></div>
-        <div class="kpi-card"><div class="kpi-title">Yield OK</div><div class="kpi-val" style="color:var(--green)" id="val_ok">0</div></div>
-        <div class="kpi-card"><div class="kpi-title">Yield NOK</div><div class="kpi-val" style="color:var(--red)" id="val_nok">0</div></div>
+        <div class="kpi-card"><div class="kpi-title">Demo Net Profit</div><div class="kpi-val" id="val_profit" data-loading="true">—</div></div>
+        <div class="kpi-card"><div class="kpi-title">Total Output</div><div class="kpi-val" id="val_total" data-loading="true">—</div></div>
+        <div class="kpi-card"><div class="kpi-title">Yield OK</div><div class="kpi-val" style="color:var(--green)" id="val_ok" data-loading="true">—</div></div>
+        <div class="kpi-card"><div class="kpi-title">Yield NOK</div><div class="kpi-val" style="color:var(--red)" id="val_nok" data-loading="true">—</div></div>
     </div>
     <div class="nexus-vq-label nexus-vq-controls-title">02 / LINE OPERATIONS &amp; REPORTING</div>
     <div class="control-bar">
@@ -193,6 +193,10 @@ HTML_TEMPLATE = """
                 document.getElementById('val_total').textContent = data.total_units;
                 document.getElementById('val_ok').textContent = data.ok_units;
                 document.getElementById('val_nok').textContent = data.nok_units;
+                // A real zero is displayed only after the first actual demo API response.
+                ['val_oee', 'val_profit', 'val_total', 'val_ok', 'val_nok'].forEach(id => {
+                    document.getElementById(id).removeAttribute('data-loading');
+                });
 
                 const oeeVal = (data.oee * 100).toFixed(1);
                 document.getElementById('val_oee').textContent = oeeVal + '%';

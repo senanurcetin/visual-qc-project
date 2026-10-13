@@ -208,3 +208,10 @@ body {
 @media (max-width:780px) {
   .nexus-chart-empty { font-size:.69rem; }
 }
+
+/* Cold-load values are not zero until the simulation confirms them. */
+.kpi-card .kpi-val[data-loading="true"] {
+  color:#a9c2df!important; font-weight:500;
+  font-size:clamp(1.4rem,1.7vw,1.8rem)!important;
+  letter-spacing:.015em; opacity:.86;
+}
