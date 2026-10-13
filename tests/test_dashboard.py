@@ -214,6 +214,10 @@ class DashboardRouteTests(unittest.TestCase):
         self.assertIn("Waiting for the first simulated profit reading", html)
         self.assertIn("Awaiting simulated production events", html)
         self.assertIn("profitEmpty.hidden = true", html)
+        self.assertIn('id="nexus-command-status"', html)
+        self.assertIn("if (!response.ok) throw new Error('Control HTTP '", html)
+        self.assertIn("NOT ACCEPTED · CHECK DEMO CONNECTION", html)
+        self.assertIn("lastCommandId", html)
         for id in ("val_oee", "val_profit", "val_total", "val_ok", "val_nok"):
             self.assertIn(f'id="{id}" data-loading="true">—</div>', html)
         self.assertIn("removeAttribute('data-loading')", html)

@@ -106,6 +106,9 @@ HTML_TEMPLATE = """
         <a href="/spc" class="btn btn-case-study">SPC Chart</a>
         <a href="/api/export_report" class="btn btn-export">&#x1F4E5; Export Report</a>
     </div>
+    <div class="nexus-command-status" id="nexus-command-status" data-state="ready" role="status" aria-live="polite">
+      <span class="nexus-command-dot" aria-hidden="true"></span><span id="nexus-command-label">SIMULATED LINE CONTROLS READY</span>
+    </div>
     <div class="data-provenance" role="note" aria-label="Dashboard data provenance">
       <strong>SIMULATED PRODUCTION DATA</strong>
       <span>Line counts, OEE and profit are calculated from the visitor's simulated run. The review queue uses simulated defect events; evaluated NEU-CLS model results are documented separately in the <a href="/case-study">model case study</a>.</span>
@@ -242,12 +245,33 @@ HTML_TEMPLATE = """
             });
     }
 
-    function sendCmd(cmd) {
-        fetch('/api/control', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({command: cmd})
-        }).then(() => setTimeout(update, 50));
+    // Commands control a simulation. A request in flight is not confirmation
+    // that a command was actually accepted by the backend.
+    let lastCommandId = 0;
+    async function sendCmd(cmd) {
+        const requestId = ++lastCommandId;
+        const indicator = document.getElementById('nexus-command-status');
+        const label = document.getElementById('nexus-command-label');
+        const setStatus = (state, text) => {
+            if (requestId !== lastCommandId) return;
+            if (indicator) indicator.dataset.state = state;
+            if (label) label.textContent = text;
+        };
+        setStatus('pending', 'SENDING ' + cmd + ' · SIMULATED LINE');
+        try {
+            const response = await fetch('/api/control', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                cache: 'no-store',
+                body: JSON.stringify({command: cmd})
+            });
+            if (!response.ok) throw new Error('Control HTTP ' + response.status);
+            setStatus('accepted', cmd + ' ACCEPTED BY DEMO API');
+            setTimeout(update, 50);
+        } catch (error) {
+            console.error('Simulated command failed:', error);
+            setStatus('error', cmd + ' NOT ACCEPTED · CHECK DEMO CONNECTION');
+        }
     }
 
     // 3D hat ikizi yüklenemezse (WebGL yok / CDN erişilemiyor) eski 2D kamera akışına düş.
