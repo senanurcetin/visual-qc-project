@@ -1,0 +1,154 @@
+/* NEXUS / Visual QC — portfolio-grade styling of the ACTUAL simulation HMI.
+   Overrides the legacy illustration palette; never changes unit/defect values. */
+:root {
+  --bg: #071829 !important;
+  --card: #10263d !important;
+  --border: #294767 !important;
+  --text: #eff5ff !important;
+  --blue: #4ea8ff !important;
+  --purple: #8f9bff !important;
+  --teal: #487fd8 !important;
+}
+body {
+  background: radial-gradient(ellipse at 86% 2%, rgba(78,168,255,.12), transparent 40%),
+              radial-gradient(ellipse at 13% 97%, rgba(143,155,255,.07), transparent 42%),
+              #071829 !important;
+}
+.hmi-masthead {
+  min-height: 86px;
+  padding: 15px 24px;
+  background: linear-gradient(108deg, #0b2440 0%, #133452 52%, #0c2039 100%) !important;
+  border-bottom: 1px solid #31577b !important;
+  box-shadow: 0 18px 34px rgba(0,7,21,.19);
+}
+.hmi-brand-mark {
+  border: 1px solid #5b86b5 !important;
+  background: #163b60 !important;
+  border-radius: 12px;
+}
+.hmi-brand-mark span { border-color: #8f9bff !important; }
+.nexus-vq-wordmark {
+  color: #83c4ff;
+  font-size: .66rem;
+  font-weight: 780;
+  letter-spacing: .21em;
+  line-height: 1.4;
+}
+.hmi-brand-copy strong { font-size: clamp(1.13rem, 1.8vw, 1.52rem) !important; letter-spacing: -.035em; }
+.hmi-brand-copy em { color: #a9b4ff !important; }
+.hmi-brand-copy small { font-size: .73rem; color: #bfd5eb !important; }
+.hmi-brand-meta { gap: 7px; }
+.hmi-mode-pill {
+  background: rgba(8,35,64,.78) !important;
+  color: #c8e4ff !important;
+  border: 1px solid #3a729f !important;
+  border-radius: 7px !important;
+}
+.nexus-vq-meta { color: #8db7db; font-size: .64rem; letter-spacing: .1em; font-weight: 680; }
+.nexus-vq-label {
+  flex-shrink: 0;
+  padding: 11px 23px 3px;
+  background: #0b2037;
+  color: #95c9ff;
+  font-size: .65rem;
+  font-weight: 760;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.nexus-vq-controls-title { background: #0b2037; }
+.nexus-vq-workspace-title { background: #071829; padding-top: 9px; }
+.header {
+  background: #0b2037 !important;
+  gap: 10px !important;
+  padding: 10px 20px 15px !important;
+}
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  background: linear-gradient(140deg, #163654 0%, #0e2843 100%) !important;
+  border: 1px solid #315575 !important;
+  border-top: 2px solid #4ea8ff !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 27px rgba(2,9,25,.24), inset 0 1px 0 rgba(170,209,248,.07);
+  padding: 12px 15px !important;
+}
+.kpi-card:nth-child(2) { border-top-color: #8f9bff !important; }
+.kpi-card:nth-child(5) { border-top-color: #43c99d !important; }
+.kpi-card:nth-child(6) { border-top-color: #f37a88 !important; }
+.kpi-card::after { background: none !important; }
+.kpi-title { color: #b4cbe5 !important; font-size: .67rem !important; font-weight: 700 !important; letter-spacing: .045em; }
+.kpi-val { color: #f3f8ff !important; font-size: clamp(1.12rem, 1.6vw, 1.68rem) !important; font-weight: 600; font-variant-numeric: tabular-nums; }
+#status_val { color: #b5c2ff !important; }
+#status_val[style*="--red"] { color: #f37a88 !important; }
+#status_val[style*="--green"] { color: #43c99d !important; }
+.control-bar {
+  background: #0b2037 !important;
+  border-bottom: 1px solid #294767 !important;
+  gap: 9px !important;
+  padding: 8px 20px 15px !important;
+}
+.control-bar .btn {
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #375c7e !important;
+  border-bottom-width: 1px !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 1px rgba(241,247,255,.09), 0 6px 12px rgba(0,10,25,.14) !important;
+  font-size: .72rem !important;
+  font-weight: 730;
+  letter-spacing: .055em;
+}
+.btn-start { background: #13634f !important; }
+.btn-pause { background: #745321 !important; }
+.btn-reset, .btn-case-study { background: #24548a !important; }
+.btn-estop { background: #8d3042 !important; }
+.btn-sim-fail { background: #54449a !important; }
+.btn-rag { background: #454786 !important; }
+.btn-export { background: #265fa2 !important; }
+.main-grid { gap: 13px !important; padding: 11px 20px 17px !important; }
+.panel, .right-col {
+  border: 1px solid #315575 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 15px 36px rgba(0,9,24,.21);
+}
+.right-col { background: #0b243d !important; gap: 10px !important; }
+#line-twin { border-color: #416489 !important; background: #061426; }
+.twin-chip { border-color: #3c729a !important; background: rgba(5,19,36,.88) !important; }
+.section-header {
+  color: #e3f0ff !important;
+  background: #163756 !important;
+  border-bottom: 1px solid #315575 !important;
+  padding: 9px 12px !important;
+  font-size: .7rem !important;
+  letter-spacing: .085em !important;
+}
+.chart-container { padding: 9px 13px; min-height: 110px; }
+.log-table th { background: #163655 !important; color: #c9dff7 !important; }
+.log-table td { border-bottom-color: #294767 !important; }
+.log-table tr:hover td { background: rgba(78,168,255,.095) !important; }
+.log-box { scrollbar-color: #315e89 #10243b; }
+.review-row { border-color: #294767 !important; }
+.data-provenance { background: #0b2037; border-bottom: 1px solid #294767; }
+.data-provenance strong { color: #f6b95f; }
+.data-provenance a { color: #9cccff; }
+.btn:focus-visible, a:focus-visible { outline: 2px solid #4ea8ff !important; outline-offset: 3px; }
+@media (max-width: 1120px) {
+  .hmi-masthead { padding: 12px 15px; }
+  .header { grid-template-columns: repeat(3,minmax(0,1fr)) !important; }
+  .main-grid { grid-template-columns: minmax(0,1fr) minmax(300px,.9fr); }
+}
+@media (max-width: 780px) {
+  .nexus-vq-label { padding: 10px 12px 4px; }
+  .hmi-masthead { padding: 12px; }
+  .header { grid-template-columns: repeat(2,minmax(0,1fr)) !important; padding: 9px 11px 13px !important; }
+  .control-bar { grid-template-columns: repeat(2,minmax(0,1fr)) !important; padding: 8px 11px 13px !important; }
+  .main-grid { display: flex !important; flex-direction: column !important; padding: 10px 11px 20px !important; }
+  #line-twin { height: min(60vh, 530px); min-height: 370px; }
+  .right-col { padding: 9px !important; }
+  .chart-container { min-height: 155px; }
+  .log-sec { min-height: 200px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .control-bar .btn { transition: none !important; }
+}

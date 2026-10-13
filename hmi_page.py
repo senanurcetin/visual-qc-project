@@ -73,24 +73,28 @@ HTML_TEMPLATE = """
         .kb-box a { color: #a78bfa; } .kb-box .kb-item { margin-bottom: 6px; } .kb-box .kb-note { color: #94a3b8; font-style: italic; }
         .warn-card { border: 1px solid var(--yellow) !important; color: var(--yellow) !important; }
     </style>
+    <link rel="stylesheet" href="/line/static/nexus-premium.css">
 </head>
 <body>
     <header class="hmi-masthead" aria-label="VisionQC quality control dashboard">
         <div class="hmi-brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
         <div class="hmi-brand-copy">
+            <span class="nexus-vq-wordmark">NEXUS / QUALITY INTELLIGENCE</span>
             <strong>Visual QC <em>Control Center</em></strong>
             <small>Computer vision · Steel surface inspection · Digital twin</small>
         </div>
-        <div class="hmi-brand-meta"><span class="hmi-mode-pill">SIMULATED PRODUCTION LINE</span><span class="hmi-keyboard-hint">Operations / Quality Engineering</span></div>
+        <div class="hmi-brand-meta"><span class="hmi-mode-pill">SIMULATED PRODUCTION LINE</span><span class="nexus-vq-meta">VISION INSPECTION / OPERATIONS</span><span class="hmi-keyboard-hint">Operations / Quality Engineering</span></div>
     </header>
+    <div class="nexus-vq-label">01 / PRODUCTION QUALITY KPIs</div>
     <div class="header">
         <div class="kpi-card" id="oee_card"><div class="kpi-title">Demo OEE · Simulated</div><div class="kpi-val" id="val_oee">0.0%</div></div>
-        <div class="kpi-card"><div class="kpi-title">Status</div><div id="status_val" class="kpi-val" style="color:var(--red)">INIT</div></div>
+        <div class="kpi-card"><div class="kpi-title">Status</div><div id="status_val" class="kpi-val" style="color:var(--purple)">INIT</div></div>
         <div class="kpi-card"><div class="kpi-title">Demo Net Profit</div><div class="kpi-val" id="val_profit">$0.00</div></div>
         <div class="kpi-card"><div class="kpi-title">Total Output</div><div class="kpi-val" id="val_total">0</div></div>
         <div class="kpi-card"><div class="kpi-title">Yield OK</div><div class="kpi-val" style="color:var(--green)" id="val_ok">0</div></div>
         <div class="kpi-card"><div class="kpi-title">Yield NOK</div><div class="kpi-val" style="color:var(--red)" id="val_nok">0</div></div>
     </div>
+    <div class="nexus-vq-label nexus-vq-controls-title">02 / LINE OPERATIONS &amp; REPORTING</div>
     <div class="control-bar">
         <button class="btn btn-start" onclick="sendCmd('START')">Start Cycle</button>
         <button class="btn btn-pause" onclick="sendCmd('PAUSE')">Pause System</button>
@@ -107,6 +111,7 @@ HTML_TEMPLATE = """
       <span>Line counts, OEE and profit are calculated from the visitor's simulated run. The review queue uses simulated defect events; evaluated NEU-CLS model results are documented separately in the <a href="/case-study">model case study</a>.</span>
       <span id="telemetry-status" role="note" aria-live="off" aria-label="Simulated demo API update status">Awaiting first API response</span>
     </div>
+    <div class="nexus-vq-label nexus-vq-workspace-title">03 / DIGITAL TWIN &amp; QUALITY TELEMETRY</div>
     <div class="main-grid">
         <div class="panel video-box" id="line-twin">
             <div class="twin-loading" id="twin-loading">Loading 3D line…</div>

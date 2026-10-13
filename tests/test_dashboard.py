@@ -184,6 +184,21 @@ class DashboardRouteTests(unittest.TestCase):
             with self.subTest(expected=expected):
                 self.assertIn(expected, html)
 
+    def test_nexus_portfolio_quality_design_is_served_by_the_real_hmi(self):
+        html = self.client.get("/").get_data(as_text=True)
+        self.assertIn("NEXUS / QUALITY INTELLIGENCE", html)
+        self.assertIn('href="/line/static/nexus-premium.css"', html)
+        self.assertIn("PRODUCTION QUALITY KPIs", html)
+        self.assertIn("DIGITAL TWIN", html)
+        self.assertIn("SIMULATED PRODUCTION LINE", html)
+        response = self.client.get("/line/static/nexus-premium.css")
+        self.assertEqual(response.status_code, 200)
+        css = response.get_data(as_text=True)
+        for color in ("#071829", "#4ea8ff", "#8f9bff"):
+            self.assertIn(color, css)
+        self.assertIn("@media (max-width: 780px)", css)
+        self.assertIn("prefers-reduced-motion", css)
+
     def test_nexus_hmi_stylesheet_is_served(self):
         response = self.client.get("/line/static/line3d.css")
         self.assertEqual(response.status_code, 200)
