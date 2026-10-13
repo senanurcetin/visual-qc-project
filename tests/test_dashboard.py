@@ -197,6 +197,9 @@ class DashboardRouteTests(unittest.TestCase):
         for color in ("#071829", "#4ea8ff", "#8f9bff"):
             self.assertIn(color, css)
         self.assertIn("@media (max-width: 780px)", css)
+        self.assertIn("overflow-y: auto !important;", css)
+        self.assertIn("body { display: block !important; }", css)
+        self.assertIn("overflow-x: hidden !important;", css)
         self.assertIn("prefers-reduced-motion", css)
         self.assertIn('#status_val[data-state="RUNNING"]', css)
         self.assertIn('#status_val[data-state="ESTOP"]', css)
