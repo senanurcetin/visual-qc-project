@@ -237,3 +237,18 @@ body {
 /* A valid request can be an explicit no-op: no green acceptance claim. */
 .nexus-command-status[data-state="ignored"] { color:#f9cf89; }
 .nexus-command-status[data-state="ignored"] .nexus-command-dot { background:#f6b95f; }
+
+/* Presentation acceptance: technical metadata must remain legible in
+   genuine dashboard captures rather than requiring zoom. */
+.nexus-vq-wordmark { font-size:.75rem; letter-spacing:.16em; }
+.nexus-vq-meta { font-size:.72rem; line-height:1.55; }
+.nexus-vq-label { font-size:.73rem; line-height:1.55; }
+.kpi-title { font-size:.76rem!important; line-height:1.45; }
+.nexus-command-status { font-size:.72rem; letter-spacing:.065em; line-height:1.5; }
+.nexus-chart-empty { font-size:.78rem; }
+.nexus-log-empty td { font-size:.76rem; }
+@media(max-width:780px) {
+  .nexus-vq-wordmark { font-size:.72rem; }
+  .nexus-vq-meta,.nexus-vq-label { font-size:.7rem; }
+  .nexus-command-status { font-size:.7rem; }
+}
