@@ -87,6 +87,17 @@ class BrowserSmokeTests(unittest.TestCase):
             item = page.locator(selector)
             item.scroll_into_view_if_needed()
             self.assertTrue(item.is_visible(), selector)
+        # The two HUD chips must not cover each other at 375px.
+        page.locator('.twin-tl').wait_for(timeout=15000)
+        title_bounds = page.locator('.twin-tl').bounding_box()
+        status_bounds = page.locator('.twin-tr').bounding_box()
+        self.assertIsNotNone(title_bounds)
+        self.assertIsNotNone(status_bounds)
+        self.assertLessEqual(title_bounds['y'] + title_bounds['height'], status_bounds['y'] + 1)
+        page.get_by_role('button', name='Start Cycle').click()
+        page.wait_for_function("document.getElementById('status_val').textContent === 'RUNNING'", timeout=7000)
+        page.wait_for_function("Number(document.getElementById('val_total').textContent) >= 1", timeout=15000)
+        page.evaluate('window.scrollTo(0,0)')
         self.assertEqual(self.errors, [])
 
         # Optional real screenshots (not generated artwork). Disabled unless a
