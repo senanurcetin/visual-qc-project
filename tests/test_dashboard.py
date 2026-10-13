@@ -198,6 +198,10 @@ class DashboardRouteTests(unittest.TestCase):
             self.assertIn(color, css)
         self.assertIn("@media (max-width: 780px)", css)
         self.assertIn("prefers-reduced-motion", css)
+        self.assertIn('#status_val[data-state="RUNNING"]', css)
+        self.assertIn('#status_val[data-state="ESTOP"]', css)
+        self.assertIn('.kpi-card:nth-child(5) .kpi-val', css)
+        self.assertIn('statusEl.dataset.state = data.system_mode', html)
 
     def test_nexus_hmi_stylesheet_is_served(self):
         response = self.client.get("/line/static/line3d.css")

@@ -160,3 +160,24 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .control-bar .btn { transition: none !important; }
 }
+
+/* Semantic colors must survive KPI and inline-state overrides. */
+.kpi-card:nth-child(5) .kpi-val { color:#7de7bb!important; }
+.kpi-card:nth-child(6) .kpi-val { color:#ffa9b5!important; }
+#status_val[data-state="INIT"] { color:#b5c2ff!important; }
+#status_val[data-state="RUNNING"] { color:#7de7bb!important; }
+#status_val[data-state="ESTOP"], #status_val[data-state="SERVER_ERR"] {
+  color:#ffa9b5!important;
+}
+#status_val[data-state="PAUSED"], #status_val[data-state="IDLE"] {
+  color:#f6cc87!important;
+}
+.review-row button:focus-visible, .review-row select:focus-visible {
+  outline:2px solid #4ea8ff;
+  outline-offset:2px;
+}
+@media (hover:hover) {
+  .kpi-card { transition:border-color .18s,box-shadow .18s; }
+  .kpi-card:hover { border-color:#5183b5!important;box-shadow:0 16px 35px rgba(0,9,25,.3); }
+}
+@media (prefers-reduced-motion: reduce) { .kpi-card { transition:none; } }

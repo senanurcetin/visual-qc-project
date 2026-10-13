@@ -88,7 +88,7 @@ HTML_TEMPLATE = """
     <div class="nexus-vq-label">01 / PRODUCTION QUALITY KPIs</div>
     <div class="header">
         <div class="kpi-card" id="oee_card"><div class="kpi-title">Demo OEE · Simulated</div><div class="kpi-val" id="val_oee">0.0%</div></div>
-        <div class="kpi-card"><div class="kpi-title">Status</div><div id="status_val" class="kpi-val" style="color:var(--purple)">INIT</div></div>
+        <div class="kpi-card"><div class="kpi-title">Status</div><div id="status_val" class="kpi-val" data-state="INIT" style="color:var(--purple)">INIT</div></div>
         <div class="kpi-card"><div class="kpi-title">Demo Net Profit</div><div class="kpi-val" id="val_profit">$0.00</div></div>
         <div class="kpi-card"><div class="kpi-title">Total Output</div><div class="kpi-val" id="val_total">0</div></div>
         <div class="kpi-card"><div class="kpi-title">Yield OK</div><div class="kpi-val" style="color:var(--green)" id="val_ok">0</div></div>
@@ -134,14 +134,30 @@ HTML_TEMPLATE = """
             if (typeof Chart === 'undefined') { console.error("Chart.js missing"); return; }
             const chartConfig = (type, color) => ({
                 type: type,
-                data: { labels: [], datasets: [{ data: [], borderColor: color, backgroundColor: color + '22', fill: true, tension: 0.3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: '#334155' }, ticks: { color: '#94a3af', font: {size: 10} } } } }
+                data: { labels: [], datasets: [{ data: [], borderColor: color, borderWidth: 2.5,
+                    pointRadius: 0, pointHoverRadius: 4, pointHitRadius: 15,
+                    backgroundColor: color + '22', fill: true, tension: 0.3 }] },
+                options: { responsive: true, maintainAspectRatio: false, animation: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { display: false },
+                        tooltip: { backgroundColor: '#081b31', titleColor: '#f2f8ff',
+                            bodyColor: '#c2d9f1', borderColor: '#38638d', borderWidth: 1, padding: 10 } },
+                    scales: { x: { display: false },
+                        y: { grid: { color: 'rgba(142,185,229,.16)' },
+                             ticks: { color: '#bed0e8', font: {size: 10}, maxTicksLimit: 5 } } } }
             });
             profitChart = new Chart('profitChart', chartConfig('line', '#4ea8ff'));
             oeeChart = new Chart('oeeChart', {
                 type: 'bar',
                 data: { labels: ['Availability', 'Performance', 'Quality'], datasets: [{ data: [0,0,0], backgroundColor: ['#4ea8ff', '#8f9bff', '#f6b95f'] }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { x: { max: 1, ticks: { color: '#94a3af', callback: v => (v*100)+'%' } }, y: { ticks: { color: '#f3f4f6' } } } }
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    animation: false, plugins: { legend: {display: false},
+                        tooltip: { backgroundColor: '#081b31', titleColor: '#f2f8ff',
+                            bodyColor: '#c2d9f1', borderColor: '#38638d', borderWidth: 1, padding: 10,
+                            callbacks: { label: context => (Number(context.parsed.x) * 100).toFixed(1) + '%' } } },
+                    scales: { x: { min: 0, max: 1, grid: { color: 'rgba(142,185,229,.14)' },
+                             ticks: { color: '#bed0e8', callback: v => (v*100)+'%' } },
+                              y: { grid: { display: false }, ticks: { color: '#e6f1ff' } } } }
             });
         } catch (e) { console.warn("Chart Init Error", e); }
     }
@@ -163,6 +179,7 @@ HTML_TEMPLATE = """
                 const statusEl = document.getElementById('status_val');
                 if(statusEl) {
                     statusEl.textContent = data.system_mode;
+                    statusEl.dataset.state = data.system_mode;
                     statusEl.style.color = data.system_mode === 'RUNNING' ? 'var(--green)' :
                                          (data.system_mode === 'ESTOP' ? 'var(--red)' : 'var(--yellow)');
                 }
@@ -205,6 +222,7 @@ HTML_TEMPLATE = """
                 const statusEl = document.getElementById('status_val');
                 if(statusEl && statusEl.textContent !== "SERVER ERR") {
                     statusEl.textContent = "SERVER ERR";
+                    statusEl.dataset.state = "SERVER_ERR";
                     statusEl.style.color = "var(--red)";
                 }
             });
