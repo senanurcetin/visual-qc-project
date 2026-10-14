@@ -1,5 +1,9 @@
 # Visual QC — QA acceptance (2026-10-14)
 
+> **Release outcome — 14 October 2026:** PR #46 merged to `main` as `e431433`. CircleCI Python/PostgreSQL validation **#10 passed**; the HMI subsequently passed **6/6 actual Vercel production Chromium E2E tests**. Production screenshot PR #47 and README documentation correction PR #48 also merged; the screenshot commit `676dbc3` was deployed READY. The *proposed PR*, *must run CI* and *merge only after* instructions below describe the **earlier release gate**, not an outstanding blocker for PR #46. The five local test skips (four database-backed, one CNN training-dependent) were not counted as passing; PostgreSQL integration was tested separately in CI.
+
+---
+
 ## Proposed PR
 - PR #46: fix deterministic Python test discovery and release OpenCV temporary video handles
 - Branch: `fix/test-discovery-imports-20261014`
