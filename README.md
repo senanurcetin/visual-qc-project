@@ -1,8 +1,8 @@
 # Visual QC Project
 
-![Visual QC quality inspection workflow illustration](docs/assets/visual-qc-overview.svg)
+![Visual QC production HMI: simulated line running, digital twin, quality KPIs and defect event (real browser capture)](docs/assets/visual-qc-dashboard.png)
 
-> Editorial workflow diagram, not a captured model decision. For actual application evidence and measured performance, see the [live dashboard](https://visual-qc-project-pearl.vercel.app) and the original screenshots and evaluation charts below.
+> **Real production screenshot (14 October 2026):** recorded during a successful Chromium E2E test of the Vercel operator HMI. It shows a **simulated** production line and observed simulated defect, not actual factory production. The independent measured CV model charts below remain unchanged. [Capture provenance](docs/assets/production_screenshot_provenance_20261014.json).
 
 **Quality checks:** [CircleCI — Python/PostgreSQL validation](https://circleci.com/gh/senanurcetin/visual-qc-project/5) · GitHub Actions are not the current automatic CI provider.
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
@@ -18,7 +18,7 @@ Portfolio entry: [senanur-cetin.vercel.app/projects/visual-qc-project](https://s
 
 Short video: [`docs/assets/visual-qc-dashboard.webm`](docs/assets/visual-qc-dashboard.webm)
 
-![Visual QC dashboard](docs/assets/visual-qc-dashboard.png)
+![Visual QC production operator dashboard on 375px mobile viewport](docs/assets/visual-qc-mobile-375.png)
 
 ---
 
@@ -33,7 +33,7 @@ The Flask HMI serves **[Download session report (XLSX)](https://visual-qc-projec
 - **Evidence scope:** the yellow header states **SIMULATED DEMO / NOT REAL PLANT DATA**. These measurements describe a visitor's deterministic factory-line simulation, **not** an actual plant or independently benchmarked NEU-CLS classifier performance.
 - **Empty session:** export returns 404 until simulated units are completed; it does not invent historical plant records.
 
-**Release note:** source changes and tests must pass CircleCI, and the updated Vercel deployment must be confirmed before claiming this revised workbook is available in the public demo. Existing README screenshot/video assets predate this workbook design and are not presented as new captures.
+**Release note:** source changes and tests must pass CircleCI, and the updated Vercel deployment must be confirmed before claiming this revised workbook is available in the public demo. README HMI screenshots are actual production browser captures dated 14 October 2026; the linked WebM video remains a historical recording. Screenshots do not by themselves verify workbook internals.
 
 ---
 
@@ -176,6 +176,10 @@ Reviewing the top 20% highest-entropy samples captures 82% of the classifier's m
 ---
 
 ## AI Engineering Layer — Steel QC Knowledge Assistant (RAG)
+
+![Actual production Visual QC RAG interface (Chromium screenshot)](docs/assets/visual-qc-rag.png)
+
+*Captured from the deployed /rag interface; retrieval and model quality are evaluated separately below.*
 
 ![Embedding map](docs/assets/rag-embedding-map.png)
 
@@ -358,7 +362,7 @@ python -m playwright install chromium
 E2E_BASE_URL=http://127.0.0.1:8080 E2E_SCREENSHOT_DIR=artifacts/hmi-browser python -m unittest discover -s tests/e2e -p 'test_smoke.py' -v
 ```
 
-The optional capture files are `visual-qc-desktop-1440.png` (line running after a simulated rejection) and `visual-qc-mobile-375.png` (reachable twin, charts and historian). This procedure does not enable or trigger hosted CI. No screenshot or full browser-test success is claimed until an actual run is performed and the captures are inspected. Confirm Vercel preview and production revisions separately before merging this draft or changing published imagery.
+The optional capture files are `visual-qc-desktop-1440.png` (line running after a simulated rejection) and `visual-qc-mobile-375.png` (reachable twin, charts and historian). This procedure does not enable or trigger hosted CI. Real production Chromium screenshots and a 6/6 production E2E run were recorded on 14 October 2026. Confirm Vercel preview and production revisions separately before merging this draft or changing published imagery.
 
 ---
 

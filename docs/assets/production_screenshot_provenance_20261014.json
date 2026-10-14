@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-14",
+  "origin": "public production applications, captured using Chromium Playwright",
+  "original_capture_dir": "C:\\Users\\MONSTER\\Downloads\\NEXUS_REAL_SCREENSHOTS_20261014",
+  "files": [
+    {
+      "asset": "docs/assets/visual-qc-dashboard.png",
+      "source_url": "https://visual-qc-project-pearl.vercel.app/",
+      "pixel_size": [
+        1440,
+        900
+      ],
+      "sha256": "004c3bcbf8dd9063fcbe495834ce866d478663309c35e47f1e1cecf08a72ca5e",
+      "capture_method": "Real production Playwright E2E: running simulated HMI, defect event captured",
+      "date": "2026-10-14",
+      "dataset_note": "Simulation HMI; not plant telemetry"
+    },
+    {
+      "asset": "docs/assets/visual-qc-mobile-375.png",
+      "source_url": "https://visual-qc-project-pearl.vercel.app/",
+      "pixel_size": [
+        375,
+        900
+      ],
+      "sha256": "25030e05d6f1e266c414d682fa1af08374ce4cdf249478ade93cc5fe99b04c7e",
+      "capture_method": "Playwright Chromium production capture; no editing or overlays",
+      "date": "2026-10-14",
+      "dataset_note": "Simulation HMI; not plant telemetry"
+    },
+    {
+      "asset": "docs/assets/visual-qc-rag.png",
+      "source_url": "https://visual-qc-project-pearl.vercel.app/rag",
+      "pixel_size": [
+        1440,
+        960
+      ],
+      "sha256": "da29694cda3e2e5f1ed0140cb76d7d02fb68c7433cf22ebc3267c9daf5cb6085",
+      "capture_method": "Playwright Chromium production capture; no editing or overlays",
+      "date": "2026-10-14",
+      "dataset_note": "Simulation HMI; not plant telemetry"
+    }
+  ]
+}
