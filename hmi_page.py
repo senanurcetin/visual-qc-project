@@ -8,9 +8,29 @@ HTML_TEMPLATE = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual QC | NEXUS Industrial Inspection Dashboard</title>
+    <title>NEXUS Visual QC | Simulated Quality Inspection HMI</title>
+    <link rel="icon" type="image/svg+xml" href="/line/static/seo/favicon.svg">
+    <meta name="description" content="Simulated quality-control production line with a 3D digital twin, separate NEU-CLS vision model evaluation and evidence-backed reporting.">
+    <meta name="robots" content="index,follow,max-image-preview:large">
     <meta name="theme-color" content="#071829">
-    <meta name="description" content="Interactive industrial quality-inspection HMI using simulated production-line data and genuine model-evaluation case studies.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="NEXUS">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:title" content="NEXUS Visual QC | Simulated Quality Inspection HMI">
+    <meta property="og:description" content="Simulated quality-control production line with a 3D digital twin, separate NEU-CLS vision model evaluation and evidence-backed reporting.">
+    <meta property="og:url" content="https://visual-qc-project-pearl.vercel.app/">
+    <meta property="og:image" content="https://visual-qc-project-pearl.vercel.app/line/static/seo/visual-qc-social.jpg">
+    <meta property="og:image:secure_url" content="https://visual-qc-project-pearl.vercel.app/line/static/seo/visual-qc-social.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:alt" content="Simulated Visual QC production-line HMI">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NEXUS Visual QC | Simulated Quality Inspection HMI">
+    <meta name="twitter:description" content="Simulated quality-control production line with a 3D digital twin, separate NEU-CLS vision model evaluation and evidence-backed reporting.">
+    <meta name="twitter:image" content="https://visual-qc-project-pearl.vercel.app/line/static/seo/visual-qc-social.jpg">
+    <link rel="canonical" href="https://visual-qc-project-pearl.vercel.app/">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"NEXUS Visual QC | Simulated Quality Inspection HMI","description":"Simulated quality-control production line with a 3D digital twin, separate NEU-CLS vision model evaluation and evidence-backed reporting.","url":"https://visual-qc-project-pearl.vercel.app/","isPartOf":{"@type":"WebSite","name":"NEXUS","url":"https://visual-qc-project-pearl.vercel.app/"},"primaryImageOfPage":{"@type":"ImageObject","url":"https://visual-qc-project-pearl.vercel.app/line/static/seo/visual-qc-social.jpg"}}</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/line/static/line3d.css">

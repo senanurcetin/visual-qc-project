@@ -1,5 +1,7 @@
 # Visual QC Project
 
+**SEO and social cards:** [Documented canonical URLs, screenshot sources and preview assets](docs/SEO_AND_SOCIAL_PREVIEW_GUIDE.md).
+
 ![Visual QC production HMI: simulated line running, digital twin, quality KPIs and defect event (real browser capture)](docs/assets/visual-qc-dashboard.png)
 
 > **Real production screenshot (14 October 2026):** recorded during a successful Chromium E2E test of the Vercel operator HMI. It shows a **simulated** production line and observed simulated defect, not actual factory production. The independent measured CV model charts below remain unchanged. [Capture provenance](docs/assets/production_screenshot_provenance_20261014.json).
