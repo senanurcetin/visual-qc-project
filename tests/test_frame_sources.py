@@ -30,10 +30,14 @@ class FrameSourceTests(unittest.TestCase):
             write_video(path, frames=4)
             source = camera.make_source(f"video:{path}", None)
             self.assertIsInstance(source, camera.VideoFileSource)
-            brightness = [int(source.read().mean()) for _ in range(9)]  # 4 frames, read 9 times
-            self.assertGreater(len(set(brightness)), 1)
-            self.assertEqual(brightness[0], brightness[4])  # wrapped around to the first frame
-            self.assertEqual(brightness[1], brightness[5])
+            try:
+                brightness = [int(source.read().mean()) for _ in range(9)]  # 4 frames, read 9 times
+                self.assertGreater(len(set(brightness)), 1)
+                self.assertEqual(brightness[0], brightness[4])  # wrapped around to the first frame
+                self.assertEqual(brightness[1], brightness[5])
+            finally:
+                # Windows refuses to remove TemporaryDirectory while VideoCapture owns the AVI.
+                source.capture.release()
 
     def test_unreadable_video_falls_back_to_the_simulator(self):
         now = time.time()
