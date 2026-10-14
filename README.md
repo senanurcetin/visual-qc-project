@@ -4,7 +4,7 @@
 
 > **Real production screenshot (14 October 2026):** recorded during a successful Chromium E2E test of the Vercel operator HMI. It shows a **simulated** production line and observed simulated defect, not actual factory production. The independent measured CV model charts below remain unchanged. [Capture provenance](docs/assets/production_screenshot_provenance_20261014.json).
 
-**Quality checks:** [CircleCI — Python/PostgreSQL validation](https://circleci.com/gh/senanurcetin/visual-qc-project/5) · GitHub Actions are not the current automatic CI provider.
+**Quality checks:** [CircleCI — Python/PostgreSQL validation](https://circleci.com/gh/senanurcetin/visual-qc-project/10) · GitHub Actions are not the current automatic CI provider.
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
@@ -33,7 +33,7 @@ The Flask HMI serves **[Download session report (XLSX)](https://visual-qc-projec
 - **Evidence scope:** the yellow header states **SIMULATED DEMO / NOT REAL PLANT DATA**. These measurements describe a visitor's deterministic factory-line simulation, **not** an actual plant or independently benchmarked NEU-CLS classifier performance.
 - **Empty session:** export returns 404 until simulated units are completed; it does not invent historical plant records.
 
-**Release note:** source changes and tests must pass CircleCI, and the updated Vercel deployment must be confirmed before claiming this revised workbook is available in the public demo. README HMI screenshots are actual production browser captures dated 14 October 2026; the linked WebM video remains a historical recording. Screenshots do not by themselves verify workbook internals.
+**Verified release (14 October 2026):** CircleCI Python/PostgreSQL checks passed on the release PR, the Vercel production deployment was confirmed, and the HMI passed six production Chromium E2E tests. README screenshots are genuine production browser captures; the WebM is historical. Workbook formulas, data provenance and empty-session behavior are validated by dedicated tests—not by screenshots.
 
 ---
 
@@ -47,7 +47,7 @@ Steel surface inspection needs more than a classifier. A useful system must rout
 
 | Property | Value |
 |----------|-------|
-| Source | [NEU-CLS Steel Surface Defect Dataset](http://faculty.neu.edu.cn/yunhyan/NEU_surface_defect_database.html) |
+| Source | [NEU-CLS Steel Surface Defect Dataset — official Northeastern University page](https://faculty.neu.edu.cn/songkc/en/zdylm/263265/list/) |
 | Images | 1,800 grayscale images |
 | Classes | 6 defect types, perfectly balanced (300 per class) |
 | Evaluation | Deterministic 80/20 stratified holdout (seed=42) |
@@ -92,9 +92,7 @@ production line, so the confidence-based review queue below still applies. The m
 [senanurcetin/neu-steel-defect-resnet18](https://huggingface.co/senanurcetin/neu-steel-defect-resnet18)
 (ONNX) with an [in-browser demo](https://huggingface.co/spaces/senanurcetin/neu-steel-defect-demo).
 
-**Where the 100% ends.** In the Kaggle notebook
-[NEU Steel Defects: 100% Accuracy and Where It Ends](https://www.kaggle.com/code/senanuretin/neu-steel-defects-100-accuracy-and-where-it-ends),
-a ResNet-18 trained the same way is tested on the same 360 images, each degraded at test time only:
+**Where the 100% ends.** In a separately reported robustness exercise, a ResNet-18 trained the same way was tested on the same 360 images, each degraded at test time only. The previously linked Kaggle notebook is **not currently publicly accessible (HTTP 404, checked 14 October 2026)**, so the detailed robustness figures below are historical reported results rather than newly verified public notebook output:
 
 | test-time condition | accuracy (two GPU runs) |
 |---|---|
@@ -280,7 +278,7 @@ docker compose up --build   # app on :8080 + Postgres; mount ./models to enable 
 | Retrieval & RAG | sentence-transformers (BGE), Chroma, UMAP, Qwen2.5 via transformers, NLI cross-encoder |
 | Persistence | Postgres (Neon / Docker) or SQLite, psycopg 3, versioned migrations |
 | Serving | ONNX Runtime (`/api/classify`), gunicorn in Docker |
-| CI | GitHub Actions: ruff, mypy, unit tests with a Postgres service and an 80% coverage floor, CPU-torch CNN smoke test, Playwright e2e |
+| CI | CircleCI `python-postgres-quality`: Python 3.12, Ruff, mypy, unittest + PostgreSQL 16 and coverage; Chromium HMI E2E is additionally verified locally and on production. GitHub Actions are manual-only. |
 
 ---
 
@@ -362,7 +360,7 @@ python -m playwright install chromium
 E2E_BASE_URL=http://127.0.0.1:8080 E2E_SCREENSHOT_DIR=artifacts/hmi-browser python -m unittest discover -s tests/e2e -p 'test_smoke.py' -v
 ```
 
-The optional capture files are `visual-qc-desktop-1440.png` (line running after a simulated rejection) and `visual-qc-mobile-375.png` (reachable twin, charts and historian). This procedure does not enable or trigger hosted CI. Real production Chromium screenshots and a 6/6 production E2E run were recorded on 14 October 2026. Confirm Vercel preview and production revisions separately before merging this draft or changing published imagery.
+The optional capture files are `visual-qc-desktop-1440.png` (line running after a simulated rejection) and `visual-qc-mobile-375.png` (reachable twin, charts and historian). This procedure does not enable or trigger hosted CI. Real production Chromium screenshots and a 6/6 production E2E run were recorded on 14 October 2026. The screenshot-update PR was merged and the corresponding Vercel production deployment was verified; subsequent source changes must independently repeat CI and production checks.
 
 ---
 
