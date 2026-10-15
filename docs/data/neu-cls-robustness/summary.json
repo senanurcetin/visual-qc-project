@@ -1,0 +1,59 @@
+{
+  "evaluation_kind": "reproduced_neu_cls_random_forest_image_perturbations",
+  "notebook_identity": "New reproducible study; not a recovery of an unavailable Kaggle notebook",
+  "dataset_doi": "10.6084/m9.figshare.28903550.v1",
+  "dataset_archive_sha256": "df3f85c2826ac2f3b9fa1a9bc750781a80775c9fba00f7b8bc86138bfb4b1e94",
+  "holdout_image_list_sha256": "26f63a336a40856b4af09a6ec8bf0daa27e6801ab79cb0cd8a29d253ab9480f5",
+  "model": "250-tree random forest, HOG+Gabor+grid features",
+  "random_state": 42,
+  "split": {
+    "train": 1440,
+    "test": 360,
+    "stratified": true
+  },
+  "experimental_scope": "Public balanced corpus, offline test; not real production robustness or 100 percent CNN replication",
+  "results": {
+    "clean": {
+      "samples": 360,
+      "accuracy": 0.938889,
+      "macro_f1": 0.939231,
+      "flip_fraction_vs_clean": 0.0,
+      "accuracy_delta_percentage_points": 0.0
+    },
+    "gaussian_noise_sigma_12": {
+      "samples": 360,
+      "accuracy": 0.888889,
+      "macro_f1": 0.888087,
+      "flip_fraction_vs_clean": 0.086111,
+      "accuracy_delta_percentage_points": -5.0
+    },
+    "gaussian_blur_5": {
+      "samples": 360,
+      "accuracy": 0.933333,
+      "macro_f1": 0.933577,
+      "flip_fraction_vs_clean": 0.027778,
+      "accuracy_delta_percentage_points": -0.5556
+    },
+    "brightness_plus_25": {
+      "samples": 360,
+      "accuracy": 0.833333,
+      "macro_f1": 0.839553,
+      "flip_fraction_vs_clean": 0.125,
+      "accuracy_delta_percentage_points": -10.5556
+    },
+    "contrast_065": {
+      "samples": 360,
+      "accuracy": 0.775,
+      "macro_f1": 0.77313,
+      "flip_fraction_vs_clean": 0.2,
+      "accuracy_delta_percentage_points": -16.3889
+    },
+    "jpeg_quality_45": {
+      "samples": 360,
+      "accuracy": 0.933333,
+      "macro_f1": 0.933486,
+      "flip_fraction_vs_clean": 0.022222,
+      "accuracy_delta_percentage_points": -0.5556
+    }
+  }
+}

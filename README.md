@@ -10,6 +10,8 @@
 
 > **Real production screenshot (14 October 2026):** recorded during a successful Chromium E2E test of the Vercel operator HMI. It shows a **simulated** production line and observed simulated defect, not actual factory production. The independent measured CV model charts below remain unchanged. [Capture provenance](docs/assets/production_screenshot_provenance_20261014.json).
 
+**Reproduced image robustness (15 October 2026):** [NEU-CLS perturbation study](docs/NEU_CLS_ROBUSTNESS_REPRODUCTION_2026-10-15.md) — same 360-image holdout; clean Random Forest accuracy 93.89%, dropping to 77.50% under contrast reduction. New source-backed benchmark; not the unrecovered Kaggle CNN notebook.
+
 **Quality checks:** [CircleCI — Python/PostgreSQL validation](https://circleci.com/gh/senanurcetin/visual-qc-project/10) · GitHub Actions are not the current automatic CI provider.
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
