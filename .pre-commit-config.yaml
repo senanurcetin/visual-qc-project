@@ -4,3 +4,11 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
+  - repo: local
+    hooks:
+      - id: nexus-ci-preflight
+        name: Verify CircleCI and notebook sources
+        entry: python scripts/ci_preflight.py
+        language: system
+        pass_filenames: false
+        always_run: true
