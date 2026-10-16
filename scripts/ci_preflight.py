@@ -1,4 +1,5 @@
 """Dependency-free CircleCI config and notebook preflight, no network, no execution."""
+
 from __future__ import annotations
 
 import ast
