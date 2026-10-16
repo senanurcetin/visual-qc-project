@@ -45,3 +45,7 @@ The script downloads the pinned public NEU-CLS archive to ignored `analysis/.cac
 - [Classical baseline method](../analysis/run_neu_case_study.py)
 
 **Outstanding issue #50:** The original Kaggle notebook's ownership/version/public URL remains unverified. This study supplies genuine new robustness evidence but does not claim to recover that original notebook.
+
+## Notebook publication and retired Kaggle link
+
+The previous unavailable Kaggle notebook is explicitly **retired**, not recovered. A [public GitHub Jupyter notebook](../notebooks/neu_cls_robustness_reproduction.ipynb) supplies the exact classical CV perturbations, deterministic split and environment-level output code without API credentials. Its full-data cells have not been rerun in this patch; measured values cited above remain those from the independently verified original October 15 reproduction. Publishing a new Kaggle version requires the owner's authenticated Kaggle access and a separate public URL validation. The old historical CNN perturbation metrics are not reproduced by the Random Forest notebook.
