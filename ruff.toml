@@ -1,6 +1,7 @@
 line-length = 110
 target-version = "py311"
-extend-exclude = ["docs"]
+# Jupyter cells share names across cells and are checked separately by the notebook contract test.
+extend-exclude = ["docs", "notebooks"]
 
 [lint]
 select = ["E", "F", "W", "I", "B"]
