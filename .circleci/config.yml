@@ -18,6 +18,9 @@ jobs:
     working_directory: ~/project
     steps:
       - checkout
+      - run:
+          name: Preflight CircleCI and notebook sources (no dependencies)
+          command: python scripts/ci_preflight.py
       - restore_cache:
           keys:
             - visual-qc-pip-v1-{{ checksum "requirements-dev.txt" }}
