@@ -34,10 +34,11 @@ jobs:
           paths:
             - ~/.cache/pip
       - run:
-          name: Ruff and mypy
-          command: |
-            ruff check .
-            mypy
+          name: Ruff lint
+          command: ruff check .
+      - run:
+          name: Mypy static type checking
+          command: mypy
       - run:
           name: Compile Python sources
           command: python -m compileall -q main.py case_study.py rag_demo.py analysis tests
@@ -59,11 +60,12 @@ jobs:
             echo "PostgreSQL did not become ready" >&2
             exit 1
       - run:
-          name: Unit and integration tests with coverage
-          command: |
-            coverage run -m unittest discover -s tests -v
-            coverage report
+          name: Unit and integration tests
+          command: coverage run -m unittest discover -s tests -v
           no_output_timeout: 15m
+      - run:
+          name: Enforce minimum code coverage
+          command: coverage report
       - run:
           name: Flask import contract
           command: python -c "import main; print(main.app.name)"
