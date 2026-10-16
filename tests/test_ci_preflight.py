@@ -1,4 +1,5 @@
 """Test preflight safety rules without downloading datasets or touching CI services."""
+
 from __future__ import annotations
 
 import importlib.util
