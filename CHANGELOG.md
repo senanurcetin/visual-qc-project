@@ -4,6 +4,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Release tags are
 
 ## [Unreleased]
 
+### Documentation
+- Retired the obsolete 14 October release-acceptance checklist after its release gates were completed. The README, dated change history, tests and CI runs remain the source of current evidence.
+- Removed legacy hiring-summary references from the research-metric documentation policy.
+
+
 ### Changed
 - CI and the Docker image now run on Python 3.12, the version Vercel actually serves (`.python-version`); CI used 3.11 before, so the tests were not exercising the production interpreter. README badge updated.
 - Dependabot no longer touches the `torch` / `torchvision` floors in `requirements-dl.txt` / `requirements-rag.txt`: they are loose on purpose so a machine's CUDA build is not replaced by pip.
@@ -26,7 +31,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Release tags are
 - `FrameSource` abstraction (simulator or looped video via `FRAME_SOURCE`) and `analysis/bench_frames.py` latency report.
 - Dockerfile, `docker-compose.yml` (app + Postgres), `.env.example`.
 - Tooling: ruff, mypy, coverage floor, pre-commit, Dependabot; CI runs a Postgres service and a CPU-torch smoke job.
-- `docs/roadmap.md`; `tests/test_docs_consistency.py` keeps README/hiring-summary numbers in sync with `docs/data/`.
+- `docs/roadmap.md`; `tests/test_docs_consistency.py` keeps README research metrics in sync with `docs/data/`.
 
 ### Changed
 - `main.py` split into `hmi_page`, `camera`, `report`, `line_session` modules (behaviour unchanged).
