@@ -15,7 +15,7 @@ Her faz bağımsız PR/sürüm olarak teslim edilir. Sayılar README'ye elle yaz
 ## Faz 1: Sağlamlaştırma (tamam)
 - [x] `main.py` modüllere bölündü (`hmi_page`, `camera`, `report`)
 - [x] `coverage` ölçümü ve CI eşiği; `ruff`; `pre-commit`; Dependabot; mypy
-- [x] README/hiring-summary sayıları `tests/test_docs_consistency.py` ile JSON'a karşı doğrulanır (üretim yerine sapma koruması)
+- [x] README'deki araştırma metrikleri `tests/test_docs_consistency.py` ile JSON'a karşı doğrulanır (üretim yerine sapma koruması)
 - [x] `line_sim.snapshot` maliyeti çalışma süresiyle artıyordu (7 günlük hatta ~330 ms/istek); OK sayısı blok önbelleğine alındı, ısınmış istek ~0.4 ms
 
 ## Faz 2: Gerçek model, gerçek görüntü (boru hattı CPU'da doğrulandı; gerçek eğitim GPU'da)
