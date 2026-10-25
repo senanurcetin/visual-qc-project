@@ -379,7 +379,6 @@ The optional capture files are `visual-qc-desktop-1440.png` (line running after 
 | Document | Contents |
 |----------|----------|
 | [`docs/case-study.md`](docs/case-study.md) | Full methodology, results, limitations |
-| [`docs/hiring-summary.md`](docs/hiring-summary.md) | Recruiter-facing one-page summary |
 | [`docs/data/neu-cls-case-study/`](docs/data/neu-cls-case-study/) | JSON artifacts — metrics, confusion matrix, Pareto, review queue |
 | [`docs/rag-case-study.md`](docs/rag-case-study.md) | RAG layer: method, retrieval and faithfulness results, projection honesty, limitations |
 | [`docs/data/rag-knowledge-assistant/`](docs/data/rag-knowledge-assistant/) | JSON artifacts — corpus manifest, eval set, benchmarks, sample answers, embedding map |
