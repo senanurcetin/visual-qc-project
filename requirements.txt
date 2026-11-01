@@ -4,6 +4,6 @@ Werkzeug==3.1.9
 numpy==2.2.6
 # Keep OpenCV on 4.x: 5.0 removed cv2.HOGDescriptor (see tests/test_opencv_hog.py).
 opencv-python-headless==4.14.0.94
-pandas==3.0.6
-XlsxWriter==3.2.9
+pandas==3.1.0
+XlsxWriter==3.3.1
 psycopg[binary]==3.3.6
