@@ -12,6 +12,7 @@ import time
 from collections import deque
 from collections.abc import Callable
 from functools import wraps
+from threading import Lock
 
 from flask import jsonify, request
 
@@ -20,9 +21,14 @@ class RateLimiter:
     def __init__(self, calls: int, seconds: float, clock: Callable[[], float] = time.monotonic, max_keys: int = 10_000):
         self.calls, self.seconds, self.clock, self.max_keys = calls, seconds, clock, max_keys
         self.hits: dict[str, deque[float]] = {}
+        self._lock = Lock()
 
     def check(self, key: str) -> float | None:
-        """None if the call is allowed (and counted), else the seconds until it would be."""
+        """Atomically account for a call; keep the active-key cap under concurrent requests."""
+        with self._lock:
+            return self._check_locked(key)
+
+    def _check_locked(self, key: str) -> float | None:
         now = self.clock()
         window = self.hits.get(key)
         if window is None:
