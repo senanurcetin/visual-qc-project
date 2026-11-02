@@ -4,6 +4,11 @@
 
 # Visual QC Project
 
+> **Reviewer path · 2 November 2026:** Begin with the [computer-vision case study](docs/case-study.md), then inspect the [hold-out robustness reproduction](docs/NEU_CLS_ROBUSTNESS_REPRODUCTION_2026-10-15.md) and [RAG evaluation](docs/rag-case-study.md). These are **distinct experiments**: NEU-CLS image classification, robustness under perturbations, and knowledge-retrieval/answer-grounding checks must not be combined into one score.
+>
+> **Evidence boundary:** the HMI screenshots capture a real browser rendering of a **simulated** line, not a working factory integration. The old, unavailable Kaggle CNN notebook is not a reproducible result; use the linked reproduction and current test instructions instead. [Local setup](#local-setup) · [Quality checks](#tests).
+
+
 **SEO and social cards:** [Documented canonical URLs, screenshot sources and preview assets](docs/SEO_AND_SOCIAL_PREVIEW_GUIDE.md).
 
 ![Visual QC production HMI: simulated line running, digital twin, quality KPIs and defect event (real browser capture)](docs/assets/visual-qc-dashboard.png)
