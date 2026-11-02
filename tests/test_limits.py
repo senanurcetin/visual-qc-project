@@ -54,6 +54,23 @@ class RateLimiterTests(unittest.TestCase):
             limiter.check(f"c{i}")
         self.assertLess(len(limiter.hits), 30)
 
+    def test_active_key_cap_rejects_new_clients_and_recovers_after_expiry(self):
+        clock = FakeClock()
+        limiter = RateLimiter(2, 60, clock, max_keys=2)
+        self.assertIsNone(limiter.check("a"))
+        self.assertIsNone(limiter.check("b"))
+        # An existing client may use its remaining allowance even when full.
+        self.assertIsNone(limiter.check("a"))
+        self.assertEqual(limiter.check("c"), 60.0)
+        self.assertEqual(set(limiter.hits), {"a", "b"})
+        clock.now += 10
+        self.assertEqual(limiter.check("c"), 50.0)
+        self.assertEqual(len(limiter.hits), 2)
+        clock.now += 51
+        # Expired clients are removed before the next admission.
+        self.assertIsNone(limiter.check("c"))
+        self.assertEqual(set(limiter.hits), {"c"})
+
 
 class ClientKeyTests(unittest.TestCase):
     def key(self, headers, vercel):
