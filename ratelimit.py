@@ -12,6 +12,7 @@ import time
 from collections import deque
 from collections.abc import Callable
 from functools import wraps
+from threading import Lock
 
 from flask import jsonify, request
 
@@ -20,19 +21,37 @@ class RateLimiter:
     def __init__(self, calls: int, seconds: float, clock: Callable[[], float] = time.monotonic, max_keys: int = 10_000):
         self.calls, self.seconds, self.clock, self.max_keys = calls, seconds, clock, max_keys
         self.hits: dict[str, deque[float]] = {}
+        self._lock = Lock()
 
     def check(self, key: str) -> float | None:
-        """None if the call is allowed (and counted), else the seconds until it would be."""
+        """Atomically account for a call; keep the active-key cap under concurrent requests."""
+        with self._lock:
+            return self._check_locked(key)
+
+    def _check_locked(self, key: str) -> float | None:
         now = self.clock()
-        window = self.hits.setdefault(key, deque())
+        window = self.hits.get(key)
+        if window is None:
+            # Never admit more than max_keys active clients. Prune expired keys
+            # before admission; rejecting a new key is safer than unbounded
+            # memory growth or evicting another client's active rate limit.
+            if len(self.hits) >= self.max_keys:
+                expired = [k for k, w in self.hits.items() if not w or now - w[-1] >= self.seconds]
+                for expired_key in expired:
+                    del self.hits[expired_key]
+                if len(self.hits) >= self.max_keys:
+                    retry = min(
+                        (self.seconds - (now - w[-1]) for w in self.hits.values() if w),
+                        default=self.seconds,
+                    )
+                    return max(0.0, retry)
+            window = deque()
+            self.hits[key] = window
         while window and now - window[0] >= self.seconds:
             window.popleft()
         if len(window) >= self.calls:
             return self.seconds - (now - window[0])
         window.append(now)
-        if len(self.hits) > self.max_keys:  # bound memory: forget clients whose window has emptied
-            for k in [k for k, w in self.hits.items() if not w or now - w[-1] >= self.seconds]:
-                del self.hits[k]
         return None
 
 

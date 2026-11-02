@@ -1,8 +1,10 @@
 import os
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from threading import Barrier
 
 import main
 import ratelimit
@@ -53,6 +55,54 @@ class RateLimiterTests(unittest.TestCase):
         for i in range(50, 60):
             limiter.check(f"c{i}")
         self.assertLess(len(limiter.hits), 30)
+
+    def test_active_key_cap_rejects_new_clients_and_recovers_after_expiry(self):
+        clock = FakeClock()
+        limiter = RateLimiter(2, 60, clock, max_keys=2)
+        self.assertIsNone(limiter.check("a"))
+        self.assertIsNone(limiter.check("b"))
+        # An existing client may use its remaining allowance even when full.
+        self.assertIsNone(limiter.check("a"))
+        self.assertEqual(limiter.check("c"), 60.0)
+        self.assertEqual(set(limiter.hits), {"a", "b"})
+        clock.now += 10
+        self.assertEqual(limiter.check("c"), 50.0)
+        self.assertEqual(len(limiter.hits), 2)
+        clock.now += 51
+        # Expired clients are removed before the next admission.
+        self.assertIsNone(limiter.check("c"))
+        self.assertEqual(set(limiter.hits), {"c"})
+
+    def test_concurrent_clients_respect_cap_and_per_client_allowance(self):
+        limiter = RateLimiter(2, 60, FakeClock(), max_keys=4)
+        barrier = Barrier(12)
+
+        def make_request(i):
+            barrier.wait(timeout=10)
+            # Three simultaneous requests from each of twelve distinct clients.
+            return limiter.check(f"visitor-{i // 3}")
+
+        with ThreadPoolExecutor(max_workers=12) as executor:
+            outcomes = list(executor.map(make_request, range(12)))
+
+        self.assertEqual(len(limiter.hits), 4)
+        self.assertEqual(sum(result is None for result in outcomes), 8)
+        self.assertEqual(sum(result is not None for result in outcomes), 4)
+
+    def test_concurrent_unique_clients_cannot_exceed_active_key_cap(self):
+        limiter = RateLimiter(1, 60, FakeClock(), max_keys=4)
+        barrier = Barrier(12)
+
+        def make_request(i):
+            barrier.wait(timeout=10)
+            return limiter.check(f"visitor-{i}")
+
+        with ThreadPoolExecutor(max_workers=12) as executor:
+            outcomes = list(executor.map(make_request, range(12)))
+
+        self.assertEqual(len(limiter.hits), 4)
+        self.assertEqual(sum(result is None for result in outcomes), 4)
+        self.assertEqual(sum(result is not None for result in outcomes), 8)
 
 
 class ClientKeyTests(unittest.TestCase):
