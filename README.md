@@ -1,17 +1,64 @@
-<p align="center">
-  <img src="docs/assets/nexus-official-midnight.svg" alt="NEXUS — personal brand identity" width="660">
-</p>
-
 # Visual QC Project
+
+<img align="right" src="docs/assets/nexus-official-midnight.svg" alt="NEXUS — personal brand identity" width="180">
+
+Steel surface defect classification on the NEU-CLS dataset, an uncertainty-based review queue that routes low-confidence predictions to a human, and a grounded RAG assistant over a steel quality-engineering knowledge base — wrapped in an operator-facing Flask HMI running a **simulated** production line. Built for quality-engineering teams and technical reviewers who want to see how model output turns into reviewable quality decisions.
+
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+**Quality checks:** [CircleCI — Python/PostgreSQL validation](https://circleci.com/gh/senanurcetin/visual-qc-project/10) · GitHub Actions are not the current automatic CI provider.
+
+## At a glance
+
+### Key results
+
+- **Classifier:** Random Forest on HOG + Gabor + grid features — accuracy 0.939, Macro F1 0.939 on the 360-image NEU-CLS holdout ([benchmark](#model-benchmark)).
+- **Review queue:** reviewing the top 20% highest-entropy samples captures 82% of the classifier's misclassifications (18 of 22) at 4.1× the yield of random review ([details](#review-queue--confidence-based-routing)).
+- **Robustness:** same 360-image holdout; clean Random Forest accuracy 93.89%, dropping to 77.50% under contrast reduction ([reproduction](docs/NEU_CLS_ROBUSTNESS_REPRODUCTION_2026-10-15.md)).
+- **Deep-learning comparison:** fine-tuned ResNet-18 scores 1.000 on the random and the blocked split — read as a saturated benchmark, not production readiness ([comparison](#deep-learning-comparison-october-2026)).
+
+### What it is
+
+**Computer vision analytics case study** — steel surface defect classification on the NEU-CLS dataset, combined with an operator-facing Flask QA dashboard. Covers EDA, feature engineering (HOG), model benchmarking, per-class metrics, Pareto error analysis, and confidence-based review queue design.
+
+**AI engineering layer** — an embedding-based RAG assistant over a steel quality-engineering knowledge base, with a retriever benchmark, a Chroma vector index, NLI-scored answer faithfulness, and a 3D map of the embedding space that shows which passages each answer came from ([details](#ai-engineering-layer--steel-qc-knowledge-assistant-rag)).
+
+### What it is not
+
+- Not a working factory integration: the HMI runs a simulated line (3D digital twin) or a looped video, not a live camera.
+- Not production-ready model evidence: NEU-CLS is a research benchmark, and the separate CV, robustness and RAG experiments must not be combined into one score. See [Limitations & review notes](#limitations--review-notes) and [Limitations](#limitations).
+
+## Live demo
+
+**Live demo:** [visual-qc-project-pearl.vercel.app](https://visual-qc-project-pearl.vercel.app) — HMI with 3D line twin · [RAG map](https://visual-qc-project-pearl.vercel.app/rag) · [CV case study](https://visual-qc-project-pearl.vercel.app/case-study)
+
+Portfolio entry: [senanur-cetin.vercel.app/projects/visual-qc-project](https://senanur-cetin.vercel.app/projects/visual-qc-project)
+
+![Visual QC production HMI: simulated line running, digital twin, quality KPIs and defect event (real browser capture)](docs/assets/visual-qc-dashboard.png)
+
+Short video: [`docs/assets/visual-qc-dashboard.webm`](docs/assets/visual-qc-dashboard.webm)
+
+![Visual QC production operator dashboard on 375px mobile viewport](docs/assets/visual-qc-mobile-375.png)
+
+## Quick start
+
+```bash
+python -m venv .venv
+# Windows:  .venv\Scripts\activate
+# macOS/Linux:  source .venv/bin/activate
+
+pip install -r requirements-dev.txt   # app + analysis/chart dependencies
+python main.py                        # dashboard at http://127.0.0.1:8080
+```
+
+Full analysis and RAG rebuild steps: [Local setup](#local-setup) · quality checks: [Tests](#tests).
+
+## Limitations & review notes
 
 > **Reviewer path · 2 November 2026:** Begin with the [computer-vision case study](docs/case-study.md), then inspect the [hold-out robustness reproduction](docs/NEU_CLS_ROBUSTNESS_REPRODUCTION_2026-10-15.md) and [RAG evaluation](docs/rag-case-study.md). These are **distinct experiments**: NEU-CLS image classification, robustness under perturbations, and knowledge-retrieval/answer-grounding checks must not be combined into one score.
 >
 > **Evidence boundary:** the HMI screenshots capture a real browser rendering of a **simulated** line, not a working factory integration. The old, unavailable Kaggle CNN notebook is not a reproducible result; use the linked reproduction and current test instructions instead. [Local setup](#local-setup) · [Quality checks](#tests).
-
-
-**SEO and social cards:** [Documented canonical URLs, screenshot sources and preview assets](docs/SEO_AND_SOCIAL_PREVIEW_GUIDE.md).
-
-![Visual QC production HMI: simulated line running, digital twin, quality KPIs and defect event (real browser capture)](docs/assets/visual-qc-dashboard.png)
 
 > **Real production screenshot (14 October 2026):** recorded during a successful Chromium E2E test of the Vercel operator HMI. It shows a **simulated** production line and observed simulated defect, not actual factory production. The independent measured CV model charts below remain unchanged. [Capture provenance](docs/assets/production_screenshot_provenance_20261014.json).
 
@@ -19,27 +66,15 @@
 
 **Reproduced image robustness (15 October 2026):** [NEU-CLS perturbation study](docs/NEU_CLS_ROBUSTNESS_REPRODUCTION_2026-10-15.md) — same 360-image holdout; clean Random Forest accuracy 93.89%, dropping to 77.50% under contrast reduction. New source-backed benchmark; not the unrecovered Kaggle CNN notebook.
 
-**Quality checks:** [CircleCI — Python/PostgreSQL validation](https://circleci.com/gh/senanurcetin/visual-qc-project/10) · GitHub Actions are not the current automatic CI provider.
-![Python](https://img.shields.io/badge/Python-3.12-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
+**SEO and social cards:** [Documented canonical URLs, screenshot sources and preview assets](docs/SEO_AND_SOCIAL_PREVIEW_GUIDE.md).
 
-**Computer vision analytics case study** — steel surface defect classification on the NEU-CLS dataset, combined with an operator-facing Flask QA dashboard. Covers EDA, feature engineering (HOG), model benchmarking, per-class metrics, Pareto error analysis, and confidence-based review queue design.
-
-**AI engineering layer** — an embedding-based RAG assistant over a steel quality-engineering knowledge base, with a retriever benchmark, a Chroma vector index, NLI-scored answer faithfulness, and a 3D map of the embedding space that shows which passages each answer came from ([details](#ai-engineering-layer--steel-qc-knowledge-assistant-rag)).
-
-**Live demo:** [visual-qc-project-pearl.vercel.app](https://visual-qc-project-pearl.vercel.app) — HMI with 3D line twin · [RAG map](https://visual-qc-project-pearl.vercel.app/rag) · [CV case study](https://visual-qc-project-pearl.vercel.app/case-study)
-
-Portfolio entry: [senanur-cetin.vercel.app/projects/visual-qc-project](https://senanur-cetin.vercel.app/projects/visual-qc-project)
-
-Short video: [`docs/assets/visual-qc-dashboard.webm`](docs/assets/visual-qc-dashboard.webm)
-
-![Visual QC production operator dashboard on 375px mobile viewport](docs/assets/visual-qc-mobile-375.png)
+The full list of model, data and demo limitations is in [Limitations](#limitations) below.
 
 ---
 
 ## Functional XLSX report — source-backed, not a mockup
 
-The Flask HMI serves **[Download session report (XLSX)](https://visual-qc-project-pearl.vercel.app/api/export_report)** after the visitor completes at least one simulated production unit. The real report generator is [`report.py`](report.py); [automated workbook checks](tests/test_report_workbook.py) inspect its formulas, chart source and embedded provenance statement.
+The Flask HMI serves **Download session report (XLSX)** — the *Export Report* button on the [live HMI](https://visual-qc-project-pearl.vercel.app), route `/api/export_report` — after the visitor completes at least one simulated production unit. Opening the route directly without a running session returns HTTP 404 (see *Empty session* below), so it is not linked as a standalone download. The real report generator is [`report.py`](report.py); [automated workbook checks](tests/test_report_workbook.py) inspect its formulas, chart source and embedded provenance statement.
 
 - **Dashboard sheet:** total units, accepted/rejected counts, yield and mean OEE, each calculated by a genuine Excel formula linked to the detailed log. Cached results are included for static viewers.
 - **Production Log:** timestamp, simulated unit identifier, status, defect and per-unit OEE, with filters and conditional formatting.
