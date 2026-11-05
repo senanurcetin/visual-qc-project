@@ -4,6 +4,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/). Release tags are
 
 ## [Unreleased]
 
+### Added
+- `cnn/benchmark_inference.py`: benchmarks the released ResNet-18 ONNX model on ONNX Runtime CPU, CUDA, TensorRT FP32 and TensorRT FP16, and checks top-1 agreement and logit difference against the CPU reference on every image. On an RTX 3060 Laptop GPU, TensorRT FP16 gave 3.3 ms p50 latency at batch 1 (CPU: 47.8 ms) and 1684 img/s at batch 32, with the same top-1 class as CPU on all 1800 NEU-CLS images. The results are in `docs/data/tensorrt-benchmark/benchmark.json`. Tests cover preprocessing parity and a CPU-only end-to-end run, and check that the README table matches the JSON.
+
 ### Documentation
 - Retired the obsolete 14 October release-acceptance checklist after its release gates were completed. The README, dated change history, tests and CI runs remain the source of current evidence.
 - Removed legacy hiring-summary references from the research-metric documentation policy.

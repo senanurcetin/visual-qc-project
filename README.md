@@ -271,6 +271,31 @@ The operator dashboard renders the simulated inspection line in 3D (Three.js): s
 **No real-data CNN run has been recorded yet** for this calibrated pipeline. The separate fine-tuned ResNet-18 baseline ([`cnn/train_cnn.py`](cnn/train_cnn.py)) has been run on NEU-CLS: see [Deep-learning comparison](#deep-learning-comparison-october-2026) above. After a real run of this pipeline, `python analysis/update_docs_from_dl.py` fills this block from `docs/data/neu-cls-dl/summary.json`, and the docs-consistency test keeps it in sync.
 <!-- DL-RESULTS:END -->
 
+### Inference acceleration with TensorRT (November 2026)
+
+The released ResNet-18 ONNX model ([Hugging Face](https://huggingface.co/senanurcetin/neu-steel-defect-resnet18)) runs unchanged on four ONNX Runtime backends. [`cnn/benchmark_inference.py`](cnn/benchmark_inference.py) measures each backend and compares its predictions with the CPU FP32 reference on every image. The raw output is in [`docs/data/tensorrt-benchmark/benchmark.json`](docs/data/tensorrt-benchmark/benchmark.json).
+
+| Backend | Latency, batch 1 (p50 / p95) | Throughput, batch 32 | Same top-1 as CPU | Max \|logit diff\| |
+| --- | --- | --- | --- | --- |
+| CPU FP32 | 47.779 / 77.988 ms | 34.1 img/s | reference | 0 |
+| CUDA FP32 | 7.704 / 11.885 ms | 739.8 img/s | 100% | 0.0033 |
+| TensorRT FP32 | 6.19 / 8.866 ms | 876.5 img/s | 100% | 0.00281 |
+| **TensorRT FP16** | **3.286 / 5.021 ms** | **1684.1 img/s** | **100%** | 0.01657 |
+
+On this hardware, TensorRT FP16 is about 14× faster than CPU at batch 1 and about 2.3× faster than CUDA FP32 at batch 32. All four backends agree on the predicted class for all 1800 images. Building the TensorRT engine takes about a minute the first time (`session_init_s` in the JSON); the engine is then cached.
+
+Setup: NVIDIA GeForce RTX 3060 Laptop GPU (6 GB), Windows 11, Python 3.11, ONNX Runtime 1.31.1, TensorRT 10.16, all 1800 NEU-CLS images, 300 timed runs after warm-up.
+
+Limits:
+- These are single-machine laptop numbers. The CPU figures in particular vary with thermals and background load.
+- Accuracy is measured over all 1800 images, including training images, so it shows parity between backends. It is not a held-out estimate; see [Deep-learning comparison](#deep-learning-comparison-october-2026) for that.
+- INT8 quantisation is not covered.
+
+```bash
+pip install "onnxruntime-gpu[cuda,cudnn]" "tensorrt-cu13>=10,<11" numpy pillow
+python cnn/benchmark_inference.py --onnx neu_resnet18.onnx --data <NEU-CLS root> --out results/trt
+```
+
 ---
 
 ## Docker
