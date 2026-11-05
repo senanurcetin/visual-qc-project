@@ -15,7 +15,7 @@
 
 > **Real production screenshot (14 October 2026):** recorded during a successful Chromium E2E test of the Vercel operator HMI. It shows a **simulated** production line and observed simulated defect, not actual factory production. The independent measured CV model charts below remain unchanged. [Capture provenance](docs/assets/production_screenshot_provenance_20261014.json).
 
-**Public replacement notebook:** [NEU-CLS robustness reproduction](notebooks/neu_cls_robustness_reproduction.ipynb). This is a *new* classical-model experiment; the formerly linked 100% CNN Kaggle notebook is **retired as an unavailable historical reference**, not restored or independently rerun. The actual image perturbation evidence and source hashes are documented below.
+**Public replacement notebook:** [NEU-CLS robustness reproduction](notebooks/neu_cls_robustness_reproduction.ipynb). This is a *new* classical-model experiment; the formerly linked 100% CNN Kaggle notebook is **retired as an unavailable historical reference**, not restored or independently rerun. The committed notebook contains unexecuted code. The source-backed results and source hashes are linked separately below. The offline notebook check verifies code syntax, empty outputs and the documented dataset layout.
 
 **Reproduced image robustness (15 October 2026):** [NEU-CLS perturbation study](docs/NEU_CLS_ROBUSTNESS_REPRODUCTION_2026-10-15.md) — same 360-image holdout; clean Random Forest accuracy 93.89%, dropping to 77.50% under contrast reduction. New source-backed benchmark; not the unrecovered Kaggle CNN notebook.
 
