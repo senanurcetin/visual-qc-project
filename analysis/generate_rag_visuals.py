@@ -66,7 +66,7 @@ for k, (label, prompt, color) in enumerate(variants):
         chosen = prompt is not None and f"{g}/{prompt}" == ge["selected_config"]
         ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.015, f"{b.get_height():.0%}" + (" *" if chosen else ""),
                 ha="center", fontsize=9, fontweight="bold" if chosen else "normal")
-ax.set_xticks(x); ax.set_xticklabels([ge["generators"][g]["label"] for g in gens], fontsize=9.5)
+ax.set_xticks(x); ax.set_xticklabels([ge["generators"][g]["label"].replace(" (", "\n(") for g in gens], fontsize=9.5)
 ax.set_ylim(0, 1.05); ax.set_ylabel("Answer sentences supported by retrieved passages", fontsize=9.5)
 ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{y:.0%}"))
 ax.set_title(f"Faithfulness — NLI entailment check, {ge['rag']['questions']} questions\n(* = generator and prompt used on the /rag page)",

@@ -39,6 +39,7 @@ sys.path.insert(0, str(ROOT))
 from analysis.rag import metrics as M  # noqa: E402
 from analysis.rag.chunking import chunk_sections, split_sections  # noqa: E402
 from analysis.rag.corpus import LICENSE, TOPICS, article_topics, fetch_article  # noqa: E402
+from analysis.rag.nim import NimGenerator, nim_spec  # noqa: E402
 
 CACHE = ROOT / "analysis" / ".cache" / "rag"
 OUT = ROOT / "docs" / "data" / "rag-knowledge-assistant"
@@ -55,6 +56,9 @@ GENERATORS = {
     "qwen2.5-1.5b": {"name": "Qwen/Qwen2.5-1.5B-Instruct", "label": "Qwen2.5-1.5B (fp16)", "quantization": None},
     "qwen2.5-3b": {"name": "Qwen/Qwen2.5-3B-Instruct", "label": "Qwen2.5-3B (4-bit NF4)", "quantization": "nf4"},
 }
+_NIM = nim_spec()
+if _NIM:  # a hosted Nemotron model joins the comparison only when NVIDIA_API_KEY and NIM_MODEL are set
+    GENERATORS["nemotron-nim"] = _NIM
 QUESTION_GENERATOR = "qwen2.5-1.5b"  # writes the synthetic evaluation questions
 NLI_MODEL = "cross-encoder/nli-deberta-v3-base"
 EMBEDDERS = {
@@ -180,9 +184,12 @@ class Generator:
         return [outputs[i] for i in range(len(batch))]
 
 
-def load_generator(key: str, attempts: int = 3) -> Generator:
+def load_generator(key: str, attempts: int = 3) -> Generator | NimGenerator:
     """Windows can refuse to memory-map large checkpoints when the page file is busy; retry."""
     import gc
+
+    if GENERATORS[key].get("provider") == "nim":
+        return NimGenerator(GENERATORS[key]["name"], CACHE / "generations_nim.json", log=log)
 
     for attempt in range(1, attempts + 1):
         try:

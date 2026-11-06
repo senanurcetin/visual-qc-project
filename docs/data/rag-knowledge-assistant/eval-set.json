@@ -214,316 +214,309 @@
         "lexical_overlap": 0.7143
       },
       {
-        "question": "What type of rust occurs when iron reacts with chloride in an oxygen-deprived environment?",
+        "question": "What type of rust formation occurs when rebar reacts with chloride in an oxygen-deprived environment?",
         "gold_chunk": "c0278",
         "gold_article": "Rust",
         "topic": "Corrosion & protection",
-        "lexical_overlap": 0.5
+        "lexical_overlap": 0.4444
       },
       {
-        "question": "What causes the collapse of the Mianus River bridge in 1983?",
-        "gold_chunk": "c0296",
+        "question": "What caused the Silver Bridge disaster in 1967?",
+        "gold_chunk": "c0297",
         "gold_article": "Rust",
         "topic": "Corrosion & protection",
-        "lexical_overlap": 0.8
+        "lexical_overlap": 0.75
       },
       {
         "question": "What does galvanization primarily protect against?",
-        "gold_chunk": "c0301",
+        "gold_chunk": "c0303",
         "gold_article": "Galvanization",
         "topic": "Corrosion & protection",
         "lexical_overlap": 0.0
       },
       {
         "question": "What is the most common method for applying a protective zinc coating to steel or iron?",
-        "gold_chunk": "c0298",
+        "gold_chunk": "c0300",
         "gold_article": "Galvanization",
         "topic": "Corrosion & protection",
         "lexical_overlap": 1.0
       },
       {
         "question": "What additive is often added to the molten zinc bath to improve the fluidity of the bath?",
-        "gold_chunk": "c0309",
+        "gold_chunk": "c0311",
         "gold_article": "Hot-dip galvanization",
         "topic": "Corrosion & protection",
         "lexical_overlap": 0.875
       },
       {
         "question": "What does BS EN ISO 1461 specify as the minimum coating thickness required for steel sections thicker than 6 mm?",
-        "gold_chunk": "c0312",
+        "gold_chunk": "c0314",
         "gold_article": "Hot-dip galvanization",
         "topic": "Corrosion & protection",
         "lexical_overlap": 0.7778
       },
       {
         "question": "What is the primary mechanism by which some aluminum alloys fail to form an effective oxide layer?",
-        "gold_chunk": "c0317",
+        "gold_chunk": "c0319",
         "gold_article": "Passivation (chemistry)",
         "topic": "Corrosion & protection",
         "lexical_overlap": 0.5
       },
       {
         "question": "What does the AISI three-digit number label in relation to different types of stainless steel?",
-        "gold_chunk": "c0330",
+        "gold_chunk": "c0332",
         "gold_article": "Stainless steel",
         "topic": "Corrosion & protection",
         "lexical_overlap": 0.7778
       },
       {
         "question": "What are some alternative methods besides detection rules for identifying the source of excessive variation when using statistical process control?",
-        "gold_chunk": "c0376",
+        "gold_chunk": "c0378",
         "gold_article": "Statistical process control",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.5385
       },
       {
         "question": "What does statistical process control aim to detect when there is a change in the production process?",
-        "gold_chunk": "c0370",
+        "gold_chunk": "c0372",
         "gold_article": "Statistical process control",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.4286
       },
       {
         "question": "What is the average time between false alarms for a Shewhart control chart with 3-sigma limits?",
-        "gold_chunk": "c0401",
+        "gold_chunk": "c0403",
         "gold_article": "Control chart",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.7778
       },
       {
         "question": "What does Wilkinson's algorithm do for Pareto charts?",
-        "gold_chunk": "c0408",
+        "gold_chunk": "c0410",
         "gold_article": "Pareto chart",
         "topic": "Quality control & SPC",
         "lexical_overlap": 1.0
       },
       {
         "question": "What does the right vertical axis of a Pareto chart represent?",
-        "gold_chunk": "c0407",
+        "gold_chunk": "c0409",
         "gold_article": "Pareto chart",
         "topic": "Quality control & SPC",
         "lexical_overlap": 1.0
       },
       {
         "question": "What does the Pareto analysis help managers prioritize when identifying important causes?",
-        "gold_chunk": "c0418",
+        "gold_chunk": "c0420",
         "gold_article": "Pareto principle",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.5
       },
       {
         "question": "What does the Pareto distribution define regarding the fraction of the population with wealth?",
-        "gold_chunk": "c0413",
+        "gold_chunk": "c0415",
         "gold_article": "Pareto principle",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.7143
       },
       {
         "question": "What does the acceptance sampling process involve when determining whether a lot should be accepted based on the number of nonconformities?",
-        "gold_chunk": "c0430",
+        "gold_chunk": "c0432",
         "gold_article": "Acceptance sampling",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.4167
       },
       {
         "question": "What are two key components of a sampling plan in terms of quality standards?",
-        "gold_chunk": "c0429",
+        "gold_chunk": "c0431",
         "gold_article": "Acceptance sampling",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.375
       },
       {
         "question": "What specific improvement did Six Sigma help Bank of America achieve according to their announcement?",
-        "gold_chunk": "c0453",
+        "gold_chunk": "c0455",
         "gold_article": "Six Sigma",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.4
       },
       {
         "question": "What does proactive management entail regarding the prevention of problems?",
-        "gold_chunk": "c0466",
+        "gold_chunk": "c0468",
         "gold_article": "Root-cause analysis",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.5
       },
       {
         "question": "What does the term \"risk\" specifically refer to in the context of Failure Mode and Effects Analysis?",
-        "gold_chunk": "c0514",
+        "gold_chunk": "c0516",
         "gold_article": "Failure mode and effects analysis",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.3333
       },
       {
         "question": "What does the term \"ground rules\" specifically refer to in the context of Failure Mode and Effects Analysis?",
-        "gold_chunk": "c0498",
+        "gold_chunk": "c0500",
         "gold_article": "Failure mode and effects analysis",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.5
       },
       {
         "question": "What does it mean when a process capability index value is near or below zero?",
-        "gold_chunk": "c0525",
+        "gold_chunk": "c0527",
         "gold_article": "Process capability index",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.75
       },
       {
         "question": "What does the process capability index measure regarding a manufacturing process?",
-        "gold_chunk": "c0522",
+        "gold_chunk": "c0524",
         "gold_article": "Process capability index",
         "topic": "Quality control & SPC",
         "lexical_overlap": 0.6667
       },
       {
         "question": "What significant technological advancement occurred in non-destructive testing methods during the early 20th century?",
-        "gold_chunk": "c0538",
+        "gold_chunk": "c0540",
         "gold_article": "Nondestructive testing",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.0
       },
       {
         "question": "What type of material is typically tested using liquid penetrant testing?",
-        "gold_chunk": "c0531",
+        "gold_chunk": "c0533",
         "gold_article": "Nondestructive testing",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.5714
       },
       {
         "question": "What does the diagnostic machine display in the form of a signal when using ultrasonic testing?",
-        "gold_chunk": "c0562",
+        "gold_chunk": "c0564",
         "gold_article": "Ultrasonic testing",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.8571
       },
       {
         "question": "What advantage does eddy current array (ECA) provide over conventional ECT?",
-        "gold_chunk": "c0579",
+        "gold_chunk": "c0581",
         "gold_article": "Eddy-current testing",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.6667
       },
       {
         "question": "What type of inspection is optimized ECT array particularly effective for detecting?",
-        "gold_chunk": "c0576",
+        "gold_chunk": "c0578",
         "gold_article": "Eddy-current testing",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.5
       },
       {
         "question": "What advantage does half-wave direct current (HWDC) have over full-wave direct current (FWDC) in magnetic particle inspection?",
-        "gold_chunk": "c0585",
+        "gold_chunk": "c0587",
         "gold_article": "Magnetic particle inspection",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.6364
       },
       {
         "question": "What are the effects of passing a part through an AC demagnetizing coil?",
-        "gold_chunk": "c0588",
+        "gold_chunk": "c0590",
         "gold_article": "Magnetic particle inspection",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.6667
       },
       {
         "question": "What precautions should be taken when removing excess penetrant before applying the developer?",
-        "gold_chunk": "c0601",
+        "gold_chunk": "c0603",
         "gold_article": "Dye penetrant inspection",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.3333
       },
       {
         "question": "What is the purpose of pre-cleaning before applying penetrant during liquid penetrant inspection?",
-        "gold_chunk": "c0599",
+        "gold_chunk": "c0601",
         "gold_article": "Dye penetrant inspection",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.5714
       },
       {
         "question": "What does the term \"eyeball search\" specifically refer to in the context of data analysis?",
-        "gold_chunk": "c0609",
+        "gold_chunk": "c0611",
         "gold_article": "Visual inspection",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.375
       },
       {
         "question": "What is the average duration of eye fixations during visual inspections according to the study?",
-        "gold_chunk": "c0608",
+        "gold_chunk": "c0610",
         "gold_article": "Visual inspection",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.625
       },
       {
         "question": "What is a key difference between conventional, phased array, and TOFD methods in ultrasonic testing?",
-        "gold_chunk": "c0615",
+        "gold_chunk": "c0617",
         "gold_article": "Weld quality assurance",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.7778
       },
       {
         "question": "What are some key benefits of using visual weld monitoring during the welding process?",
-        "gold_chunk": "c0616",
+        "gold_chunk": "c0618",
         "gold_article": "Weld quality assurance",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.625
       },
       {
         "question": "What type of defect detection does automated optical inspection primarily rely on?",
-        "gold_chunk": "c0627",
+        "gold_chunk": "c0629",
         "gold_article": "Automated optical inspection",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.125
       },
       {
         "question": "What is the main purpose of Automated Optical Inspection (AOI) in PCB manufacturing?",
-        "gold_chunk": "c0625",
+        "gold_chunk": "c0627",
         "gold_article": "Automated optical inspection",
         "topic": "Inspection & NDT",
         "lexical_overlap": 0.75
       },
       {
         "question": "What does the term \"machine vision\" encompass beyond its narrow definition?",
-        "gold_chunk": "c0631",
+        "gold_chunk": "c0633",
         "gold_article": "Machine vision",
         "topic": "Machine vision & ML",
         "lexical_overlap": 0.5714
       },
       {
         "question": "What are some common applications of machine vision in industrial quality control?",
-        "gold_chunk": "c0640",
+        "gold_chunk": "c0642",
         "gold_article": "Machine vision",
         "topic": "Machine vision & ML",
         "lexical_overlap": 0.125
       },
       {
         "question": "What normalization technique did Dalal and Triggs find provided the most consistent performance among the L2-hys, L2-norm, and L1-sqrt schemes?",
-        "gold_chunk": "c0653",
+        "gold_chunk": "c0655",
         "gold_article": "Histogram of oriented gradients",
         "topic": "Machine vision & ML",
         "lexical_overlap": 0.6154
       },
       {
         "question": "What is the formula for calculating the values of Gabor filters in the discrete domain?",
-        "gold_chunk": "c0667",
+        "gold_chunk": "c0669",
         "gold_article": "Gabor filter",
         "topic": "Machine vision & ML",
         "lexical_overlap": 0.5714
       },
       {
         "question": "What application specifically uses Gabor filters for facial expression recognition?",
-        "gold_chunk": "c0668",
+        "gold_chunk": "c0670",
         "gold_article": "Gabor filter",
         "topic": "Machine vision & ML",
         "lexical_overlap": 0.625
       },
       {
-        "question": "What is an example of how random forests handle mixed variable types effectively?",
-        "gold_chunk": "c0688",
-        "gold_article": "Random forest",
-        "topic": "Machine vision & ML",
-        "lexical_overlap": 0.625
-      },
-      {
         "question": "How does feature bagging differ from regular bagging in the context of random forests?",
-        "gold_chunk": "c0677",
+        "gold_chunk": "c0679",
         "gold_article": "Random forest",
         "topic": "Machine vision & ML",
         "lexical_overlap": 0.5714
@@ -543,7 +536,7 @@
         "lexical_overlap": 0.4
       }
     ],
-    "mean_lexical_overlap": 0.561
+    "mean_lexical_overlap": 0.5588
   },
   "curated": [
     {
