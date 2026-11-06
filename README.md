@@ -140,42 +140,43 @@ Samples are ranked by prediction entropy (high entropy = low confidence = route 
 
 ![Actual production Visual QC RAG interface (Chromium screenshot)](docs/assets/visual-qc-rag.png) ![Embedding map](docs/assets/rag-embedding-map.png)
 
-A retrieval-augmented assistant for process questions a quality team asks (*"When is a process out of statistical control?"*, *"How is mill scale removed before painting?"*). Everything runs locally; no paid API and no key in the page. Full method: [`docs/rag-case-study.md`](docs/rag-case-study.md). Live page: `/rag`.
+A retrieval-augmented assistant for process questions a quality team asks (*"When is a process out of statistical control?"*, *"How is mill scale removed before painting?"*). Retrieval, scoring and the local Qwen generators run on one laptop GPU; a hosted Nemotron model on NVIDIA NIM (free API tier) is compared as a third generator. Answers on the page are precomputed, so no key ships with it. Full method: [`docs/rag-case-study.md`](docs/rag-case-study.md). Live page: `/rag`.
 
 | Stage | Implementation |
 |-------|----------------|
-| Knowledge base | 43 Wikipedia articles (CC BY-SA, pinned revisions) in 6 topics → 728 section-aware passages |
-| Embeddings | `BAAI/bge-base-en-v1.5` (768-d), chosen from a 4-way benchmark |
+| Knowledge base | 43 Wikipedia articles (CC BY-SA, revision ids recorded) in 6 topics → 728 section-aware passages |
+| Embeddings | `BAAI/bge-small-en-v1.5` (384-d), chosen from a 4-way benchmark |
 | Vector DB | Chroma (HNSW, cosine) — top-4 identical to exact search on 100% of queries |
-| Generation | Local Qwen2.5 models; generator and prompt chosen by measured faithfulness |
+| Generation | Local Qwen2.5-1.5B / 3B and hosted `nvidia/nemotron-3.5-bolt-e4b` (NVIDIA NIM); generator and prompt chosen by measured faithfulness |
 | Faithfulness | NLI cross-encoder checks every answer sentence against the retrieved passages |
 | Visual | UMAP 3D map (Three.js, lazy-loaded) with a 2D fallback for phones and reduced motion |
 
-**Retrieval benchmark** — 77 generated questions with a known source passage; the exact passage must come back.
+**Retrieval benchmark** — 76 generated questions with a known source passage; the exact passage must come back.
 
 ![Retrieval benchmark](docs/assets/rag-retrieval-benchmark.png)
 
 | Retriever | Hit@1 | Hit@4 | MRR@10 |
 |-----------|-------|-------|--------|
-| TF-IDF keyword baseline | 0.688 | 0.896 | 0.773 |
-| MiniLM-L6 (384-d) | 0.584 | 0.844 | 0.720 |
-| BGE-small (384-d) | 0.740 | 0.922 | 0.828 |
-| **BGE-base (768-d), selected** | 0.727 | **0.948** | **0.833** |
+| TF-IDF keyword baseline | 0.684 | 0.895 | 0.770 |
+| MiniLM-L6 (384-d) | 0.605 | 0.855 | 0.736 |
+| **BGE-small (384-d), selected** | **0.763** | 0.934 | **0.843** |
+| BGE-base (768-d) | 0.724 | **0.947** | 0.831 |
 
 The keyword baseline beats the small MiniLM model because generated questions reuse the passage's terms; without a baseline that would have gone unnoticed.
 
-**Faithfulness** — an NLI cross-encoder checks each answer sentence against 1–3 sentence windows of the four retrieved passages (99 questions). The control is the same model answering without retrieval. Values are the share of answer sentences entailed by the retrieved passages.
+**Faithfulness** — an NLI cross-encoder checks each answer sentence against 1–3 sentence windows of the four retrieved passages (98 questions). The control is the same model answering without retrieval. Values are the share of answer sentences entailed by the retrieved passages.
 
 ![Faithfulness](docs/assets/rag-faithfulness.png)
 
 | Generator | No retrieval | RAG, basic prompt | RAG, strict prompt |
 |-----------|-------------|-------------------|--------------------|
-| Qwen2.5-1.5B (fp16) | 14.2% | 52.7% | 48.9% |
-| Qwen2.5-3B (4-bit NF4) | 20.7% | 61.7% | **75.7%** (used on `/rag`) |
+| Qwen2.5-1.5B (fp16, local) | 13.0% | 45.1% | 48.8% |
+| Qwen2.5-3B (4-bit NF4, local) | 20.3% | 60.2% | 77.3% |
+| Nemotron 3.5 Bolt E4B (NVIDIA NIM, hosted) | 19.1% | 93.2% | **96.4%** (used on `/rag`) |
 
-The strict "no background knowledge" prompt hurts the 1.5B model and helps the 3B model, so the configuration on the page was picked by the metric. The selected setup declines 2% of questions instead of answering beyond its sources.
+Without retrieval all three models land near 13–20%, so the gap is grounding, not model knowledge: with the same four passages Nemotron keeps 96.4% of its sentences inside the sources against 77.3% for the best local model, and 92.1% of its answers are fully supported (Qwen2.5-3B: 71.1%). It also declines more often (9.2% vs 1.0%) instead of answering beyond its sources. The configuration on the page was picked by the metric.
 
-**3D projection** — highlighted passages on the map always come from the full 768-dimensional Chroma search. The projection keeps passage neighbourhoods (UMAP trustworthiness 0.99 vs 0.91 for PCA) but not question-to-passage distances: on average only 1.6 of the 4 points nearest a question in 3D are real results. The page prints that overlap under the map for every example question.
+**3D projection** — highlighted passages on the map always come from the full 384-dimensional Chroma search. The projection keeps passage neighbourhoods (UMAP trustworthiness 0.99 vs 0.89 for PCA) but not question-to-passage distances: on average only 1.6 of the 4 points nearest a question in 3D are real results. The page prints that overlap under the map for every example question.
 
 ## Dashboard and Operator Workflow
 

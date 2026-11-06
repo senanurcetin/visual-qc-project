@@ -13,7 +13,7 @@
       "title": "Non-metallic inclusions",
       "topic": "Surface defects",
       "url": "https://en.wikipedia.org/wiki/Non-metallic_inclusions",
-      "revid": 1360401124,
+      "revid": 1381089383,
       "chunks": 6
     },
     {
@@ -27,28 +27,28 @@
       "title": "Surface roughness",
       "topic": "Surface defects",
       "url": "https://en.wikipedia.org/wiki/Surface_roughness",
-      "revid": 1368981143,
+      "revid": 1381466685,
       "chunks": 13
     },
     {
       "title": "Surface finish",
       "topic": "Surface defects",
       "url": "https://en.wikipedia.org/wiki/Surface_finish",
-      "revid": 1366987201,
+      "revid": 1380298721,
       "chunks": 9
     },
     {
       "title": "Fatigue (material)",
       "topic": "Surface defects",
       "url": "https://en.wikipedia.org/wiki/Fatigue_(material)",
-      "revid": 1372946764,
+      "revid": 1380067535,
       "chunks": 32
     },
     {
       "title": "Rolling (metalworking)",
       "topic": "Rolling & steelmaking",
       "url": "https://en.wikipedia.org/wiki/Rolling_(metalworking)",
-      "revid": 1366876369,
+      "revid": 1381019834,
       "chunks": 32
     },
     {
@@ -69,7 +69,7 @@
       "title": "Steelmaking",
       "topic": "Rolling & steelmaking",
       "url": "https://en.wikipedia.org/wiki/Steelmaking",
-      "revid": 1373528399,
+      "revid": 1380223301,
       "chunks": 32
     },
     {
@@ -104,35 +104,35 @@
       "title": "Corrosion",
       "topic": "Corrosion & protection",
       "url": "https://en.wikipedia.org/wiki/Corrosion",
-      "revid": 1372207240,
+      "revid": 1381040387,
       "chunks": 32
     },
     {
       "title": "Pitting corrosion",
       "topic": "Corrosion & protection",
       "url": "https://en.wikipedia.org/wiki/Pitting_corrosion",
-      "revid": 1374357716,
+      "revid": 1382220430,
       "chunks": 19
     },
     {
       "title": "Rust",
       "topic": "Corrosion & protection",
       "url": "https://en.wikipedia.org/wiki/Rust",
-      "revid": 1374332056,
-      "chunks": 21
+      "revid": 1383345029,
+      "chunks": 23
     },
     {
       "title": "Galvanization",
       "topic": "Corrosion & protection",
       "url": "https://en.wikipedia.org/wiki/Galvanization",
-      "revid": 1371697546,
+      "revid": 1382704960,
       "chunks": 9
     },
     {
       "title": "Hot-dip galvanization",
       "topic": "Corrosion & protection",
       "url": "https://en.wikipedia.org/wiki/Hot-dip_galvanization",
-      "revid": 1365851113,
+      "revid": 1380213459,
       "chunks": 6
     },
     {
@@ -146,14 +146,14 @@
       "title": "Stainless steel",
       "topic": "Corrosion & protection",
       "url": "https://en.wikipedia.org/wiki/Stainless_steel",
-      "revid": 1375674999,
+      "revid": 1380364058,
       "chunks": 32
     },
     {
       "title": "Statistical process control",
       "topic": "Quality control & SPC",
       "url": "https://en.wikipedia.org/wiki/Statistical_process_control",
-      "revid": 1347350052,
+      "revid": 1379841838,
       "chunks": 19
     },
     {
@@ -188,7 +188,7 @@
       "title": "Six Sigma",
       "topic": "Quality control & SPC",
       "url": "https://en.wikipedia.org/wiki/Six_Sigma",
-      "revid": 1376483479,
+      "revid": 1383079006,
       "chunks": 32
     },
     {
@@ -237,7 +237,7 @@
       "title": "Magnetic particle inspection",
       "topic": "Inspection & NDT",
       "url": "https://en.wikipedia.org/wiki/Magnetic_particle_inspection",
-      "revid": 1362375965,
+      "revid": 1382794496,
       "chunks": 14
     },
     {
@@ -272,21 +272,21 @@
       "title": "Machine vision",
       "topic": "Machine vision & ML",
       "url": "https://en.wikipedia.org/wiki/Machine_vision",
-      "revid": 1364783408,
+      "revid": 1382211240,
       "chunks": 16
     },
     {
       "title": "Histogram of oriented gradients",
       "topic": "Machine vision & ML",
       "url": "https://en.wikipedia.org/wiki/Histogram_of_oriented_gradients",
-      "revid": 1368082534,
+      "revid": 1378946231,
       "chunks": 17
     },
     {
       "title": "Gabor filter",
       "topic": "Machine vision & ML",
       "url": "https://en.wikipedia.org/wiki/Gabor_filter",
-      "revid": 1374826645,
+      "revid": 1382399515,
       "chunks": 8
     },
     {
@@ -294,13 +294,13 @@
       "topic": "Machine vision & ML",
       "url": "https://en.wikipedia.org/wiki/Random_forest",
       "revid": 1373673788,
-      "chunks": 32
+      "chunks": 30
     },
     {
       "title": "Anomaly detection",
       "topic": "Machine vision & ML",
       "url": "https://en.wikipedia.org/wiki/Anomaly_detection",
-      "revid": 1375691298,
+      "revid": 1383686035,
       "chunks": 26
     }
   ],
