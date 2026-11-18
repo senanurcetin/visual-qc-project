@@ -1,13 +1,19 @@
 name: CI
 
-# CI runs on CircleCI; GitHub Actions minutes are exhausted.
-# Keep manual emergency verification only when explicitly enabled.
+# GitHub-hosted runners are free for public repositories, so this runs on every
+# PR and on main. CircleCI remains configured in .circleci/config.yml.
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   quality:
-    if: vars.ENABLE_GITHUB_ACTIONS_CI == 'true'
     runs-on: ubuntu-latest
 
     services:
@@ -101,7 +107,7 @@ jobs:
       - name: Install dependencies and Chromium
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt playwright==1.55.0
+          pip install -r requirements.txt playwright==1.62.0
           python -m playwright install --with-deps chromium
 
       - name: Start app

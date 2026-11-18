@@ -1,4 +1,5 @@
 """Browser smoke tests. Run against a live server: E2E_BASE_URL=http://127.0.0.1:8081 python -m unittest discover -s tests/e2e"""
+import json
 import os
 import unittest
 from pathlib import Path
@@ -115,8 +116,13 @@ class BrowserSmokeTests(unittest.TestCase):
         page.locator("#map-section").scroll_into_view_if_needed()
         page.wait_for_selector("#map-frame canvas", timeout=15000)
         self.assertTrue(page.evaluate(loaded))
+        # The expected badge comes from the committed data, so regenerating the
+        # sample answers (e.g. with a new generator) does not break this test.
+        samples = Path(__file__).resolve().parents[2] / "docs/data/rag-knowledge-assistant/sample-queries.json"
+        f = json.loads(samples.read_text(encoding="utf-8"))["samples"][3]["faithfulness"]
+        badge = "declined" if f.get("abstained") else f"{sum(c['supported'] for c in f['sentences'])}/{len(f['sentences'])} supported"
         page.locator(".q-btn").nth(3).click()
-        page.wait_for_function("document.querySelector('.subhead .badge').textContent.toLowerCase().includes('declined')")
+        page.wait_for_function("t => document.querySelector('.subhead .badge').textContent.trim() === t", arg=badge)
         self.assertEqual(self.errors, [])
 
     def test_rag_mobile_uses_2d_without_horizontal_scroll(self):
